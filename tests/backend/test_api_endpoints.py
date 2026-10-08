@@ -355,3 +355,79 @@ def test_get_literature_sources() -> None:
     data = response.json()
     assert isinstance(data, list)
     assert len(data) >= 1
+
+
+# -----------------------------------------------------------------------------
+# Multipart Upload & Vision Model Integration Tests
+# -----------------------------------------------------------------------------
+
+
+def test_analyze_multipart_image_upload() -> None:
+    """Verify POST /analyze handles multipart/form-data with binary image file."""
+    # Create minimal 1x1 GIF/PNG byte payload
+    png_bytes = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x01\x00\x00\x00\x01\x00\x08\x06\x00\x00\x00\x5c\x72\xa8\x66\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82"
+
+    files = {
+        "images": ("survey_wall.png", png_bytes, "image/png"),
+    }
+    data = {
+        "structure_type": "baoli",
+        "name": "Darbhanga Fort Baoli",
+        "region": "Bihar, India",
+        "notes": "Severe cracks on north retaining masonry wall",
+        "roi_box": "[20, 30, 200, 150]",
+    }
+
+    response = client.post("/analyze", data=data, files=files)
+    assert response.status_code == 200
+
+    res = response.json()
+    model = AnalysisResult.model_validate(res)
+    assert model.structure.name == "Darbhanga Fort Baoli"
+    assert model.structure.type == "baoli"
+    assert len(model.vision.detections) >= 1
+    assert model.vision.detections[0].class_name == "crack"
+    assert model.visual_condition.value > 0.0
+
+    validate_model_against_contract(model, "analysis.schema.json")
+
+
+def test_analyze_with_krish_demo_asset() -> None:
+    """Verify POST /analyze integrates Krish's pilot evaluation detections."""
+    payload = {
+        "structure_type": "baoli",
+        "name": "Darbhanga Damaged Masonry",
+        "source_images": ["crack_1.jpg"],
+    }
+    response = client.post("/analyze", json=payload)
+    assert response.status_code == 200
+
+    res = response.json()
+    model = AnalysisResult.model_validate(res)
+    assert len(model.vision.detections) >= 1
+    # Check that crack from demo summary is detected
+    crack_det = next((d for d in model.vision.detections if d.class_name == "crack"), None)
+    assert crack_det is not None
+    assert crack_det.confidence >= 0.70
+
+    validate_model_against_contract(model, "analysis.schema.json")
+
+
+def test_vision_analyze_multipart_upload() -> None:
+    """Verify POST /vision/analyze handles multipart/form-data."""
+    jpeg_bytes = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00H\x00H\x00\x00\xff\xdb\x00C\x00\x08\x06\x06\x07\x06\x05\x08\x07\x07\x07\t\t\x08\n\x0c\x14\r\x0c\x0b\x0b\x0c\x19\x12\x13\x0f\x14\x1d\x1a\x1f\x1e\x1d\x1a\x1c\x1c $.' \",#\x1c\x1c(7),01444\x1f'9=82<.342\xff\xc0\x00\x11\x08\x00\x10\x00\x10\x03\x01\"\x00\x02\x11\x01\x03\x11\x01\xff\xda\x00\x0c\x03\x01\x00\x02\x11\x03\x11\x00?\x00\xbf\x00\xff\xd9"
+    files = {
+        "images": ("wall_fissure.jpg", jpeg_bytes, "image/jpeg"),
+    }
+    data = {
+        "structure_type": "kund",
+        "roi_box": "[10, 15, 80, 120]",
+    }
+    response = client.post("/vision/analyze", data=data, files=files)
+    assert response.status_code == 200
+
+    res = response.json()
+    model = VisionResult.model_validate(res)
+    assert model.structure_type == "kund"
+    assert len(model.detections) >= 1
+    validate_model_against_contract(model, "vision_result.schema.json")

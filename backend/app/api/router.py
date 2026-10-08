@@ -5,8 +5,11 @@ Integrates live Vision, Engineering, Material Compatibility, Restoration Plannin
 and Knowledge subsystems.
 """
 
+import json
 from typing import Any, Dict, List, Optional, Union
-from fastapi import APIRouter, Body, HTTPException, status
+from fastapi import APIRouter, Body, HTTPException, Request, status
+from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
 
 from backend.app.schemas.analysis import AnalysisResult
 from backend.app.schemas.engineering import EngineeringResult
@@ -57,23 +60,92 @@ def get_health() -> HealthResponse:
 # -----------------------------------------------------------------------------
 
 
+async def _extract_pipeline_request(
+    request: Request,
+) -> tuple[AnalysisPipelineRequest, Optional[bytes], Optional[List[float]]]:
+    """Parse incoming pipeline request supporting both JSON payloads and multipart/form-data."""
+    content_type = request.headers.get("content-type", "")
+    image_bytes: Optional[bytes] = None
+    roi_box: Optional[List[float]] = None
+
+    if "application/json" in content_type:
+        try:
+            body_json = await request.json()
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail="Invalid JSON body") from exc
+        try:
+            req_model = AnalysisPipelineRequest.model_validate(body_json)
+        except ValidationError as e:
+            raise RequestValidationError(e.errors()) from e
+        return req_model, None, None
+
+    # Handle multipart/form-data or application/x-www-form-urlencoded
+    form = await request.form()
+    uploaded_file = form.get("images")
+    source_images: List[str] = ["survey_image_01.jpg"]
+
+    if uploaded_file is not None and hasattr(uploaded_file, "read"):
+        image_bytes = await uploaded_file.read()
+        fname = getattr(uploaded_file, "filename", None)
+        if fname:
+            source_images = [fname]
+    elif isinstance(uploaded_file, str) and uploaded_file:
+        source_images = [uploaded_file]
+
+    roi_str = form.get("roi_box")
+    if roi_str:
+        try:
+            roi_box = json.loads(str(roi_str))
+        except Exception:
+            roi_box = None
+
+    st_raw = form.get("structure_type", "baoli")
+    try:
+        st_enum = StructureType(st_raw)
+    except ValueError:
+        st_enum = StructureType.BAOLI
+
+    req_dict: Dict[str, Any] = {
+        "structure_type": st_enum,
+        "name": form.get("name") or "Heritage Water Structure",
+        "region": form.get("region") or "Northern India",
+        "source_images": source_images,
+    }
+
+    notes = form.get("notes")
+    if notes:
+        req_dict["inspection_data"] = {"notes": notes}
+
+    try:
+        req_model = AnalysisPipelineRequest.model_validate(req_dict)
+    except ValidationError as e:
+        raise RequestValidationError(e.errors()) from e
+
+    return req_model, image_bytes, roi_box
+
+
 @api_router.post(
     "/vision/analyze",
     response_model=VisionResult,
     status_code=status.HTTP_200_OK,
     summary="Vision Defect Analysis",
-    description="Extract and normalize image-space defect segments.",
+    description="Extract and normalize image-space defect segments from JSON or multipart image uploads.",
     tags=["Vision"],
 )
-def analyze_vision(
-    request: AnalysisPipelineRequest = Body(...),
+async def analyze_vision(
+    request: Request,
 ) -> VisionResult:
     """Run computer vision defect extraction and spatial analysis."""
+    req_model, image_bytes, roi_box = await _extract_pipeline_request(request)
     return vision_service.analyze_image(
-        structure_type=request.structure_type,
-        image_dimensions=request.image_dimensions,
-        scale_reference=request.scale_reference,
-        detections=request.detections,
+        image_bytes=image_bytes,
+        image_name=req_model.source_images[0] if req_model.source_images else None,
+        source_images=req_model.source_images,
+        structure_type=req_model.structure_type,
+        image_dimensions=req_model.image_dimensions,
+        scale_reference=req_model.scale_reference,
+        detections=req_model.detections,
+        roi_box=roi_box,
     )
 
 
@@ -177,26 +249,29 @@ def generate_restoration_roadmap(
     response_model=AnalysisResult,
     status_code=status.HTTP_200_OK,
     summary="Unified Analysis Pipeline",
-    description="Orchestrates full end-to-end multi-disciplinary conservation pipeline.",
+    description="Orchestrates full end-to-end multi-disciplinary conservation pipeline from JSON or multipart form.",
     tags=["Pipeline"],
 )
-def analyze_structure(
-    request: AnalysisPipelineRequest = Body(...),
+async def analyze_structure(
+    request: Request,
 ) -> AnalysisResult:
     """Execute end-to-end inspection pipeline (Vision -> Engineering -> Unified Contract)."""
+    req_model, image_bytes, roi_box = await _extract_pipeline_request(request)
     return analysis_service.orchestrate_analysis(
-        structure_type=request.structure_type,
-        name=request.name,
-        region=request.region,
-        source_images=request.source_images,
-        image_dimensions=request.image_dimensions,
-        scale_reference=request.scale_reference,
-        detections=request.detections,
-        inspection_data=request.inspection_data,
-        inferred_material=request.inferred_material,
-        material_confidence=request.material_confidence,
-        candidate_materials=request.candidate_materials,
-        recent_repair_type=request.recent_repair_type,
+        structure_type=req_model.structure_type,
+        name=req_model.name,
+        region=req_model.region,
+        source_images=req_model.source_images,
+        image_bytes=image_bytes,
+        image_dimensions=req_model.image_dimensions,
+        scale_reference=req_model.scale_reference,
+        detections=req_model.detections,
+        inspection_data=req_model.inspection_data,
+        inferred_material=req_model.inferred_material,
+        material_confidence=req_model.material_confidence,
+        candidate_materials=req_model.candidate_materials,
+        recent_repair_type=req_model.recent_repair_type,
+        roi_box=roi_box,
     )
 
 

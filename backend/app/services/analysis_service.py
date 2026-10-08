@@ -49,6 +49,7 @@ class AnalysisService:
         material_confidence: Optional[float] = None,
         candidate_materials: Optional[List[str]] = None,
         recent_repair_type: Optional[str] = None,
+        roi_box: Optional[List[float]] = None,
     ) -> AnalysisResult:
         """Run full vision and engineering pipeline and synthesize unified AnalysisResult.
 
@@ -66,6 +67,7 @@ class AnalysisService:
             material_confidence: Confidence of substrate identification.
             candidate_materials: Candidate intervention materials to evaluate.
             recent_repair_type: Modern repair observed on site.
+            roi_box: Optional user-selected bounding region [x, y, w, h].
 
         Returns:
             AnalysisResult: Full validated contract instance.
@@ -75,10 +77,13 @@ class AnalysisService:
         # Step 1: Vision Inference / Defect Extraction
         vision_result: VisionResult = vision_service.analyze_image(
             image_bytes=image_bytes,
+            image_name=resolved_images[0] if resolved_images else None,
+            source_images=resolved_images,
             structure_type=structure_type,
             image_dimensions=image_dimensions,
             scale_reference=scale_reference,
             detections=detections,
+            roi_box=roi_box,
         )
 
         # Step 2: Engineering Assessment & IKS Material/Restoration Analysis
