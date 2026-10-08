@@ -24,6 +24,8 @@ frontend/node_modules/
 frontend/dist/
 .vite/
 frontend/.vite/
+.vercel/
+frontend/.vercel/
 
 # ML Models and Weights
 *.pt

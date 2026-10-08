@@ -1,0 +1,43 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build --prefix frontend",
+  "outputDirectory": "frontend/dist",
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/analyze",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/engineering",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/material-compatibility",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/restore",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/knowledge/:path*",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/vision/:path*",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/((?!assets/|samples/|favicon\\.ico|manifest\\.json).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
