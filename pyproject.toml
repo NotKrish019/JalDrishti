@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Jal-Dharohar Digital Intelligence & Conservation Platform"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
     { name = "Krish", email = "krish@example.com" },
     { name = "Kirti Antil", email = "kirti@example.com" },
@@ -35,6 +35,10 @@ vision = [
     "scikit-image>=0.21.0",
     "numpy>=1.24.0"
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["backend*", "engineering*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
