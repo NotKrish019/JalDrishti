@@ -13,6 +13,6 @@ def test_health_endpoint() -> None:
     data = response.json()
     assert data == {
         "status": "ok",
-        "project": "baoliguard",
+        "project": "jaldrishti",
         "version": "0.1.0",
     }

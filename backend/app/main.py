@@ -1,4 +1,4 @@
-"""BaoliGuard FastAPI Application Entrypoint.
+"""JalDrishti FastAPI Application Entrypoint.
 
 Maintained by Swastik Parmar (Backend / Integration Engineer).
 Phase 1 Foundation: Minimal, robust FastAPI application with typed routing,

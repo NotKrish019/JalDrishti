@@ -91,8 +91,8 @@ class DetectionItem(BaseModel):
     largest_component_length_pixels: Optional[float] = Field(
         default=None, ge=0.0, description="Pixel length of largest contiguous defect component"
     )
-    relative_severity: Optional[RelativeSeverity] = Field(
-        default=None, description="Relative visual defect severity"
+    relative_severity: RelativeSeverity = Field(
+        default=RelativeSeverity.MODERATE, description="Relative visual defect severity"
     )
     burden_score: Optional[float] = Field(
         default=None, ge=0.0, description="Calculated visual defect burden score"

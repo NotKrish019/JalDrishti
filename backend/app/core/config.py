@@ -1,4 +1,4 @@
-"""Core application configuration for BaoliGuard backend.
+"""Core application configuration for JalDrishti backend.
 
 Maintained by Swastik Parmar (Backend / Integration Engineer).
 Provides strongly typed environment configuration with safe defaults.
@@ -12,8 +12,8 @@ from pydantic import BaseModel, Field
 class Settings(BaseModel):
     """Application settings loaded from environment or defaults."""
 
-    project_name: str = "BaoliGuard API"
-    project_slug: str = "baoliguard"
+    project_name: str = "JalDrishti API"
+    project_slug: str = "jaldrishti"
     version: str = "0.1.0"
     description: str = "Jal-Dharohar Digital Intelligence & Conservation Platform API"
 

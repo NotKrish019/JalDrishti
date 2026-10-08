@@ -11,7 +11,7 @@ client = TestClient(app)
 
 def test_app_lifecycle_and_metadata() -> None:
     """Verify application starts and contains proper metadata."""
-    assert app.title == "BaoliGuard API"
+    assert app.title == "JalDrishti API"
     assert app.version == "0.1.0"
     assert app.description is not None
 
@@ -27,13 +27,13 @@ def test_health_endpoint_success() -> None:
     assert "version" in data
 
     assert data["status"] == "ok"
-    assert data["project"] == "baoliguard"
+    assert data["project"] == "jaldrishti"
     assert data["version"] == "0.1.0"
 
     # Verify Pydantic schema validation
     parsed = HealthResponse(**data)
     assert parsed.status == "ok"
-    assert parsed.project == "baoliguard"
+    assert parsed.project == "jaldrishti"
     assert parsed.version == "0.1.0"
 
 
@@ -57,29 +57,19 @@ def test_cors_rejects_unauthorized_origin() -> None:
     assert response.headers.get("access-control-allow-origin") is None
 
 
-def test_reserved_analyze_endpoint_returns_501() -> None:
-    """Verify POST /analyze returns HTTP 501 Not Implemented."""
-    response = client.post("/analyze")
-    assert response.status_code == 501
-    assert "Phase 2" in response.json().get("detail", "")
+def test_live_restore_endpoint_returns_200() -> None:
+    """Verify POST /restore returns HTTP 200 OK with live conservation roadmap."""
+    response = client.post("/restore", json={})
+    assert response.status_code == 200
+    data = response.json()
+    assert "prioritized_actions" in data
+    assert "restoration_strategy" in data
 
 
-def test_reserved_engineering_endpoint_returns_501() -> None:
-    """Verify POST /engineering returns HTTP 501 Not Implemented."""
-    response = client.post("/engineering")
-    assert response.status_code == 501
-    assert "Phase 2" in response.json().get("detail", "")
-
-
-def test_reserved_restore_endpoint_returns_501() -> None:
-    """Verify POST /restore returns HTTP 501 Not Implemented."""
-    response = client.post("/restore")
-    assert response.status_code == 501
-    assert "Phase 2" in response.json().get("detail", "")
-
-
-def test_reserved_material_compatibility_endpoint_returns_501() -> None:
-    """Verify POST /material-compatibility returns HTTP 501 Not Implemented."""
-    response = client.post("/material-compatibility")
-    assert response.status_code == 501
-    assert "Phase 2" in response.json().get("detail", "")
+def test_live_material_compatibility_endpoint_returns_200() -> None:
+    """Verify POST /material-compatibility returns HTTP 200 OK with compatibility evaluation."""
+    response = client.post("/material-compatibility", json={})
+    assert response.status_code == 200
+    data = response.json()
+    assert "candidate_interventions" in data
+    assert data.get("verification_required") is True

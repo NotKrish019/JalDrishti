@@ -1,1 +1,1 @@
-"""BaoliGuard Backend Package."""
+"""JalDrishti Backend Package."""

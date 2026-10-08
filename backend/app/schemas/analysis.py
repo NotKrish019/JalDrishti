@@ -9,10 +9,10 @@ Top-level pipeline contract connecting:
 """
 
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
-from backend.app.schemas.engineering import EngineeringResult, ScoreMetric
+from backend.app.schemas.engineering import ScoreMetric
 from backend.app.schemas.material import MaterialCompatibilityResult
 from backend.app.schemas.restoration import RestorationResult
 from backend.app.schemas.vision import VisionResult
@@ -60,7 +60,7 @@ class AnalysisMetadata(BaseModel):
         ..., description="Execution status across pipeline components"
     )
     orchestrated_by: Optional[str] = Field(
-        default="Swastik Parmar (Backend Orchestrator)",
+        default="JalDrishti Orchestrator (Phase 2)",
         description="Module or agent responsible for orchestration",
     )
 
@@ -77,22 +77,22 @@ class AnalysisResult(BaseModel):
     structure: StructureInfo = Field(
         ..., description="Structure classification and source assets"
     )
-    vision: Union[VisionResult, Dict[str, Any]] = Field(
+    vision: VisionResult = Field(
         ..., description="Vision inference payload matching vision_result.schema.json"
     )
-    visual_condition: Union[ScoreMetric, Dict[str, Any]] = Field(
+    visual_condition: ScoreMetric = Field(
         ..., description="Condition evaluation score matching engineering_result.schema.json"
     )
-    water_functionality: Union[ScoreMetric, Dict[str, Any]] = Field(
+    water_functionality: ScoreMetric = Field(
         ..., description="Hydrological assessment matching engineering_result.schema.json"
     )
-    material: Union[MaterialCompatibilityResult, Dict[str, Any]] = Field(
+    material: MaterialCompatibilityResult = Field(
         ..., description="Material compatibility matching material_compatibility.schema.json"
     )
     root_cause: Dict[str, Any] = Field(
         ..., description="Deterministic root cause analysis identifying degradation mechanisms"
     )
-    restoration: Union[RestorationResult, Dict[str, Any]] = Field(
+    restoration: RestorationResult = Field(
         ..., description="Restoration roadmap matching restoration_result.schema.json"
     )
     metadata: AnalysisMetadata = Field(

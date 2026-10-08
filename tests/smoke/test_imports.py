@@ -27,4 +27,4 @@ def test_backend_app_importable() -> None:
     """Verify that backend application package imports without circular errors."""
     from backend.app.main import app
 
-    assert app.title == "BaoliGuard API"
+    assert app.title == "JalDrishti API"

@@ -19,6 +19,12 @@ from backend.app.schemas.engineering import (
     SubScores,
 )
 from backend.app.schemas.health import HealthResponse
+from backend.app.schemas.requests import (
+    AnalysisPipelineRequest,
+    EngineeringAssessmentRequest,
+    MaterialCompatibilityRequest,
+    RestorationPlanRequest,
+)
 from backend.app.schemas.material import (
     CandidateIntervention,
     CompatibilityDimensions,
@@ -47,8 +53,12 @@ from backend.app.schemas.vision import (
 )
 
 __all__ = [
-    # Health
+    # Health & Requests
     "HealthResponse",
+    "EngineeringAssessmentRequest",
+    "MaterialCompatibilityRequest",
+    "RestorationPlanRequest",
+    "AnalysisPipelineRequest",
     # Vision
     "StructureType",
     "VisionDefectClass",
