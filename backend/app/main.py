@@ -1,42 +1,39 @@
 """BaoliGuard FastAPI Application Entrypoint.
 
-Phase 0 bootstrap implementation providing base health endpoint.
-No production endpoints or fabricated analysis results are active in Phase 0.
+Maintained by Swastik Parmar (Backend / Integration Engineer).
+Phase 1 Foundation: Minimal, robust FastAPI application with typed routing,
+strict CORS for local development, and contract validation boundaries.
 """
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(
-    title="BaoliGuard API",
-    description="Jal-Dharohar Digital Intelligence & Conservation Platform API",
-    version="0.1.0",
-)
-
-# CORS setup for local development with frontend PWA
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+from backend.app.api.router import api_router
+from backend.app.core.config import settings
 
 
-@app.get("/health")
-def get_health() -> dict[str, str]:
-    """Health check endpoint to verify backend service readiness.
+def create_application() -> FastAPI:
+    """Build and configure the FastAPI application instance."""
+    application = FastAPI(
+        title=settings.project_name,
+        description=settings.description,
+        version=settings.version,
+    )
 
-    Returns:
-        dict: Standardized health status response.
-    """
-    return {
-        "status": "ok",
-        "project": "baoliguard",
-        "version": "0.1.0",
-    }
+    # Restrict CORS to allowed development origins (defaults to http://localhost:5173)
+    # Wildcard origins are strictly avoided for security and predictable development.
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    # Register API routing
+    application.include_router(api_router)
+
+    return application
 
 
-# Placeholder note:
-# Additional endpoints such as POST /analyze will be orchestrated by Swastik Parmar
-# during Phase 1 based on the shared contracts in /contracts.
+app = create_application()

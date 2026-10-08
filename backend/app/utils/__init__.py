@@ -1,4 +1,5 @@
-"""Backend utility functions and helpers.
+"""Backend utility functions and helpers package.
 
-TODO: Swastik Parmar - Implement utility functions in Phase 1.
+Maintained by Swastik Parmar (Backend / Integration Engineer).
+Provides shared helpers for contract validation, timeformatting, and error serialization.
 """

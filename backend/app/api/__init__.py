@@ -1,4 +1,8 @@
-"""API routing module for BaoliGuard backend.
+"""API routing package for BaoliGuard backend.
 
-TODO: Swastik Parmar - Register API route handlers here in Phase 1.
+Maintained by Swastik Parmar (Backend / Integration Engineer).
 """
+
+from backend.app.api.router import api_router
+
+__all__ = ["api_router"]
