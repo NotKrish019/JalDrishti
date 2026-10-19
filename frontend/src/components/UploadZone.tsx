@@ -1,325 +1,192 @@
-import React, { useState, useRef } from 'react';
-import { StructureTypology, AnalysisRequestPayload, InspectionROI } from '../types';
-import { Button } from './Button';
-import { StatusBadge } from './StatusBadge';
+import React, { useId, useRef, useState } from 'react';
+import { Icon } from './Icon';
+import { ACCEPTED_IMAGE_TYPES, MAX_UPLOAD_BYTES } from '../services/api';
+import { formatBytes } from '../utils/analysis';
+
+export interface SelectedImage {
+  file: File;
+  previewUrl: string;
+  width: number;
+  height: number;
+}
 
 export interface UploadZoneProps {
-  onAnalyze: (payload: AnalysisRequestPayload) => void;
-  isLoading?: boolean;
+  selected: SelectedImage | null;
+  onSelect: (image: SelectedImage) => void;
+  onClear: () => void;
+  /** Locks replacement/removal, e.g. while uploading or once the file is stored. */
+  locked?: boolean;
+  lockedReason?: string;
+  /** Replaces the plain preview (used to show the ROI selector). */
+  previewSlot?: React.ReactNode;
   className?: string;
 }
 
+/** Validates against the same rules the backend enforces, before any bytes are sent. */
+const validate = (file: File): string | null => {
+  if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+    return `“${file.name}” is ${file.type || 'an unknown type'}. Use a JPEG, PNG or WebP photograph.`;
+  }
+  if (file.size === 0) return `“${file.name}” is empty.`;
+  if (file.size > MAX_UPLOAD_BYTES) {
+    return `“${file.name}” is ${formatBytes(file.size)}. The limit is ${formatBytes(MAX_UPLOAD_BYTES)}.`;
+  }
+  return null;
+};
+
+const readDimensions = (url: string): Promise<{ width: number; height: number }> =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    img.onerror = () => reject(new Error('decode'));
+    img.src = url;
+  });
+
 export const UploadZone: React.FC<UploadZoneProps> = ({
-  onAnalyze,
-  isLoading = false,
+  selected,
+  onSelect,
+  onClear,
+  locked = false,
+  lockedReason,
+  previewSlot,
   className = '',
 }) => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [structureType, setStructureType] = useState<StructureTypology>('baoli');
-  const [structureName, setStructureName] = useState<string>('');
-  const [region, setRegion] = useState<string>('Rajasthan');
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [roi, setRoi] = useState<InspectionROI>({
-    x: 0,
-    y: 0,
-    width: 100,
-    height: 100,
-    isNormalized: true,
-  });
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputId = useId();
+  const hintId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSelectSample = () => {
-    setPreviewUrl('/samples/stepwell_ashlar_wall.svg');
-    setSelectedFile(null);
-    setStructureType('baoli');
-    setStructureName('Sample Stepwell (Dholpur Sandstone Ashlar)');
-    setRegion('Rajasthan');
-  };
-
-  const handleFileSelect = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload a valid photographic image (JPEG, PNG, WebP).');
+  const accept = async (file: File | undefined) => {
+    if (!file || locked) return;
+    const problem = validate(file);
+    if (problem) {
+      setError(problem);
       return;
     }
-    setSelectedFile(file);
-    const objectUrl = URL.createObjectURL(file);
-    setPreviewUrl(objectUrl);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFileSelect(e.dataTransfer.files[0]);
+    const url = URL.createObjectURL(file);
+    try {
+      const { width, height } = await readDimensions(url);
+      setError(null);
+      onSelect({ file, previewUrl: url, width, height });
+    } catch {
+      URL.revokeObjectURL(url);
+      setError(`“${file.name}” could not be decoded as an image.`);
     }
+    if (inputRef.current) inputRef.current.value = '';
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
+  const input = (
+    <input
+      ref={inputRef}
+      id={inputId}
+      type="file"
+      accept={ACCEPTED_IMAGE_TYPES.join(',')}
+      className="peer sr-only"
+      aria-describedby={hintId}
+      disabled={locked}
+      onChange={(event) => accept(event.target.files?.[0])}
+    />
+  );
 
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
+  const errorLine = error && (
+    <p role="alert" className="mt-3 flex items-start gap-2 text-sm text-danger-700">
+      <Icon name="alert" className="mt-0.5 h-4 w-4 shrink-0" />
+      {error}
+    </p>
+  );
 
-  const clearSelection = () => {
-    setSelectedFile(null);
-    if (previewUrl && previewUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    setPreviewUrl(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const handleTriggerAnalysis = () => {
-    onAnalyze({
-      imageFile: selectedFile || undefined,
-      imagePreviewUrl: previewUrl || undefined,
-      structureType,
-      structureName: structureName.trim() || undefined,
-      region: region.trim() || undefined,
-      roi,
-    });
-  };
-
-  return (
-    <div className={`bg-[#083358]/80 border border-[#28A9E0]/25 rounded-sm p-6 sm:p-8 font-sans ${className}`}>
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Image Ingestion Workspace */}
-        <div className="lg:col-span-7">
-          <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#28A9E0]/20">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#28A9E0]">
-              Survey Photogrammetry Ingestion
-            </span>
-            {selectedFile && (
-              <button
-                type="button"
-                onClick={clearSelection}
-                className="text-xs font-medium text-[#D3455B] hover:underline"
-              >
-                Remove Asset
-              </button>
-            )}
-          </div>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            className="hidden"
-            onChange={(e) => {
-              if (e.target.files && e.target.files.length > 0) {
-                handleFileSelect(e.target.files[0]);
-              }
-            }}
-          />
-
-          {previewUrl ? (
-            <div>
-              <div className="relative rounded-sm overflow-hidden border border-[#28A9E0]/30 bg-[#041B2E] aspect-[16/10] group">
-                <img
-                  src={previewUrl}
-                  alt="Survey Ingestion Preview"
-                  className="w-full h-full object-cover"
-                />
-                {/* Active ROI Box Overlay */}
-                <div
-                  className="absolute border border-[#28A9E0] bg-[#28A9E0]/15 pointer-events-none"
-                  style={{
-                    left: `${roi.x}%`,
-                    top: `${roi.y}%`,
-                    width: `${roi.width}%`,
-                    height: `${roi.height}%`,
-                  }}
-                >
-                  <span className="text-[10px] font-semibold bg-[#062B49] text-[#28A9E0] px-1.5 py-0.5 ml-1 mt-1 inline-block border border-[#28A9E0]/40 rounded-xs">
-                    Target ROI: {roi.width}% × {roi.height}%
-                  </span>
-                </div>
-
-                <div className="absolute inset-0 bg-gradient-to-t from-[#062B49]/90 via-transparent to-transparent flex items-end justify-between p-4 pointer-events-none">
-                  <div className="text-xs text-white truncate">
-                    <div className="font-semibold truncate">{selectedFile?.name || 'Reference Asset'}</div>
-                    <div className="text-[11px] text-[#8CD8F5]/80">
-                      {selectedFile ? `${(selectedFile.size / 1024).toFixed(1)} KB` : '1920 × 1080 px'} • Ingestion Validated
-                    </div>
-                  </div>
-                  <div className="pointer-events-auto">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      Change
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick ROI selection pills below preview */}
-              <div className="mt-3 p-3 bg-[#062B49] border border-[#28A9E0]/20 rounded-sm flex flex-wrap items-center justify-between gap-2 text-xs">
-                <span className="text-[11px] text-[#8CD8F5]/75 font-semibold uppercase">Inspection ROI:</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {[
-                    { label: 'Full Surface (100%)', roi: { x: 0, y: 0, width: 100, height: 100, isNormalized: true } },
-                    { label: 'Lower Basin Tier', roi: { x: 10, y: 55, width: 80, height: 42, isNormalized: true } },
-                    { label: 'Central Arcade', roi: { x: 25, y: 20, width: 50, height: 55, isNormalized: true } },
-                  ].map((item, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setRoi(item.roi)}
-                      className={`text-[11px] font-medium px-2.5 py-1 transition-all rounded-sm border ${
-                        roi.x === item.roi.x && roi.width === item.roi.width
-                          ? 'bg-[#087CC1] text-white border-[#28A9E0] font-semibold'
-                          : 'bg-[#083358] text-[#8CD8F5] border-[#28A9E0]/20 hover:text-white'
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onClick={() => fileInputRef.current?.click()}
-              className={`border border-[#28A9E0]/30 hover:border-[#28A9E0]/60 p-8 text-center cursor-pointer transition-all duration-150 flex flex-col items-center justify-center aspect-[16/10] rounded-sm ${
-                isDragging
-                  ? 'bg-[#0C3D66] border-[#28A9E0]'
-                  : 'bg-[#062B49]/80'
-              }`}
-            >
-              <div className="w-12 h-12 rounded-sm border border-[#28A9E0]/30 flex items-center justify-center text-[#28A9E0] mb-3 bg-[#083358]">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h4 className="text-sm font-semibold text-white mb-1">
-                Add Survey Images
-              </h4>
-              <p className="text-xs text-[#8CD8F5]/80 max-w-xs mb-4 leading-relaxed">
-                Drag &amp; drop high-resolution photographs of masonry, intake channels, or steps.
-              </p>
-              <div className="flex flex-wrap items-center justify-center gap-2">
-                <Button size="sm" variant="primary" type="button">
-                  Browse Files
-                </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSelectSample();
-                  }}
-                >
-                  Load Reference Asset
-                </Button>
-              </div>
-            </div>
-          )}
-
-          <div className="mt-3 text-[11px] text-[#587286] flex items-center justify-between">
-            <span>Single-view orthogonal photogrammetry</span>
-            <span>Image-space pixel quantification</span>
-          </div>
-        </div>
-
-        {/* Right Column: Structure Metadata Context Form */}
-        <div className="lg:col-span-5 space-y-4">
-          <div>
-            <span className="text-[11px] font-semibold tracking-wider uppercase text-[#8CD8F5]/70 block mb-1">
-              Structural Attributes
-            </span>
-            <h3 className="text-sm font-semibold text-white">
-              Typology &amp; Regional Context
-            </h3>
-            <p className="text-xs text-[#8CD8F5]/80 mt-0.5 leading-relaxed">
-              Provides geological grounding for IKS material matching algorithms.
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-[#DDF6FC] uppercase tracking-wide mb-1.5">
-              Typology Classification
-            </label>
-            <div className="grid grid-cols-3 gap-1.5">
-              {(['baoli', 'kund', 'vav', 'bawari', 'tank', 'other'] as StructureTypology[]).map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setStructureType(t)}
-                  className={`h-8 px-2 text-xs font-semibold uppercase tracking-wider border transition-all text-center rounded-sm ${
-                    structureType === t
-                      ? 'bg-[#087CC1] text-white border-[#28A9E0]'
-                      : 'bg-[#062B49] border-[#28A9E0]/20 text-[#8CD8F5] hover:text-white'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-[#DDF6FC] uppercase tracking-wide mb-1.5">
-              Structure Name (Optional)
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Agrasen ki Baoli, Chand Baori, Rani ki Vav"
-              value={structureName}
-              onChange={(e) => setStructureName(e.target.value)}
-              className="w-full h-8 bg-[#062B49] border border-[#28A9E0]/25 rounded-sm px-3 text-xs text-white placeholder:text-[#587286] focus:outline-none focus:border-[#28A9E0] transition-colors"
+  if (selected) {
+    return (
+      <div className={className}>
+        {previewSlot ?? (
+          <div className="flex items-center justify-center bg-ink-900">
+            <img
+              src={selected.previewUrl}
+              alt={`Preview of ${selected.file.name}`}
+              className="block max-h-[34rem] w-auto max-w-full object-contain"
             />
           </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-[#DDF6FC] uppercase tracking-wide mb-1.5">
-              Hydrological &amp; Geological Region
-            </label>
-            <select
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              className="w-full h-8 bg-[#062B49] border border-[#28A9E0]/25 rounded-sm px-2.5 text-xs text-white focus:outline-none focus:border-[#28A9E0] transition-colors"
-            >
-              <option value="Rajasthan">Rajasthan (Arid / Quartzite &amp; Sandstone)</option>
-              <option value="Gujarat">Gujarat (Patan / Adalaj Alluvial Sandstone)</option>
-              <option value="Delhi NCR">Delhi NCR (Aravalli Quartzite / Lakhori Brick)</option>
-              <option value="Madhya Pradesh">Madhya Pradesh (Malwa Plateau / Basalt &amp; Sandstone)</option>
-              <option value="Bihar">Bihar (Darbhanga / Gangetic Alluvium Brick)</option>
-              <option value="Maharashtra">Maharashtra (Deccan Traps / Basalt Masonry)</option>
-              <option value="Karnataka">Karnataka (Hampi / Granite Stepped Tanks)</option>
-              <option value="Other">Other Indigenous Hydrological Zone</option>
-            </select>
-          </div>
-
-          <div className="pt-3 border-t border-[#28A9E0]/20 space-y-3">
-            <div className="flex items-center justify-between text-xs text-[#8CD8F5]">
-              <StatusBadge label="Ready For Ingestion" variant="info" size="sm" />
-              <span>Pipeline: SEE → REVIVE</span>
+        )}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <p className="min-w-0 text-sm">
+            <span className="block truncate font-medium text-ink-900">{selected.file.name}</span>
+            <span className="font-mono text-xs text-ink-500 tabular-nums">
+              {selected.width} × {selected.height} px · {formatBytes(selected.file.size)}
+            </span>
+          </p>
+          {locked ? (
+            lockedReason && <p className="text-xs text-ink-500">{lockedReason}</p>
+          ) : (
+            <div className="flex items-center gap-2">
+              {input}
+              <label
+                htmlFor={inputId}
+                className="inline-flex h-8 cursor-pointer items-center rounded-sm border border-ink-900/25 px-3 text-xs font-medium text-ink-900 transition-colors duration-fast hover:border-ink-900 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-laterite-400"
+              >
+                Replace
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setError(null);
+                  onClear();
+                }}
+                className="inline-flex h-8 items-center gap-1.5 rounded-sm px-3 text-xs font-medium text-ink-600 transition-colors duration-fast hover:bg-ink-900/[0.05] hover:text-ink-900"
+              >
+                <Icon name="close" className="h-3.5 w-3.5" />
+                Remove
+              </button>
             </div>
-
-            <Button
-              variant="primary"
-              size="lg"
-              className="w-full"
-              isLoading={isLoading}
-              onClick={handleTriggerAnalysis}
-            >
-              {selectedFile ? 'Initiate Computer Vision Analysis' : 'Analyse Reference Survey'}
-            </Button>
-          </div>
+          )}
         </div>
+        <p id={hintId} className="sr-only">
+          JPEG, PNG or WebP, up to {formatBytes(MAX_UPLOAD_BYTES)}.
+        </p>
+        {errorLine}
       </div>
+    );
+  }
+
+  return (
+    <div className={className}>
+      {input}
+      <label
+        htmlFor={inputId}
+        onDragOver={(event) => {
+          event.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(event) => {
+          event.preventDefault();
+          setDragging(false);
+          accept(event.dataTransfer.files?.[0]);
+        }}
+        className={`group flex aspect-[4/3] cursor-pointer flex-col items-start justify-end border p-6 transition-colors duration-base ease-out sm:aspect-[16/10] sm:p-10 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-laterite-400 ${
+          dragging ? 'border-jade-500 bg-jade-50' : 'border-ink-900/20 bg-white hover:border-ink-900/50'
+        }`}
+      >
+        <span
+          className={`mb-auto flex h-12 w-12 items-center justify-center rounded-full border transition-colors duration-base ${
+            dragging ? 'border-jade-500 text-jade-600' : 'border-ink-900/20 text-ink-700 group-hover:border-ink-900'
+          }`}
+        >
+          <Icon name="upload" className="h-5 w-5" />
+        </span>
+        <span className="font-display text-display-sm font-medium text-ink-900">
+          {dragging ? 'Release to add the photograph' : 'Drop a photograph of the structure'}
+        </span>
+        <span className="mt-2 text-sm text-ink-600">
+          or <span className="font-medium text-ink-900 underline decoration-ink-900/30 underline-offset-4">choose a file</span>
+        </span>
+        <span id={hintId} className="mt-6 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-ink-500">
+          JPEG · PNG · WebP — up to {formatBytes(MAX_UPLOAD_BYTES)}
+        </span>
+      </label>
+      {errorLine}
     </div>
   );
 };
+
+export default UploadZone;

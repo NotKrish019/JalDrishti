@@ -1,220 +1,315 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PageContainer } from '../components/PageContainer';
-import { StatusBadge } from '../components/StatusBadge';
-import { AppRoute } from '../types';
+import { Button } from '../components/Button';
+import { Icon } from '../components/Icon';
+import { EmptyState } from '../components/EmptyState';
+import { LoadingState } from '../components/LoadingState';
+import { OriginTag } from '../components/StatusBadge';
+import { AppRoute, KnowledgeSource, StructureKnowledgeRecord } from '../types';
+import { fetchSources, fetchStructures } from '../services/api';
 
 export interface KnowledgePageProps {
   onRouteChange: (route: AppRoute) => void;
 }
 
+type LoadState =
+  | { status: 'loading' }
+  | { status: 'error'; message: string }
+  | { status: 'ready'; structures: StructureKnowledgeRecord[]; sources: Map<string, KnowledgeSource>; sourcesError?: string };
+
+const ListBlock: React.FC<{ title: string; items?: string[] }> = ({ title, items }) =>
+  items && items.length > 0 ? (
+    <section className="border-t border-ink-900/15 pt-5">
+      <h3 className="text-sm font-semibold text-ink-900">{title}</h3>
+      <ul className="mt-3 space-y-2.5">
+        {items.map((item) => (
+          <li key={item} className="flex gap-3 text-sm leading-relaxed text-ink-700">
+            <span className="mt-[10px] h-px w-3 shrink-0 bg-ink-500" aria-hidden="true" />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ) : null;
+
+const StructureDetail: React.FC<{ record: StructureKnowledgeRecord; sources: Map<string, KnowledgeSource> }> = ({
+  record,
+  sources,
+}) => (
+  <article aria-labelledby={`typology-${record.id}`}>
+    <header className="pb-8">
+      <div className="flex flex-wrap items-center gap-3">
+        <OriginTag kind="knowledge" />
+        {record.sources && record.sources.length > 0 && (
+          <span className="font-mono text-[0.6875rem] text-ink-500 tabular-nums">
+            {record.sources.length} cited source{record.sources.length === 1 ? '' : 's'}
+          </span>
+        )}
+      </div>
+      <h2 id={`typology-${record.id}`} className="mt-5 font-display text-display-lg font-medium text-ink-900">
+        {record.name}
+      </h2>
+      {record.alternate_names && record.alternate_names.length > 0 && (
+        <p className="mt-3 text-sm text-ink-600">Also: {record.alternate_names.join(', ')}</p>
+      )}
+      {record.regions && record.regions.length > 0 && (
+        <p className="mt-1 text-sm text-ink-600">Regions: {record.regions.join(' · ')}</p>
+      )}
+    </header>
+
+    <div className="space-y-10">
+      <ListBlock title="Traditional function" items={record.traditional_function} />
+
+      {record.engineering_principles && record.engineering_principles.length > 0 && (
+        <section className="border-t border-ink-900/15 pt-5">
+          <h3 className="text-sm font-semibold text-ink-900">Engineering principles</h3>
+          <div className="mt-4 space-y-8">
+            {record.engineering_principles.map((p, i) => (
+              <div key={p.principle} className="grid gap-3 md:grid-cols-[2.5rem_minmax(0,1fr)]">
+                <span className="font-mono text-xs text-laterite-500 tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <h4 className="font-display text-2xl font-medium leading-tight text-ink-900">{p.principle}</h4>
+                  <dl className="mt-3 grid gap-x-5 gap-y-2 text-sm sm:grid-cols-[6rem_minmax(0,1fr)]">
+                    {(
+                      [
+                        ['What', p.what],
+                        ['Why', p.why],
+                        ['How', p.how],
+                        ['Significance', p.engineering_significance],
+                      ] as const
+                    ).map(([label, text]) =>
+                      text ? (
+                        <React.Fragment key={label}>
+                          <dt className="text-xs text-ink-500 sm:pt-0.5">{label}</dt>
+                          <dd className="leading-relaxed text-ink-700">{text}</dd>
+                        </React.Fragment>
+                      ) : null,
+                    )}
+                  </dl>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {record.water_management_principles && record.water_management_principles.length > 0 && (
+        <section className="border-t border-ink-900/15 pt-5">
+          <h3 className="text-sm font-semibold text-ink-900">Water management</h3>
+          <div className="mt-4 grid gap-6 md:grid-cols-2">
+            {record.water_management_principles.map((p) => (
+              <div key={p.principle}>
+                <h4 className="text-sm font-medium text-ink-900">{p.principle}</h4>
+                {p.description && <p className="mt-1.5 text-sm leading-relaxed text-ink-700">{p.description}</p>}
+                {p.hydrological_mechanism && (
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-600">{p.hydrological_mechanism}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {record.traditional_materials && record.traditional_materials.length > 0 && (
+        <section className="border-t border-ink-900/15 pt-5">
+          <h3 className="text-sm font-semibold text-ink-900">Traditional materials</h3>
+          <dl className="mt-4 divide-y divide-ink-900/10">
+            {record.traditional_materials.map((m) => (
+              <div key={m.material_family} className="grid gap-2 py-3 md:grid-cols-[12rem_minmax(0,1fr)] md:gap-6">
+                <dt className="text-sm font-medium text-ink-900">{m.material_family}</dt>
+                <dd className="text-sm leading-relaxed text-ink-700">
+                  {m.usage}
+                  {m.traditional_role && <span className="mt-1 block text-ink-600">{m.traditional_role}</span>}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+
+      <div className="grid gap-10 lg:grid-cols-2">
+        <ListBlock title="Construction features" items={record.construction_features} />
+        <ListBlock title="Environmental adaptations" items={record.environmental_adaptations} />
+        <ListBlock title="Common deterioration" items={record.common_deterioration_factors} />
+        <ListBlock title="Conservation considerations" items={record.conservation_considerations} />
+      </div>
+
+      {record.limitations && record.limitations.length > 0 && (
+        <section className="rounded-sm border border-ochre-500/30 bg-ochre-100/40 p-5">
+          <h3 className="text-sm font-semibold text-ink-900">Limitations of this record</h3>
+          <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-ink-700">
+            {record.limitations.map((l) => (
+              <li key={l}>{l}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {record.sources && record.sources.length > 0 && (
+        <section className="border-t border-ink-900/15 pt-5">
+          <h3 className="text-sm font-semibold text-ink-900">Sources</h3>
+          <ol className="mt-3 space-y-4">
+            {record.sources.map((id) => {
+              const source = sources.get(id);
+              return (
+                <li key={id} className="text-sm leading-relaxed">
+                  {source ? (
+                    <>
+                      <p className="text-ink-900">
+                        {source.url ? (
+                          <a
+                            href={source.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-baseline gap-1 underline decoration-ink-900/30 underline-offset-4 hover:decoration-ink-900"
+                          >
+                            {source.title}
+                            <Icon name="external" className="h-3 w-3 self-center" />
+                            <span className="sr-only">(opens in a new tab)</span>
+                          </a>
+                        ) : (
+                          source.title
+                        )}
+                      </p>
+                      <p className="text-xs text-ink-500">
+                        {[source.publisher, source.year].filter(Boolean).join(', ')}
+                        {source.topic ? ` — ${source.topic}` : ''}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="font-mono text-xs text-ink-500">{id} (details unavailable)</p>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      )}
+    </div>
+  </article>
+);
+
 export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onRouteChange }) => {
-  const [selectedTypology, setSelectedTypology] = useState<string>('baoli');
+  const [state, setState] = useState<LoadState>({ status: 'loading' });
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
-  const typologies = [
-    {
-      id: 'baoli',
-      name: 'Baoli / Stepwell',
-      region: 'North & Western India (Delhi, Rajasthan, Haryana)',
-      function: 'Deep subterranean aquifer tapping with monumental stepped arcades.',
-      principle: 'Hydrostatic pressure counterbalanced by stepped retaining terraces; lower tiers remain submerged to prevent masonry drying contraction.',
-      materials: 'Dholpur red sandstone, Delhi quartzite ashlar, slaked fat lime, crushed burnt brick (surkhi).',
-    },
-    {
-      id: 'vav',
-      name: 'Vav',
-      region: 'Gujarat (Patan, Adalaj, Ahmedabad)',
-      function: 'Linear subterranean stepped corridor combining water sanctuary and cooling respite for desert caravans.',
-      principle: 'Multi-tiered pavilion structures act as internal structural cross-braces against lateral earth and soil moisture pressure.',
-      materials: 'Fine-grained alluvial sandstone, lime-surkhi with curd/jaggery organic setting retarders.',
-    },
-    {
-      id: 'kund',
-      name: 'Kund / Stepped Tank',
-      region: 'Rajasthan & Uttar Pradesh (Abhaneri, Varanasi)',
-      function: 'Steep geometric pyramid basin designed for surface runoff percolation and communal ablution.',
-      principle: 'Fractal interlocking stairs disperse dynamic water turbulence during torrential cloudbursts, preventing soil scouring.',
-      materials: 'Hard basalt and metamorphic quartzite blocks laid with dry hydraulic interlocking keys.',
-    },
-    {
-      id: 'jhalra',
-      name: 'Jhalra',
-      region: 'Jodhpur & Marwar',
-      function: 'Seepage-fed stepwell engineered down-gradient from an upstream lake or reservoir.',
-      principle: 'Passive underground filtration through natural sand strata before entering the drawing chamber.',
-      materials: 'Local rhyolite and sandstone ashlar with lime mortar pointing.',
-    },
-  ];
+  const load = useCallback(async () => {
+    setState({ status: 'loading' });
+    try {
+      const [structures, sourcesResult] = await Promise.all([
+        fetchStructures(),
+        fetchSources().then(
+          (list) => ({ list, error: undefined as string | undefined }),
+          (error: unknown) => ({ list: [] as KnowledgeSource[], error: error instanceof Error ? error.message : 'Unavailable' }),
+        ),
+      ]);
+      setState({
+        status: 'ready',
+        structures,
+        sources: new Map(sourcesResult.list.map((s) => [s.source_id, s])),
+        sourcesError: sourcesResult.error,
+      });
+      setSelectedId((current) => current ?? structures[0]?.id ?? null);
+    } catch (error) {
+      setState({ status: 'error', message: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  }, []);
 
-  const current = typologies.find((t) => t.id === selectedTypology) || typologies[0];
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const structures = state.status === 'ready' ? state.structures : [];
+  const selected = useMemo(() => structures.find((s) => s.id === selectedId) ?? structures[0], [structures, selectedId]);
+
+  const handleTabKey = (event: React.KeyboardEvent, index: number) => {
+    const delta = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[event.key];
+    if (!delta) return;
+    event.preventDefault();
+    const next = structures[(index + delta + structures.length) % structures.length];
+    setSelectedId(next.id);
+    tabRefs.current[next.id]?.focus();
+  };
 
   return (
     <PageContainer
-      title="Indian Knowledge Systems (IKS) Archive"
-      subtitle="Canonical architectural, hydrological, and materials repository for traditional Indian water systems."
-      badge={
-        <StatusBadge
-          label="IKS Repository v1.4"
-          variant="jal"
-          size="md"
-        />
-      }
+      eyebrow="04 — Knowledge"
+      title="Water structure knowledge"
+      subtitle="Curated records of traditional Indian water structures — how they were built, why they work, and how they decay — with the sources each record cites."
       actions={
-        <button
-          onClick={() => onRouteChange('/upload')}
-          className="h-8 px-4 text-xs font-semibold text-white bg-[#087CC1] hover:bg-[#28A9E0] rounded-sm border border-[#28A9E0]/40 transition-colors shadow-sm"
-        >
-          Inspect a Dharohar →
-        </button>
+        <Button variant="secondary" onClick={() => onRouteChange('/upload')}>
+          Start an inspection
+        </Button>
       }
     >
-      {/* Light Content Region: White / Soft surface for editorial clarity and high readability */}
-      <div className="bg-white text-[#09283C] rounded-sm border border-[#28A9E0]/30 shadow-sm overflow-hidden font-sans">
-        {/* Typology Selector Bar */}
-        <div className="bg-[#F3FAFD] border-b border-[#087CC1]/20 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase text-[#087CC1] tracking-wider">
-              Structure Typology:
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {typologies.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => setSelectedTypology(t.id)}
-                  className={`px-3 py-1 text-xs font-medium rounded-sm transition-all ${
-                    selectedTypology === t.id
-                      ? 'bg-[#087CC1] text-white shadow-xs'
-                      : 'bg-white text-[#587286] border border-[#28A9E0]/20 hover:text-[#09283C]'
-                  }`}
-                >
-                  {t.name}
-                </button>
-              ))}
+      {state.status === 'loading' && <LoadingState label="Loading records from the knowledge service" className="max-w-md" />}
+
+      {state.status === 'error' && (
+        <EmptyState
+          title="Knowledge service unreachable"
+          description={<p>{state.message}</p>}
+          actions={
+            <Button onClick={() => void load()} icon={<Icon name="refresh" className="h-4 w-4" />}>
+              Try again
+            </Button>
+          }
+        />
+      )}
+
+      {state.status === 'ready' && structures.length === 0 && (
+        <EmptyState title="No records" description="The knowledge service returned no structure records." />
+      )}
+
+      {state.status === 'ready' && selected && (
+        <div className="grid gap-10 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-16">
+          <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+            <p className="eyebrow mb-3 text-ink-500" id="typology-tabs-label">
+              Typologies
+            </p>
+            <div
+              role="tablist"
+              aria-labelledby="typology-tabs-label"
+              aria-orientation="vertical"
+              className="-mx-[var(--gutter)] flex gap-1 overflow-x-auto px-[var(--gutter)] lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0"
+            >
+              {structures.map((s, i) => {
+                const active = s.id === selected.id;
+                return (
+                  <button
+                    key={s.id}
+                    ref={(el) => (tabRefs.current[s.id] = el)}
+                    role="tab"
+                    id={`tab-${s.id}`}
+                    aria-selected={active}
+                    aria-controls="typology-panel"
+                    tabIndex={active ? 0 : -1}
+                    onClick={() => setSelectedId(s.id)}
+                    onKeyDown={(event) => handleTabKey(event, i)}
+                    className={`flex shrink-0 items-baseline gap-3 whitespace-nowrap rounded-sm px-3 py-2.5 text-left transition-colors duration-fast lg:border-l-2 lg:rounded-none ${
+                      active
+                        ? 'bg-ink-900 text-stone-50 lg:border-laterite-500 lg:bg-transparent lg:text-ink-900'
+                        : 'text-ink-600 hover:text-ink-900 lg:border-transparent'
+                    }`}
+                  >
+                    <span className="font-mono text-[0.625rem] tabular-nums opacity-70">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="font-display text-xl font-medium">{s.name}</span>
+                  </button>
+                );
+              })}
             </div>
+            {state.sourcesError && (
+              <p className="mt-4 text-xs text-ochre-700">Source details could not be loaded: {state.sourcesError}</p>
+            )}
           </div>
-          <div className="text-xs text-[#587286]">
-            Region: <strong className="text-[#09283C]">{current.region}</strong>
+
+          <div id="typology-panel" role="tabpanel" aria-labelledby={`tab-${selected.id}`} tabIndex={0} className="min-w-0 focus:outline-none">
+            <StructureDetail record={selected} sources={state.sources} />
           </div>
         </div>
-
-        {/* Editorial Body: Detailed Architectural Deep Dive */}
-        <div className="p-6 sm:p-10 space-y-10">
-          {/* Section 1: Overview & Traditional Function */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start pb-8 border-b border-[#087CC1]/15">
-            <div className="md:col-span-4">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#087CC1] block mb-1">
-                Traditional Function
-              </span>
-              <h3 className="text-xl font-bold text-[#09283C]">
-                {current.name}
-              </h3>
-              <p className="text-xs text-[#587286] mt-2 leading-relaxed">
-                {current.region}
-              </p>
-            </div>
-            <div className="md:col-span-8 space-y-3">
-              <p className="text-sm text-[#09283C] leading-relaxed font-normal">
-                {current.function}
-              </p>
-              <div className="p-4 bg-[#F3FAFD] rounded-sm border border-[#28A9E0]/20 text-xs text-[#587286] leading-relaxed">
-                <strong className="text-[#09283C] block mb-1">Hydrological Context:</strong>
-                Unlike modern deep borewells which exhaust subterranean reserves, traditional stepwells tap the shallow unconfined water table. They fluctuate naturally with seasonal monsoon surges, acting as visual barometers for local water wealth.
-              </div>
-            </div>
-          </div>
-
-          {/* Section 2: Canonical Engineering Principles */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start pb-8 border-b border-[#087CC1]/15">
-            <div className="md:col-span-4">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#087CC1] block mb-1">
-                Engineering Principle
-              </span>
-              <h3 className="text-xl font-bold text-[#09283C]">
-                Canonical Mechanics &amp; Equilibrium
-              </h3>
-            </div>
-            <div className="md:col-span-8 space-y-4">
-              <p className="text-sm text-[#09283C] leading-relaxed">
-                {current.principle}
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <div className="p-4 bg-[#F3FAFD] border border-[#28A9E0]/20 rounded-sm">
-                  <div className="text-xs font-semibold text-[#09283C] mb-1">
-                    Aparajitaprccha Mandate (Sutra 74)
-                  </div>
-                  <p className="text-xs text-[#587286] leading-relaxed">
-                    "Water structures must allow the earth to exhale. Tight impermeability invites cracking from trapped hydrostatic upheaval."
-                  </p>
-                </div>
-                <div className="p-4 bg-[#F3FAFD] border border-[#28A9E0]/20 rounded-sm">
-                  <div className="text-xs font-semibold text-[#09283C] mb-1">
-                    Vastu Vidya Hydrology
-                  </div>
-                  <p className="text-xs text-[#587286] leading-relaxed">
-                    "Inlets must turn thrice to drop coarse sand; only tranquil waters shall enter the deep well chamber."
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Section 3: Material Practice & Pozzolanic Mortars */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start pb-8 border-b border-[#087CC1]/15">
-            <div className="md:col-span-4">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#087CC1] block mb-1">
-                Material Practice
-              </span>
-              <h3 className="text-xl font-bold text-[#09283C]">
-                Lime Mortars vs. Portland Cement
-              </h3>
-            </div>
-            <div className="md:col-span-8 space-y-4">
-              <p className="text-sm text-[#09283C] leading-relaxed">
-                Historic water structures rely on flexible, breathable fat lime (calcium hydroxide) blended with reactive pozzolanic surkhi (calcined clay). When immersed in water, it forms insoluble calcium silicate hydrates that self-heal hairline thermal cracks.
-              </p>
-              <div className="p-4 bg-amber-50 border border-amber-200 rounded-sm text-xs text-amber-900 leading-relaxed">
-                <strong className="block font-semibold mb-1 text-amber-950">
-                  ⚠️ The Portland Cement Hazard (Why Cement Repairs Fail):
-                </strong>
-                Modern Ordinary Portland Cement (OPC) is rigid, impermeable, and rich in soluble alkalis. It traps subterranean moisture behind masonry faces, causing catastrophic stone spalling, salt efflorescence blisters, and structural joint detachment.
-              </div>
-            </div>
-          </div>
-
-          {/* Section 4: Archival Sources & Field Citations */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-            <div className="md:col-span-4">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#087CC1] block mb-1">
-                Archival Sources
-              </span>
-              <h3 className="text-xl font-bold text-[#09283C]">
-                Canonical References &amp; Codes
-              </h3>
-            </div>
-            <div className="md:col-span-8">
-              <ul className="space-y-3 text-xs text-[#587286]">
-                <li className="p-3 bg-[#F3FAFD] border border-[#28A9E0]/20 rounded-sm">
-                  <strong className="text-[#09283C] block font-semibold">
-                    1. Archaeological Survey of India (ASI) Conservation Manual
-                  </strong>
-                  Section 4.2: Restoration of Historic Masonry in Aquatic Substrates. Mandatory use of slaked lime and surkhi.
-                </li>
-                <li className="p-3 bg-[#F3FAFD] border border-[#28A9E0]/20 rounded-sm">
-                  <strong className="text-[#09283C] block font-semibold">
-                    2. Aparajitaprccha of Bhuvanadeva (12th Century CE)
-                  </strong>
-                  Chapters on Stepwells (Vapividhana) and Hydraulic Tanks (Jaladhara).
-                </li>
-                <li className="p-3 bg-[#F3FAFD] border border-[#28A9E0]/20 rounded-sm">
-                  <strong className="text-[#09283C] block font-semibold">
-                    3. The Stepwells of Gujarat in Art-Historical Perspective (Jutta Jain-Neubauer)
-                  </strong>
-                  Structural typologies and water-harvesting engineering in Western India.
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
     </PageContainer>
   );
 };
+
+export default KnowledgePage;

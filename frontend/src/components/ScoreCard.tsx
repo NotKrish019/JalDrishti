@@ -1,125 +1,66 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MetricScore } from '../types';
+import { humanize } from '../utils/analysis';
 
 export interface ScoreCardProps {
-  title: string;
-  score: MetricScore;
-  category?: 'condition' | 'water' | 'priority' | 'neutral';
-  description?: string;
-  icon?: React.ReactNode;
+  label: string;
+  metric: MetricScore;
+  /** Reading guide shown beneath the scale. */
+  direction?: 'higher_better' | 'higher_worse';
+  className?: string;
 }
 
-export const ScoreCard: React.FC<ScoreCardProps> = ({
-  title,
-  score,
-  category = 'neutral',
-  description,
-  icon,
-}) => {
-  const [showLimitations, setShowLimitations] = useState(false);
-
-  // Normalize percentage for progress bar
-  const range = score.scale_max - score.scale_min;
-  const percentage = range > 0 ? Math.min(100, Math.max(0, ((score.value - score.scale_min) / range) * 100)) : score.value;
-
-  const colorConfig = {
-    condition: {
-      bar: percentage > 70 ? 'bg-emerald-500' : percentage > 40 ? 'bg-amber-500' : 'bg-rose-500',
-      text: percentage > 70 ? 'text-emerald-400' : percentage > 40 ? 'text-amber-400' : 'text-rose-400',
-      bgGlow: percentage > 70 ? 'from-emerald-500/10' : percentage > 40 ? 'from-amber-500/10' : 'from-rose-500/10',
-      badge: percentage > 70 ? 'Fair / Stable' : percentage > 40 ? 'Moderate Degradation' : 'High Vulnerability',
-    },
-    water: {
-      bar: 'bg-jal-500',
-      text: 'text-jal-400',
-      bgGlow: 'from-jal-500/10',
-      badge: percentage > 60 ? 'Recharge Viable' : 'Hydrologically Impaired',
-    },
-    priority: {
-      bar: percentage > 70 ? 'bg-rose-500' : percentage > 40 ? 'bg-amber-500' : 'bg-slate-400',
-      text: percentage > 70 ? 'text-rose-400' : percentage > 40 ? 'text-amber-400' : 'text-slate-300',
-      bgGlow: percentage > 70 ? 'from-rose-500/10' : percentage > 40 ? 'from-amber-500/10' : 'from-slate-500/10',
-      badge: percentage > 70 ? 'Immediate Action' : percentage > 40 ? 'Phased Intervention' : 'Routine Monitoring',
-    },
-    neutral: {
-      bar: 'bg-sandstone-500',
-      text: 'text-sandstone-400',
-      bgGlow: 'from-sandstone-500/10',
-      badge: 'Metric Value',
-    },
-  };
-
-  const currentTheme = colorConfig[category];
+/**
+ * One engineering metric exactly as returned: value on its declared scale,
+ * the rule that produced it, the engine's own confidence and its limitations.
+ */
+export const ScoreCard: React.FC<ScoreCardProps> = ({ label, metric, direction = 'higher_better', className = '' }) => {
+  const span = metric.scale_max - metric.scale_min || 1;
+  const fraction = Math.min(1, Math.max(0, (metric.value - metric.scale_min) / span));
+  const digits = span <= 1 ? 2 : 1;
 
   return (
-    <div className={`glass-panel rounded-xl p-5 relative overflow-hidden bg-gradient-to-b ${currentTheme.bgGlow} to-transparent border border-slate-800`}>
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="flex items-center gap-2">
-          {icon && <span className="text-slate-400">{icon}</span>}
-          <div>
-            <h4 className="text-sm font-semibold text-slate-200">{title}</h4>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
-              {currentTheme.badge}
-            </span>
-          </div>
-        </div>
-        <div className="text-right">
-          <div className="flex items-baseline justify-end gap-1">
-            <span className={`text-2xl font-bold font-mono tracking-tight ${currentTheme.text}`}>
-              {score.value.toFixed(1)}
-            </span>
-            <span className="text-xs text-slate-500 font-mono">
-              / {score.scale_max}
-            </span>
-          </div>
-          <div className="text-[10px] text-slate-400 font-mono">
-            Confidence: {(score.confidence * 100).toFixed(0)}%
-          </div>
-        </div>
-      </div>
-
-      {/* Progress track */}
-      <div className="w-full bg-slate-800/80 rounded-full h-1.5 mb-3 overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-500 ${currentTheme.bar}`}
-          style={{ width: `${percentage}%` }}
-        />
-      </div>
-
-      {description && (
-        <p className="text-xs text-slate-400 mb-3 leading-relaxed">
-          {description}
+    <article className={`flex flex-col border-t border-ink-900/15 pt-4 ${className}`}>
+      <div className="flex items-baseline justify-between gap-3">
+        <h4 className="text-sm font-medium text-ink-900">{label}</h4>
+        <p className="font-mono text-xs text-ink-500 tabular-nums">
+          scale {metric.scale_min}–{metric.scale_max}
         </p>
-      )}
-
-      {/* Methodology badge & limitations accordion */}
-      <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
-        <span className="font-mono text-[10px] text-slate-400 truncate max-w-[200px]" title={score.method}>
-          Rule: {score.method}
-        </span>
-        {score.limitations && score.limitations.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setShowLimitations(!showLimitations)}
-            className="text-amber-400/90 hover:text-amber-300 font-medium underline-offset-2 hover:underline transition-colors flex items-center gap-1"
-          >
-            <span>{showLimitations ? 'Hide Limitations' : `Limitations (${score.limitations.length})`}</span>
-          </button>
-        )}
       </div>
 
-      {showLimitations && score.limitations && (
-        <div className="mt-3 p-2.5 bg-amber-950/30 border border-amber-800/40 rounded-lg text-[11px] text-amber-200/90 space-y-1">
-          <div className="font-semibold text-amber-300 text-[10px] uppercase tracking-wider mb-1">
-            Explicit Engineering Limitations
-          </div>
-          <ul className="list-disc list-inside space-y-0.5 text-slate-300 text-[10.5px]">
-            {score.limitations.map((lim, idx) => (
-              <li key={idx}>{lim}</li>
+      <p className="mt-2 font-display text-[2.75rem] font-medium leading-none text-ink-900 tabular-nums">
+        {metric.value.toFixed(digits)}
+      </p>
+
+      <div className="relative mt-3 h-[3px] bg-ink-900/10" aria-hidden="true">
+        <div className="absolute inset-y-0 left-0 bg-ink-900" style={{ width: `${fraction * 100}%` }} />
+      </div>
+      <p className="mt-1.5 text-[0.6875rem] text-ink-500">
+        {direction === 'higher_better' ? 'Higher indicates better observed condition' : 'Higher indicates greater burden or urgency'}
+      </p>
+
+      <dl className="mt-4 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 text-xs">
+        <dt className="text-ink-500">Method</dt>
+        <dd className="break-words font-mono text-ink-700">{metric.method}</dd>
+        <dt className="text-ink-500">Engine confidence</dt>
+        <dd className="font-mono text-ink-700 tabular-nums">{(metric.confidence * 100).toFixed(0)}%</dd>
+      </dl>
+
+      {metric.limitations.length > 0 && (
+        <div className="mt-3">
+          <p className="text-xs text-ink-500">Limitations</p>
+          <ul className="mt-1 space-y-1 text-xs leading-relaxed text-ink-700">
+            {metric.limitations.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="mt-[7px] h-px w-2 shrink-0 bg-ink-500" aria-hidden="true" />
+                <span>{humanize(item)}</span>
+              </li>
             ))}
           </ul>
         </div>
       )}
-    </div>
+    </article>
   );
 };
+
+export default ScoreCard;

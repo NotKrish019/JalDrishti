@@ -1,201 +1,146 @@
-import React, { useState } from 'react';
-import { RestorationResultContract, PrioritizedAction } from '../types';
-import { Card } from './Card';
+import React from 'react';
+import { RestorationResultContract, RestorationPhase } from '../types';
+import { StatusBadge, BadgeVariant } from './StatusBadge';
+import { humanize } from '../utils/analysis';
+
+const PHASES: { id: RestorationPhase; label: string }[] = [
+  { id: 'phase_1_immediate_stabilization', label: 'Immediate stabilisation' },
+  { id: 'phase_2_hydrological_remediation', label: 'Hydrological remediation' },
+  { id: 'phase_3_masonry_and_iks_consolidation', label: 'Masonry and traditional consolidation' },
+  { id: 'phase_4_long_term_monitoring', label: 'Long-term monitoring' },
+];
+
+const URGENCY: Record<string, BadgeVariant> = {
+  immediate: 'danger',
+  high: 'ochre',
+  medium: 'neutral',
+  routine: 'jade',
+};
+
+const SEVERITY: Record<string, BadgeVariant> = {
+  destructive: 'danger',
+  high_risk: 'danger',
+  moderate_risk: 'ochre',
+};
 
 export interface RestorationRoadmapProps {
   restoration: RestorationResultContract;
+  /** Show IKS guidelines and prohibited practices as well as the phased actions. */
+  showGuidance?: boolean;
   className?: string;
 }
 
-export const RestorationRoadmap: React.FC<RestorationRoadmapProps> = ({
-  restoration,
-  className = '',
-}) => {
-  const [selectedPhaseFilter, setSelectedPhaseFilter] = useState<string>('all');
+/** Phased conservation considerations from the restoration planner. */
+export const RestorationRoadmap: React.FC<RestorationRoadmapProps> = ({ restoration, showGuidance = true, className = '' }) => {
+  const actions = [...(restoration.prioritized_actions ?? [])].sort((a, b) => a.step - b.step);
+  const knownPhases = new Set(PHASES.map((p) => p.id));
+  const phases = [
+    ...PHASES,
+    ...Array.from(new Set(actions.map((a) => a.phase)))
+      .filter((p) => !knownPhases.has(p))
+      .map((p) => ({ id: p, label: humanize(p) })),
+  ].filter((phase) => actions.some((a) => a.phase === phase.id));
 
-  const phaseNames: Record<string, { label: string; badge: string }> = {
-    phase_1_immediate_stabilization: { label: 'Phase 1: Immediate Stabilization', badge: 'border-rose-700 bg-rose-950/30 text-rose-300' },
-    phase_2_hydrological_remediation: { label: 'Phase 2: Hydrological Remediation', badge: 'border-jal-700 bg-jal-950/30 text-jal-300' },
-    phase_3_masonry_and_iks_consolidation: { label: 'Phase 3: Masonry & IKS Consolidation', badge: 'border-sandstone-700 bg-sandstone-950/30 text-sandstone-300' },
-    phase_4_long_term_monitoring: { label: 'Phase 4: Long-Term Monitoring', badge: 'border-emerald-700 bg-emerald-950/30 text-emerald-300' },
-  };
-
-  const filteredActions = selectedPhaseFilter === 'all'
-    ? restoration.prioritized_actions
-    : restoration.prioritized_actions.filter((a) => a.phase === selectedPhaseFilter);
+  const iks = restoration.iks_guidelines;
 
   return (
-    <div className={`space-y-8 ${className}`}>
-      {/* Strategy Banner & Phase Filter Tabs */}
-      <div className="glass-panel rounded-2xl p-6 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-emerald-400 font-mono text-xs font-bold px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800">
-              STRATEGY
-            </span>
-            <h3 className="text-base font-bold text-white capitalize font-mono">
-              {restoration.restoration_strategy.replace(/_/g, ' ')}
-            </h3>
-          </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Sequenced minimum-intervention conservation roadmap with explicit prerequisite dependencies.
-          </p>
-        </div>
+    <div className={className}>
+      <p className="mb-6 text-sm text-ink-700">
+        Strategy: <span className="font-medium text-ink-900">{humanize(restoration.restoration_strategy)}</span>
+      </p>
 
-        {/* Phase Filter Tabs */}
-        <div className="flex flex-wrap gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs font-mono">
-          <button
-            type="button"
-            onClick={() => setSelectedPhaseFilter('all')}
-            className={`px-2.5 py-1 rounded-lg transition-colors ${
-              selectedPhaseFilter === 'all' ? 'bg-sandstone-600 text-white font-bold' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            All Steps ({restoration.prioritized_actions.length})
-          </button>
-          {Object.keys(phaseNames).map((phaseKey) => (
-            <button
-              key={phaseKey}
-              type="button"
-              onClick={() => setSelectedPhaseFilter(phaseKey)}
-              className={`px-2.5 py-1 rounded-lg transition-colors ${
-                selectedPhaseFilter === phaseKey ? 'bg-sandstone-600 text-white font-bold' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              {phaseKey.split('_')[1].toUpperCase()}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Prioritized Steps Timeline */}
-      <div className="space-y-4">
-        {filteredActions.map((action: PrioritizedAction) => {
-          const phaseMeta = phaseNames[action.phase] || { label: action.phase, badge: 'border-slate-700 text-slate-300' };
-          const isImmediate = action.urgency === 'immediate';
-
-          return (
-            <div
-              key={action.step}
-              className={`glass-panel rounded-xl p-5 border transition-all ${
-                isImmediate ? 'border-rose-800/80 bg-rose-950/15' : 'border-slate-800 hover:border-slate-700'
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-heritage-900 border border-sandstone-500/60 flex items-center justify-center font-mono font-bold text-sandstone-300 shrink-0 text-sm">
-                    {action.step}
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-white tracking-tight">{action.action_title}</h4>
-                    <div className="flex flex-wrap items-center gap-2 mt-1">
-                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${phaseMeta.badge}`}>
-                        {phaseMeta.label}
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-                        Target: {action.target_defect.replace(/_/g, ' ')}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <span
-                  className={`text-[9.5px] font-mono px-2 py-0.5 rounded uppercase font-bold self-start sm:self-auto border ${
-                    isImmediate
-                      ? 'bg-rose-950 text-rose-300 border-rose-800'
-                      : action.urgency === 'high'
-                      ? 'bg-amber-950 text-amber-300 border-amber-800'
-                      : 'bg-slate-900 text-slate-400 border border-slate-700'
-                  }`}
-                >
-                  Urgency: {action.urgency}
-                </span>
-              </div>
-
-              <p className="text-xs text-slate-300 leading-relaxed mb-3">
-                {action.recommended_technique}
-              </p>
-
-              <div className="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800 text-xs font-mono mb-2">
-                <span className="text-sandstone-300 font-semibold">Material Specification: </span>
-                <span className="text-slate-300">{action.material_specification}</span>
-              </div>
-
-              {action.preconditions && action.preconditions.length > 0 && (
-                <div className="text-[11px] font-mono text-amber-300/90 flex items-start gap-1.5 pt-2 border-t border-slate-800/60">
-                  <span className="font-bold">⚠️ Precondition:</span>
-                  <span>{action.preconditions.join('; ')}</span>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Prohibited Interventions & Traditional IKS Craftsmanship */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Prohibited Practices */}
-        <div className="lg:col-span-6">
-          <Card
-            borderAccent="surkhi"
-            title="Prohibited Destructive Interventions"
-            subtitle="Actions explicitly prohibited to prevent irreversible damage to stone fabric"
-          >
-            <div className="space-y-3">
-              {restoration.incompatible_practices.map((incomp, idx) => (
-                <div key={idx} className="p-3.5 rounded-xl bg-rose-950/20 border border-rose-800/50 text-xs">
-                  <div className="flex items-center justify-between text-rose-300 font-bold mb-1">
-                    <span>🚫 {incomp.prohibited_action}</span>
-                    <span className="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded bg-rose-950 text-rose-400 border border-rose-800">
-                      {incomp.severity}
-                    </span>
-                  </div>
-                  <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong className="text-rose-200">Failure Mechanism: </strong>
-                    {incomp.failure_mechanism}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-
-        {/* Traditional IKS Guidelines */}
-        <div className="lg:col-span-6">
-          <Card
-            borderAccent="sandstone"
-            title="Traditional IKS Craftsmanship Specification"
-            subtitle="Authentic mortar preparation & seasonal curing protocols"
-          >
-            <div className="space-y-4 text-xs text-slate-300 leading-relaxed font-sans">
+      {actions.length === 0 ? (
+        <p className="text-sm text-ink-600">The planner returned no prioritised actions.</p>
+      ) : (
+        <ol className="space-y-10">
+          {phases.map((phase, phaseIndex) => (
+            <li key={phase.id} className="grid gap-4 md:grid-cols-[12rem_minmax(0,1fr)]">
               <div>
-                <span className="text-[10px] font-mono uppercase text-sandstone-300 font-bold block mb-1">
-                  HISTORICAL LIME-SURKHI BLEND
-                </span>
-                <p className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-[11.5px] text-amber-200/90 leading-relaxed">
-                  {restoration.iks_guidelines.traditional_mortar_recipe}
-                </p>
+                <p className="font-mono text-xs text-laterite-500 tabular-nums">Phase {phaseIndex + 1}</p>
+                <p className="mt-1 font-display text-xl font-medium leading-tight text-ink-900">{phase.label}</p>
               </div>
-
-              <div>
-                <span className="text-[10px] font-mono uppercase text-sandstone-300 font-bold block mb-1">
-                  CLASSICAL TREATISE AUTHORITY
-                </span>
-                <ul className="space-y-1 list-disc list-inside text-[11px] text-slate-400 font-mono">
-                  {restoration.iks_guidelines.craftsmanship_references.map((ref, idx) => (
-                    <li key={idx}>{ref}</li>
+              <ul className="space-y-4">
+                {actions
+                  .filter((a) => a.phase === phase.id)
+                  .map((action) => (
+                    <li key={action.step} className="break-inside-avoid border-t border-ink-900/15 pt-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <h4 className="text-sm font-semibold text-ink-900">
+                          <span className="mr-2 font-mono font-normal text-ink-500 tabular-nums">{String(action.step).padStart(2, '0')}</span>
+                          {action.action_title}
+                        </h4>
+                        <StatusBadge label={humanize(action.urgency)} variant={URGENCY[action.urgency] ?? 'neutral'} />
+                      </div>
+                      <dl className="mt-3 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-[8rem_minmax(0,1fr)]">
+                        <dt className="text-xs text-ink-500">Targets</dt>
+                        <dd className="text-ink-700">{humanize(action.target_defect)}</dd>
+                        <dt className="text-xs text-ink-500">Technique</dt>
+                        <dd className="leading-relaxed text-ink-700">{action.recommended_technique}</dd>
+                        <dt className="text-xs text-ink-500">Materials</dt>
+                        <dd className="leading-relaxed text-ink-700">{action.material_specification}</dd>
+                        {action.preconditions && action.preconditions.length > 0 && (
+                          <>
+                            <dt className="text-xs text-ink-500">Before starting</dt>
+                            <dd className="leading-relaxed text-ink-700">{action.preconditions.join(' ')}</dd>
+                          </>
+                        )}
+                      </dl>
+                    </li>
                   ))}
-                </ul>
-              </div>
+              </ul>
+            </li>
+          ))}
+        </ol>
+      )}
 
-              <div className="p-3 rounded-xl bg-sandstone-950/40 border border-sandstone-900/60 text-[11px] text-sandstone-200">
-                <strong className="text-sandstone-300 font-mono uppercase block mb-0.5">Seasonal Curing Protocol:</strong>
-                {restoration.iks_guidelines.seasonal_curing_rules}
-              </div>
-            </div>
-          </Card>
+      {showGuidance && restoration.incompatible_practices?.length > 0 && (
+        <div className="mt-12">
+          <h3 className="text-sm font-semibold text-ink-900">Practices to avoid</h3>
+          <ul className="mt-3 divide-y divide-ink-900/10 border-y border-ink-900/10">
+            {restoration.incompatible_practices.map((p) => (
+              <li key={p.prohibited_action} className="grid gap-2 py-4 break-inside-avoid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] md:gap-6">
+                <p className="text-sm font-medium text-ink-900">{p.prohibited_action}</p>
+                <p className="text-sm leading-relaxed text-ink-700">{p.failure_mechanism}</p>
+                <div>
+                  <StatusBadge label={humanize(p.severity)} variant={SEVERITY[p.severity] ?? 'neutral'} />
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
+      )}
+
+      {showGuidance && iks && (
+        <div className="mt-12 grid gap-8 md:grid-cols-2">
+          {iks.traditional_mortar_recipe && (
+            <div className="break-inside-avoid">
+              <h3 className="text-sm font-semibold text-ink-900">Traditional mortar</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-700">{iks.traditional_mortar_recipe}</p>
+            </div>
+          )}
+          {iks.seasonal_curing_rules && (
+            <div className="break-inside-avoid">
+              <h3 className="text-sm font-semibold text-ink-900">Seasonal curing</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-700">{iks.seasonal_curing_rules}</p>
+            </div>
+          )}
+          {iks.craftsmanship_references?.length > 0 && (
+            <div className="break-inside-avoid md:col-span-2">
+              <h3 className="text-sm font-semibold text-ink-900">References cited by the planner</h3>
+              <ul className="mt-2 space-y-1.5 text-sm text-ink-700">
+                {iks.craftsmanship_references.map((ref) => (
+                  <li key={ref} className="flex gap-3">
+                    <span className="mt-[9px] h-px w-3 shrink-0 bg-ink-500" aria-hidden="true" />
+                    <span>{ref}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
+
+export default RestorationRoadmap;

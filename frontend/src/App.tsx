@@ -1,191 +1,74 @@
-import React, { useState, useEffect } from 'react';
-import { Header } from './components/Header';
-import { Navigation } from './components/Navigation';
-import { LoadingState } from './components/LoadingState';
+import React, { useCallback, useEffect, useState } from 'react';
+import { AppShell } from './components/AppShell';
 import { HomePage } from './pages/HomePage';
 import { UploadPage } from './pages/UploadPage';
 import { AnalysisPage } from './pages/AnalysisPage';
 import { KnowledgePage } from './pages/KnowledgePage';
 import { ReportPage } from './pages/ReportPage';
-import { AppRoute, AnalysisResultContract, AnalysisRequestPayload } from './types';
-import { submitAnalysisRequest, getDevelopmentMockFixture } from './services/api';
+import { AppRoute, InspectionSession } from './types';
+import { getDevelopmentMockFixture } from './services/api';
+
+const ROUTES: AppRoute[] = ['/', '/upload', '/analysis', '/knowledge', '/report'];
+
+const routeFromLocation = (): AppRoute => {
+  const path = window.location.pathname.replace(/\/+$/, '') || '/';
+  return (ROUTES as string[]).includes(path) ? (path as AppRoute) : '/';
+};
 
 export const App: React.FC = () => {
-  // Sync initial route from browser URL or default to '/'
-  const getInitialRoute = (): AppRoute => {
-    const path = window.location.pathname;
-    if (
-      path === '/upload' ||
-      path === '/analysis' ||
-      path === '/knowledge' ||
-      path === '/report'
-    ) {
-      return path as AppRoute;
-    }
-    return '/';
-  };
+  const [currentRoute, setCurrentRoute] = useState<AppRoute>(routeFromLocation);
+  const [session, setSession] = useState<InspectionSession | null>(null);
 
-  const [currentRoute, setCurrentRoute] = useState<AppRoute>(getInitialRoute);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResultContract | null>(null);
-  const [isMockFixture, setIsMockFixture] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [loadingStep, setLoadingStep] = useState<'see' | 'understand' | 'assess' | 'revive'>('see');
-
-  // Handle browser back/forward buttons
   useEffect(() => {
-    const handlePopState = () => {
-      const path = window.location.pathname;
-      if (
-        path === '/upload' ||
-        path === '/analysis' ||
-        path === '/knowledge' ||
-        path === '/report' ||
-        path === '/'
-      ) {
-        setCurrentRoute(path as AppRoute);
-      } else {
-        setCurrentRoute('/');
-      }
-    };
-
+    const handlePopState = () => setCurrentRoute(routeFromLocation());
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const handleNavigate = (route: AppRoute) => {
-    if (route !== currentRoute) {
-      window.history.pushState(null, '', route);
-      setCurrentRoute(route);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleNavigate = useCallback((route: AppRoute, hash?: string) => {
+    const target = hash ? `${route}#${hash}` : route;
+    if (route !== routeFromLocation() || hash) {
+      window.history.pushState(null, '', target);
     }
-  };
-
-  const handleLoadDemoFixture = async () => {
-    setIsLoading(true);
-    setLoadingStep('see');
-
-    setTimeout(() => setLoadingStep('understand'), 300);
-    setTimeout(() => setLoadingStep('assess'), 600);
-    setTimeout(() => setLoadingStep('revive'), 900);
-
-    try {
-      const fixture = await getDevelopmentMockFixture();
-      setAnalysisResult(fixture);
-      setIsMockFixture(true);
-      handleNavigate('/analysis');
-    } finally {
-      setIsLoading(false);
+    setCurrentRoute(route);
+    if (!hash) {
+      // Jump instantly: smooth-scrolling back through the 3D descent would replay it.
+      window.scrollTo({ top: 0, behavior: 'auto' });
     }
-  };
+  }, []);
 
-  const handleAnalyze = async (payload: AnalysisRequestPayload) => {
-    setIsLoading(true);
-    setLoadingStep('see');
-
-    try {
-      // First attempt live backend API submission
-      const result = await submitAnalysisRequest(payload);
-      setAnalysisResult(result);
-      setIsMockFixture(false);
+  const handleInspectionComplete = useCallback(
+    (next: InspectionSession) => {
+      setSession(next);
       handleNavigate('/analysis');
-    } catch {
-      // Provide clear feedback and load the development sample fixture for layout inspection
-      setLoadingStep('understand');
-      await new Promise((r) => setTimeout(r, 400));
-      setLoadingStep('assess');
-      await new Promise((r) => setTimeout(r, 400));
-      setLoadingStep('revive');
-      await new Promise((r) => setTimeout(r, 400));
+    },
+    [handleNavigate],
+  );
 
-      const fixture = await getDevelopmentMockFixture();
-      if (payload.structureType) {
-        fixture.structure.type = payload.structureType;
-      }
-      if (payload.structureName) {
-        fixture.structure.name = payload.structureName;
-      }
-      if (payload.region) {
-        fixture.structure.region = payload.region;
-      }
-      if (payload.imagePreviewUrl) {
-        fixture.structure.source_images = [payload.imagePreviewUrl];
-      }
+  // Explicit, user-initiated only. The fixture is labelled everywhere it is shown.
+  const handleLoadFixture = useCallback(async () => {
+    const fixture = await getDevelopmentMockFixture();
+    setSession({ result: fixture, provenance: 'fixture' });
+    handleNavigate('/analysis');
+  }, [handleNavigate]);
 
-      setAnalysisResult(fixture);
-      setIsMockFixture(true);
-      handleNavigate('/analysis');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  if (currentRoute === '/') {
+    return <HomePage onRouteChange={handleNavigate} />;
+  }
 
   return (
-    <div className="min-h-screen bg-[#062B49] text-white flex flex-col font-sans selection:bg-[#087CC1] selection:text-white">
-      {/* Universal Technical Header */}
-      <Header
-        currentRoute={currentRoute}
-        onRouteChange={handleNavigate}
-        hasAnalysisResult={analysisResult !== null}
-      />
-
-      {/* Main Tabbed Navigation */}
-      <Navigation
-        currentRoute={currentRoute}
-        onRouteChange={handleNavigate}
-        hasAnalysisResult={analysisResult !== null}
-      />
-
-      {/* Loading Overlay */}
-      {isLoading ? (
-        <div className="flex-1 flex items-center justify-center p-6">
-          <LoadingState
-            step={loadingStep}
-            title="Executing Jal-Dharohar Pipeline"
-            message="Evaluating non-invasive imagery through computer vision and deterministic conservation rules..."
-          />
-        </div>
-      ) : (
-        <>
-          {currentRoute === '/' && (
-            <HomePage
-              onRouteChange={handleNavigate}
-              onLoadDemoFixture={handleLoadDemoFixture}
-            />
-          )}
-
-          {currentRoute === '/upload' && (
-            <UploadPage
-              onAnalyze={handleAnalyze}
-              isLoading={isLoading}
-            />
-          )}
-
-          {currentRoute === '/analysis' && (
-            <AnalysisPage
-              result={analysisResult}
-              isMockFixture={isMockFixture}
-              onRouteChange={handleNavigate}
-              onLoadDemoFixture={handleLoadDemoFixture}
-            />
-          )}
-
-          {currentRoute === '/knowledge' && (
-            <KnowledgePage
-              onRouteChange={handleNavigate}
-            />
-          )}
-
-          {currentRoute === '/report' && (
-            <ReportPage
-              result={analysisResult}
-              isMockFixture={isMockFixture}
-              onRouteChange={handleNavigate}
-              onLoadDemoFixture={handleLoadDemoFixture}
-            />
-          )}
-        </>
+    <AppShell currentRoute={currentRoute} onRouteChange={handleNavigate} session={session}>
+      {currentRoute === '/upload' && (
+        <UploadPage onComplete={handleInspectionComplete} onRouteChange={handleNavigate} />
       )}
-    </div>
+      {currentRoute === '/analysis' && (
+        <AnalysisPage session={session} onRouteChange={handleNavigate} onLoadFixture={handleLoadFixture} />
+      )}
+      {currentRoute === '/knowledge' && <KnowledgePage onRouteChange={handleNavigate} />}
+      {currentRoute === '/report' && (
+        <ReportPage session={session} onRouteChange={handleNavigate} onLoadFixture={handleLoadFixture} />
+      )}
+    </AppShell>
   );
 };
 

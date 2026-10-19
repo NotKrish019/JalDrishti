@@ -44,6 +44,7 @@ export interface DetectionItem {
   total_length_pixels?: number;
   largest_component_length_pixels?: number;
   relative_severity?: DefectSeverity;
+  burden_score?: number;
 }
 
 export interface VisionResultContract {
@@ -169,6 +170,13 @@ export interface RestorationResultContract {
   iks_guidelines: IKSGuidelines;
 }
 
+/** Shape returned by the live `/analyze` endpoint for `root_cause`. */
+export interface RootCauseSummary {
+  findings: RootCauseItem[];
+  primary_cause?: string;
+  count?: number;
+}
+
 export interface PipelineMetadata {
   created_at: string;
   pipeline_status: 'completed' | 'partial' | 'failed';
@@ -188,7 +196,7 @@ export interface AnalysisResultContract {
   restoration_priority_score?: MetricScore;
   sub_scores?: EngineeringSubScores;
   material: MaterialCompatibilityContract;
-  root_cause: Record<string, unknown> | RootCauseItem[];
+  root_cause: RootCauseSummary | RootCauseItem[] | Record<string, unknown>;
   restoration: RestorationResultContract;
   metadata: PipelineMetadata;
 }
@@ -197,6 +205,38 @@ export interface AnalysisResultContract {
  * Frontend Navigation & Application State Types
  */
 export type AppRoute = '/' | '/upload' | '/analysis' | '/knowledge' | '/report';
+
+/**
+ * Mirrors contracts/image_upload_result.schema.json (POST /images/upload).
+ * Cloudinary storage only; an uploaded image has not been analysed.
+ */
+export interface ImageUploadResult {
+  image_id: string;
+  inspection_id?: string | null;
+  status: 'uploaded' | 'processing' | 'ready' | 'failed' | string;
+  preview_url: string;
+  original_url?: string | null;
+  format: string;
+  width: number;
+  height: number;
+  bytes: number;
+  created_at: string;
+}
+
+/**
+ * Where an analysis result came from. 'fixture' is the local development
+ * sample and must never be presented as a real inspection.
+ */
+export type ResultProvenance = 'live' | 'fixture';
+
+export interface InspectionSession {
+  result: AnalysisResultContract;
+  provenance: ResultProvenance;
+  /** Present only when the image was stored through the backend Cloudinary workflow. */
+  image?: ImageUploadResult;
+  /** Local object URL of the inspected file, used for overlays when no stored preview exists. */
+  localPreviewUrl?: string;
+}
 
 /**
  * Region of Interest (ROI) coordinates for focused defect inspection
@@ -211,10 +251,64 @@ export interface InspectionROI {
 
 export interface AnalysisRequestPayload {
   imageFile?: File;
+  /** Backend image id from POST /images/upload, when the image was stored. */
+  imageId?: string;
   imagePreviewUrl?: string;
   structureType: StructureTypology;
   structureName?: string;
   region?: string;
   notes?: string;
   roi?: InspectionROI;
+}
+
+/**
+ * Knowledge base records served by GET /knowledge/structures (knowledge/structures/*.json).
+ */
+export interface EngineeringPrincipleRecord {
+  principle: string;
+  what?: string;
+  why?: string;
+  how?: string;
+  engineering_significance?: string;
+}
+
+export interface WaterManagementPrincipleRecord {
+  principle: string;
+  description?: string;
+  hydrological_mechanism?: string;
+}
+
+export interface TraditionalMaterialRecord {
+  material_family: string;
+  usage?: string;
+  traditional_role?: string;
+}
+
+export interface StructureKnowledgeRecord {
+  id: string;
+  name: string;
+  alternate_names?: string[];
+  regions?: string[];
+  traditional_function?: string[];
+  engineering_principles?: EngineeringPrincipleRecord[];
+  water_management_principles?: WaterManagementPrincipleRecord[];
+  environmental_adaptations?: string[];
+  traditional_materials?: TraditionalMaterialRecord[];
+  construction_features?: string[];
+  common_deterioration_factors?: string[];
+  conservation_considerations?: string[];
+  sources?: string[];
+  limitations?: string[];
+}
+
+/** GET /knowledge/sources (knowledge/sources/sources_index.json). */
+export interface KnowledgeSource {
+  source_id: string;
+  title: string;
+  publisher?: string;
+  year?: number;
+  url?: string;
+  topic?: string;
+  claim_supported?: string;
+  claims_supported?: string[];
 }

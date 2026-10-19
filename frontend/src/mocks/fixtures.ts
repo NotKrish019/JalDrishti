@@ -75,7 +75,7 @@ export const MOCK_ANALYSIS_FIXTURE: AnalysisResultContract = {
     ],
     processing_metadata: {
       inference_latency_ms: 142.5,
-      model_version: "yolov8-seg-baoli-v0.1-prototype"
+      model_version: "development-fixture (no model run)"
     }
   },
   visual_condition: {
@@ -294,6 +294,6 @@ export const MOCK_ANALYSIS_FIXTURE: AnalysisResultContract = {
   metadata: {
     created_at: "2026-10-08T12:00:00Z",
     pipeline_status: "completed",
-    orchestrated_by: "baoliguard-orchestration-engine-local-scaffold"
+    orchestrated_by: "development fixture — not produced by the pipeline"
   }
 };

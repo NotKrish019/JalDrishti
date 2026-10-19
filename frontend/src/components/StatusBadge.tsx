@@ -1,73 +1,60 @@
 import React from 'react';
 
-export type BadgeVariant = 'info' | 'success' | 'warning' | 'danger' | 'sandstone' | 'jal' | 'neutral';
+export type BadgeVariant = 'neutral' | 'jade' | 'ochre' | 'danger' | 'laterite' | 'ink';
 
 export interface StatusBadgeProps {
   label: string;
   variant?: BadgeVariant;
-  pulse?: boolean;
-  icon?: React.ReactNode;
-  size?: 'sm' | 'md';
+  /** Show a small leading dot. */
+  dot?: boolean;
   className?: string;
 }
 
-export const StatusBadge: React.FC<StatusBadgeProps> = ({
-  label,
-  variant = 'neutral',
-  pulse = false,
-  icon,
-  size = 'sm',
-  className = '',
-}) => {
-  const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-[11px]';
-
-  const variantClasses: Record<BadgeVariant, { container: string; dot: string }> = {
-    info: {
-      container: 'bg-[#083358] text-[#28A9E0] border-[#28A9E0]/40',
-      dot: 'bg-[#28A9E0]',
-    },
-    success: {
-      container: 'bg-[#083358] text-[#2E8B57] border-[#2E8B57]/40',
-      dot: 'bg-[#2E8B57]',
-    },
-    warning: {
-      container: 'bg-[#083358] text-[#E08A1E] border-[#E08A1E]/40',
-      dot: 'bg-[#E08A1E]',
-    },
-    danger: {
-      container: 'bg-[#083358] text-[#D3455B] border-[#D3455B]/40',
-      dot: 'bg-[#D3455B]',
-    },
-    sandstone: {
-      container: 'bg-[#083358] text-[#D8C8B0] border-[#D8C8B0]/30',
-      dot: 'bg-[#D8C8B0]',
-    },
-    jal: {
-      container: 'bg-[#083358] text-[#8CD8F5] border-[#28A9E0]/40',
-      dot: 'bg-[#28A9E0]',
-    },
-    neutral: {
-      container: 'bg-[#083358] text-[#8CD8F5]/80 border-[#28A9E0]/20',
-      dot: 'bg-[#8CD8F5]',
-    },
-  };
-
-  const style = variantClasses[variant];
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 font-medium rounded-sm border ${sizeClasses} ${style.container} ${className}`}
-    >
-      <span className="relative flex h-1.5 w-1.5 shrink-0">
-        {pulse && (
-          <span
-            className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${style.dot}`}
-          />
-        )}
-        <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${style.dot}`} />
-      </span>
-      {icon && <span className="shrink-0">{icon}</span>}
-      <span>{label}</span>
-    </span>
-  );
+const STYLES: Record<BadgeVariant, string> = {
+  neutral: 'border-ink-900/15 bg-stone-100 text-ink-700',
+  jade: 'border-jade-500/30 bg-jade-50 text-jade-700',
+  ochre: 'border-ochre-500/40 bg-ochre-100 text-ochre-700',
+  danger: 'border-danger-500/30 bg-danger-100 text-danger-700',
+  laterite: 'border-laterite-500/30 bg-laterite-300/20 text-laterite-600',
+  ink: 'border-ink-900 bg-ink-900 text-stone-50',
 };
+
+const DOTS: Record<BadgeVariant, string> = {
+  neutral: 'bg-ink-500',
+  jade: 'bg-jade-500',
+  ochre: 'bg-ochre-500',
+  danger: 'bg-danger-500',
+  laterite: 'bg-laterite-500',
+  ink: 'bg-stone-50',
+};
+
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ label, variant = 'neutral', dot = false, className = '' }) => (
+  <span
+    className={`inline-flex max-w-full items-center gap-1.5 rounded-sm border px-2 py-[3px] leading-tight font-mono text-[0.6875rem] uppercase tracking-[0.08em] ${STYLES[variant]} ${className}`}
+  >
+    {dot && <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOTS[variant]}`} aria-hidden="true" />}
+    {label}
+  </span>
+);
+
+/**
+ * Declares where a block of information came from, so model output, rule-based
+ * engine output and items needing expert confirmation are never conflated.
+ */
+export type OriginKind = 'model' | 'unverified' | 'rules' | 'knowledge' | 'expert' | 'user' | 'fixture';
+
+const ORIGIN: Record<OriginKind, { label: string; variant: BadgeVariant }> = {
+  model: { label: 'Model output', variant: 'laterite' },
+  unverified: { label: 'Not from a trained model', variant: 'ochre' },
+  rules: { label: 'Rule-based engine', variant: 'jade' },
+  knowledge: { label: 'Knowledge base', variant: 'neutral' },
+  expert: { label: 'Requires expert verification', variant: 'ochre' },
+  user: { label: 'Your input', variant: 'neutral' },
+  fixture: { label: 'Development sample', variant: 'ochre' },
+};
+
+export const OriginTag: React.FC<{ kind: OriginKind; className?: string }> = ({ kind, className }) => (
+  <StatusBadge label={ORIGIN[kind].label} variant={ORIGIN[kind].variant} dot className={className} />
+);
+
+export default StatusBadge;

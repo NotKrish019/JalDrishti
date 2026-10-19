@@ -2,92 +2,221 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------------------------------------------------
+ * Motion and layering tokens (colour/type tokens live in tailwind.config.js)
+ * ------------------------------------------------------------------ */
 :root {
-  --color-deep-water: #063B63;
-  --color-ocean-blue: #0A6FB7;
-  --color-clear-water: #2498D5;
-  --color-light-water: #8FD5F2;
-  --color-mist: #EAF7FB;
-  --color-white: #FFFFFF;
-  --color-ink: #102433;
-  --color-muted-ink: #5E7280;
-  --color-stone: #D8C8B0;
-  --color-green: #3E8F6B;
-  --color-amber: #C9902E;
-  --color-red: #B64A45;
-
-  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color-scheme: dark;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 160ms;
+  --dur-base: 320ms;
+  --dur-slow: 700ms;
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --nav-h: 4rem;
+  color-scheme: light;
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  background-color: #063B63;
-  color: #FFFFFF;
-  font-family: 'Poppins', sans-serif;
-  overflow-x: hidden;
-}
-
-.font-editorial {
-  font-family: 'IBM Plex Serif', Georgia, serif;
-}
-
-/* Custom technical scrollbar in ocean water blues */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #04253e;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #0A6FB7;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #2498D5;
-}
-
-/* Subtle water atmospheric caustics */
-.water-caustic-layer {
-  background-image: radial-gradient(circle at 50% -10%, rgba(143, 213, 242, 0.15) 0%, transparent 65%);
-}
-
-/* Floating micro-animation for fish & particles */
-@keyframes subtleFloat {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
   }
-  50% {
-    transform: translateY(-6px) rotate(0.5deg);
+
+  body {
+    @apply bg-stone-50 font-sans text-ink-900 antialiased;
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    @apply bg-jade-500 text-stone-50;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme('colors.laterite.400');
+    outline-offset: 3px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 }
 
-@keyframes gentleDrift {
-  0%, 100% {
-    transform: translateX(0px);
+@layer components {
+  /* Horizontal page gutter shared by every section */
+  .gutter {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
   }
-  50% {
-    transform: translateX(8px);
+
+  /* Small uppercase label used for section indices and metadata */
+  .eyebrow {
+    @apply font-mono text-eyebrow uppercase;
+  }
+
+  /* Architectural hairline rule */
+  .rule {
+    @apply border-t border-ink-900/15;
+  }
+
+  .rule-light {
+    @apply border-t border-stone-50/15;
+  }
+
+  /* Primary interactive surfaces */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm px-5 h-11 text-sm font-medium tracking-wide transition-colors duration-fast ease-out disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-ink-900 text-stone-50 hover:bg-jade-600;
+  }
+
+  .btn-secondary {
+    @apply btn border border-ink-900/25 text-ink-900 hover:border-ink-900 hover:bg-ink-900/[0.04];
+  }
+
+  .btn-ghost-light {
+    @apply btn border border-stone-50/30 text-stone-50 hover:border-stone-50 hover:bg-stone-50/[0.06];
+  }
+
+  .btn-light {
+    @apply btn bg-stone-50 text-ink-900 hover:bg-stone-200;
+  }
+
+  .field {
+    @apply block w-full rounded-sm border border-ink-900/20 bg-white px-3 h-11 text-sm text-ink-900 placeholder:text-ink-500 transition-colors duration-fast focus:border-jade-500 focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-jade-500/20;
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-xs font-medium text-ink-700;
+  }
+
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size var(--dur-base) var(--ease-out);
+  }
+
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
   }
 }
 
-.animate-subtle-float {
-  animation: subtleFloat 7s ease-in-out infinite;
+@layer utilities {
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    @apply sr-only;
+  }
+
+  /* Subtle stone grain used on parchment surfaces */
+  .grain {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .grain::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
 }
 
-.animate-gentle-drift {
-  animation: gentleDrift 10s ease-in-out infinite;
+/* ------------------------------------------------------------------
+ * Reveal-on-scroll (driven by hooks/useReveal). Content is visible by
+ * default; the hidden state only applies once JS has marked the root.
+ * ------------------------------------------------------------------ */
+.js-reveal [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.js-reveal [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* Masked line reveal for editorial headings */
+.js-reveal [data-reveal='mask'] {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1s var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.js-reveal [data-reveal='mask'].is-revealed {
+  clip-path: inset(0 0 0 0);
+}
+
+@keyframes scroll-cue {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  45% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+
+.animate-scroll-cue {
+  animation: scroll-cue 2.4s var(--ease-inout) infinite;
+}
+
+@keyframes indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+.animate-indeterminate {
+  animation: indeterminate 1.4s var(--ease-inout) infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-subtle-float,
-  .animate-gentle-drift {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .js-reveal [data-reveal],
+  .js-reveal [data-reveal='mask'] {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
   }
 }

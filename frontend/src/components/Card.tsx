@@ -1,72 +1,57 @@
 import React from 'react';
 
 export interface CardProps {
-  children: React.ReactNode;
+  /** Small mono label above the title. */
+  eyebrow?: React.ReactNode;
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
-  badge?: React.ReactNode;
-  action?: React.ReactNode;
-  footer?: React.ReactNode;
+  /** Right-aligned header content: origin tags, actions. */
+  aside?: React.ReactNode;
+  tone?: 'white' | 'stone' | 'ink';
+  padding?: 'none' | 'sm' | 'md';
   className?: string;
-  elevated?: boolean;
-  borderAccent?: 'sandstone' | 'jal' | 'surkhi' | 'none';
-  onClick?: () => void;
+  children?: React.ReactNode;
+  as?: 'section' | 'div' | 'article';
 }
 
+const TONES = {
+  white: 'bg-white border-ink-900/10 text-ink-900',
+  stone: 'bg-stone-100 border-ink-900/10 text-ink-900',
+  ink: 'bg-ink-900 border-ink-900 text-stone-50',
+};
+
+const PADDING = { none: '', sm: 'p-4', md: 'p-5 sm:p-6' };
+
+/** A bordered panel. Flat, hairline-bordered, tight radius — a sheet in a dossier, not a floating card. */
 export const Card: React.FC<CardProps> = ({
-  children,
+  eyebrow,
   title,
   subtitle,
-  badge,
-  action,
-  footer,
+  aside,
+  tone = 'white',
+  padding = 'md',
   className = '',
-  elevated = false,
-  borderAccent = 'none',
-  onClick,
+  children,
+  as: Tag = 'section',
 }) => {
-  const accentClasses = {
-    sandstone: 'border-l-2 border-l-[#D8C8B0]',
-    jal: 'border-l-2 border-l-[#28A9E0]',
-    surkhi: 'border-l-2 border-l-[#E08A1E]',
-    none: '',
-  };
-
-  const baseClasses = elevated
-    ? 'bg-[#0C3D66]/85 border border-[#28A9E0]/30 rounded-sm shadow-panel'
-    : 'bg-[#083358]/70 border border-[#28A9E0]/20 rounded-sm';
-
-  const interactiveClasses = onClick
-    ? 'cursor-pointer hover:border-[#28A9E0]/50 transition-all duration-150'
-    : '';
+  const hasHeader = eyebrow || title || subtitle || aside;
+  const muted = tone === 'ink' ? 'text-stone-300' : 'text-ink-600';
 
   return (
-    <div
-      onClick={onClick}
-      className={`${baseClasses} ${accentClasses[borderAccent]} ${interactiveClasses} ${className}`}
-    >
-      {(title || subtitle || badge || action) && (
-        <div className="px-4 py-3 border-b border-[#28A9E0]/15 flex items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              {title && (
-                <h3 className="text-xs sm:text-sm font-semibold text-white tracking-tight">
-                  {title}
-                </h3>
-              )}
-              {badge}
-            </div>
-            {subtitle && <p className="text-[11px] text-[#8CD8F5]/80 mt-0.5 leading-snug">{subtitle}</p>}
+    <Tag className={`rounded-sm border ${TONES[tone]} ${PADDING[padding]} ${className}`}>
+      {hasHeader && (
+        <header className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+          <div className="min-w-0">
+            {eyebrow && <div className={`eyebrow mb-2 ${muted}`}>{eyebrow}</div>}
+            {title && <h3 className="text-base font-semibold leading-snug">{title}</h3>}
+            {subtitle && <p className={`mt-1 text-sm leading-relaxed ${muted}`}>{subtitle}</p>}
           </div>
-          {action && <div className="shrink-0">{action}</div>}
-        </div>
+          {aside && <div className="flex shrink-0 flex-wrap items-center gap-2">{aside}</div>}
+        </header>
       )}
-      <div className="p-4">{children}</div>
-      {footer && (
-        <div className="px-4 py-2.5 bg-[#062B49]/60 border-t border-[#28A9E0]/15 rounded-b-sm">
-          {footer}
-        </div>
-      )}
-    </div>
+      {children}
+    </Tag>
   );
 };
+
+export default Card;

@@ -3,16 +3,16 @@
   "name": "JalDrishti — Digital Intelligence for India's Traditional Water Heritage",
   "icons": [
     {
-      "src": "/vite.svg",
-      "sizes": "192x192 512x512",
+      "src": "/favicon.svg",
+      "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ],
   "start_url": "/",
-  "background_color": "#063B63",
-  "theme_color": "#063B63",
+  "background_color": "#17140F",
+  "theme_color": "#17140F",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "description": "AI-assisted digital engineering, IKS material compatibility, and conservation platform for traditional Indian water systems."
+  "description": "Computer vision, Indian Knowledge Systems and rule-based conservation engineering for India's traditional water structures."
 }

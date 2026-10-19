@@ -1,48 +1,36 @@
 import React from 'react';
 
 export interface SectionProps {
-  title: string;
-  subtitle?: string;
-  icon?: React.ReactNode;
-  tag?: string;
-  action?: React.ReactNode;
-  children: React.ReactNode;
+  id?: string;
+  /** Index shown in mono, e.g. "A" or "03". */
+  index?: string;
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  aside?: React.ReactNode;
   className?: string;
+  children: React.ReactNode;
 }
 
-export const Section: React.FC<SectionProps> = ({
-  title,
-  subtitle,
-  icon,
-  tag,
-  action,
-  children,
-  className = '',
-}) => {
+/** A titled region within a page, separated by a hairline rule. */
+export const Section: React.FC<SectionProps> = ({ id, index, title, description, aside, className = '', children }) => {
+  const headingId = id ? `${id}-title` : undefined;
   return (
-    <section className={`mb-12 ${className}`}>
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 pb-3 border-b border-[#28A9E0]/20">
-        <div>
-          <div className="flex items-center gap-2.5 mb-1">
-            {tag && (
-              <span className="text-[11px] font-medium tracking-wide uppercase text-[#28A9E0] px-2 py-0.5 bg-[#083358] border border-[#28A9E0]/30 rounded-sm">
-                {tag}
-              </span>
-            )}
-            {icon && <span className="text-[#8CD8F5]">{icon}</span>}
-            <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-white">
+    <section id={id} aria-labelledby={headingId} className={`rule pt-6 ${className}`}>
+      <header className="mb-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+        <div className="flex gap-4">
+          {index && <span className="eyebrow pt-1.5 text-ink-500 tabular-nums">{index}</span>}
+          <div>
+            <h2 id={headingId} className="text-lg font-semibold text-ink-900">
               {title}
             </h2>
+            {description && <p className="mt-1 max-w-prose text-sm leading-relaxed text-ink-600">{description}</p>}
           </div>
-          {subtitle && (
-            <p className="text-xs sm:text-sm text-[#8CD8F5]/80 max-w-3xl leading-relaxed">
-              {subtitle}
-            </p>
-          )}
         </div>
-        {action && <div className="shrink-0">{action}</div>}
-      </div>
-      <div>{children}</div>
+        {aside && <div className="flex flex-wrap items-center gap-2">{aside}</div>}
+      </header>
+      {children}
     </section>
   );
 };
+
+export default Section;

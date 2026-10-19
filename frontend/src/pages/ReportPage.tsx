@@ -1,233 +1,202 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import { PageContainer } from '../components/PageContainer';
 import { Section } from '../components/Section';
 import { Button } from '../components/Button';
-import { StatusBadge } from '../components/StatusBadge';
-import { ConservationChain } from '../components/ConservationChain';
+import { Icon } from '../components/Icon';
+import { EmptyState } from '../components/EmptyState';
+import { InspectionCanvas } from '../components/InspectionCanvas';
+import { VisualMetricsPanel } from '../components/VisualMetricsPanel';
+import { ScoreCard } from '../components/ScoreCard';
+import { RootCauseAnalysisCard } from '../components/RootCauseAnalysisCard';
 import { MaterialDnaCard } from '../components/MaterialDnaCard';
 import { WhyThisRecommendation } from '../components/WhyThisRecommendation';
-import { RootCauseAnalysisCard } from '../components/RootCauseAnalysisCard';
 import { RestorationRoadmap } from '../components/RestorationRoadmap';
-import { AnalysisResultContract, AppRoute, RootCauseItem } from '../types';
+import { ProvenanceBanner } from '../components/ProvenanceBanner';
+import { OriginTag } from '../components/StatusBadge';
+import { AppRoute, InspectionSession } from '../types';
+import { formatTimestamp, humanize, listEngineeringMetrics, readRootCauses, resolveImageSource, visionOrigin } from '../utils/analysis';
 
 export interface ReportPageProps {
-  result: AnalysisResultContract | null;
-  isMockFixture?: boolean;
+  session: InspectionSession | null;
   onRouteChange: (route: AppRoute) => void;
-  onLoadDemoFixture: () => void;
+  onLoadFixture: () => void;
 }
 
-export type ReportTab = 'all' | 'chain' | 'material' | 'why' | 'root_cause' | 'roadmap';
+const noop = () => undefined;
 
-export const ReportPage: React.FC<ReportPageProps> = ({
-  result,
-  isMockFixture = false,
-  onRouteChange,
-  onLoadDemoFixture,
-}) => {
-  const [activeTab, setActiveTab] = useState<ReportTab>('all');
+/** Printable conservation dossier for the current session. */
+export const ReportPage: React.FC<ReportPageProps> = ({ session, onRouteChange, onLoadFixture }) => {
+  const metrics = useMemo(() => (session ? listEngineeringMetrics(session.result) : []), [session]);
+  const causes = useMemo(() => (session ? readRootCauses(session.result) : []), [session]);
+  const allClasses = useMemo(
+    () => new Set(session?.result.vision.detections.map((d) => d.class_name) ?? []),
+    [session],
+  );
 
-  if (!result) {
+  if (!session) {
     return (
-      <PageContainer
-        title="Conservation Dossier"
-        subtitle="IKS material compatibility assessment and phased restoration roadmap."
-      >
-        <div className="bg-[#083358]/80 border border-[#28A9E0]/25 rounded-sm p-10 text-center max-w-xl mx-auto my-8 shadow-panel">
-          <div className="w-12 h-12 rounded-sm border border-[#28A9E0]/30 flex items-center justify-center text-[#28A9E0] mx-auto mb-4 bg-[#062B49]">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <h2 className="text-base font-semibold text-white mb-1.5">
-            No Survey Dossier Active
-          </h2>
-          <p className="text-xs text-[#8CD8F5]/80 mb-6 leading-relaxed">
-            A photographic survey must be analyzed to synthesize the IKS material compatibility matrix and the phased conservation roadmap.
-          </p>
-          <div className="flex justify-center gap-3">
-            <Button
-              variant="primary"
-              size="md"
-              onClick={onLoadDemoFixture}
-            >
-              Load Reference Dossier
-            </Button>
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={() => onRouteChange('/upload')}
-            >
-              + New Survey
-            </Button>
-          </div>
-        </div>
+      <PageContainer eyebrow="03 — Report" title="Conservation dossier" subtitle="A printable record of one inspection.">
+        <EmptyState
+          title="Nothing to report yet"
+          description="A dossier is assembled from a completed inspection. Run one first, or open the labelled development sample to preview the layout."
+          actions={
+            <>
+              <Button onClick={() => onRouteChange('/upload')} icon={<Icon name="upload" className="h-4 w-4" />}>
+                Start an inspection
+              </Button>
+              <Button variant="secondary" onClick={onLoadFixture}>
+                View development sample
+              </Button>
+            </>
+          }
+        />
       </PageContainer>
     );
   }
 
-  // Safely extract root cause items from contract
-  const rootCauses: RootCauseItem[] = Array.isArray(result.root_cause)
-    ? (result.root_cause as RootCauseItem[])
-    : [
-        {
-          finding: 'Vegetation root expansion along primary ashlar masonry bed joints',
-          probable_cause: 'Mortar loss from historic unmaintained joints followed by seed germination in microclimatic dampness',
-          evidence_rules: [
-            'Root intrusion connected to visible bedding joint line',
-            'Displaced sandstone facing stones localized to root clusters',
-          ],
-          urgency: 'critical',
-        },
-        {
-          finding: 'Efflorescence and sub-surface salt spalling at lower basin tier',
-          probable_cause: 'Intermittent ground moisture rising through capillary action without evaporation relief due to debris accumulation',
-          evidence_rules: ['Defects concentrated within 1.5m above current sediment line'],
-          urgency: 'high',
-        },
-      ];
-
-  const primaryDamage = result.vision.detections[0]?.class_name?.replace(/_/g, ' ') || 'Ashlar Joint Loss';
-  const primaryAction = result.restoration.prioritized_actions[0]?.action_title || 'Non-destructive vegetation extraction';
+  const { result } = session;
+  const isFixture = session.provenance === 'fixture';
+  const rulesOrigin = isFixture ? 'fixture' : 'rules';
+  const disclaimer =
+    'This dossier summarises photographic evidence and rule-based assessments. It does not certify structural safety and does not replace on-site investigation by qualified conservation engineers. Material recommendations depend on laboratory confirmation of the original material.';
 
   return (
-    <PageContainer
-      title="Conservation Dossier"
-      subtitle={`Evidence-based restoration roadmap & IKS material compatibility for ${result.structure.name || 'Historic Water Structure'}.`}
-      badge={
-        isMockFixture ? (
-          <StatusBadge
-            label="Reference Dossier"
-            variant="sandstone"
-            size="sm"
-          />
-        ) : (
-          <StatusBadge
-            label="Live Dossier"
-            variant="success"
-            size="sm"
-          />
-        )
-      }
-      actions={
-        <div className="flex items-center gap-2.5">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.print()}
-          >
-            Print Dossier
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => onRouteChange('/analysis')}
-          >
-            ← Diagnostics
-          </Button>
+    <div className="relative">
+      {isFixture && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-[1] flex items-center justify-center overflow-hidden print:absolute"
+        >
+          <span className="-rotate-[24deg] whitespace-nowrap font-display text-[12vw] font-medium uppercase tracking-[0.1em] text-ochre-500/[0.07] print:text-ochre-500/15">
+            Development sample
+          </span>
         </div>
-      }
-    >
-      {/* Dossier Section Filter Tabs: Poppins typography, subtle blue highlight rule */}
-      <div className="flex items-center space-x-6 overflow-x-auto no-scrollbar border-b border-[#28A9E0]/20 mb-8 text-xs font-sans">
-        {[
-          { id: 'all', label: 'All Sections' },
-          { id: 'chain', label: '01. Causal Chain' },
-          { id: 'material', label: '02. Material Compatibility' },
-          { id: 'why', label: '03. Engineering Rationale' },
-          { id: 'root_cause', label: '04. Root Cause' },
-          { id: 'roadmap', label: '05. Phased Roadmap' },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id as ReportTab)}
-            className={`pb-2.5 whitespace-nowrap transition-all relative font-medium ${
-              activeTab === tab.id
-                ? 'text-white font-semibold'
-                : 'text-[#8CD8F5]/75 hover:text-white'
-            }`}
-          >
-            <span>{tab.label}</span>
-            {activeTab === tab.id && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#28A9E0] rounded-t-xs" />
+      )}
+
+      <PageContainer
+        eyebrow="03 — Report"
+        title="Conservation dossier"
+        subtitle={
+          <>
+            {result.structure.name || `Unnamed ${humanize(result.structure.type).toLowerCase()}`} ·{' '}
+            {humanize(result.structure.type)}
+            {result.structure.region ? ` · ${result.structure.region}` : ''}
+          </>
+        }
+        actions={
+          <>
+            <Button variant="secondary" onClick={() => onRouteChange('/analysis')} icon={<Icon name="arrowLeft" className="h-4 w-4" />}>
+              Findings
+            </Button>
+            <Button onClick={() => window.print()} icon={<Icon name="printer" className="h-4 w-4" />}>
+              Print / save as PDF
+            </Button>
+          </>
+        }
+        banner={<ProvenanceBanner session={session} />}
+        className="relative z-[2] print:max-w-none print:px-0 print:pb-0"
+      >
+        <div className="space-y-14 print:space-y-10">
+          <Section index="01" title="Record">
+            <dl className="grid gap-x-10 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                ['Structure', result.structure.name || 'Not named'],
+                ['Typology', humanize(result.structure.type)],
+                ['Region', result.structure.region || 'Not stated'],
+                ['Generated', formatTimestamp(result.metadata.created_at)],
+                ['Pipeline status', humanize(result.metadata.pipeline_status)],
+                ['Vision model', result.vision.processing_metadata?.model_version ?? 'Not reported'],
+                ['Image ID', session.image?.image_id ?? 'Not stored'],
+                ['Inspection ID', session.image?.inspection_id ?? '—'],
+                ['Source', isFixture ? 'Development fixture (not an inspection)' : 'JalDrishti API response'],
+              ].map(([label, value]) => (
+                <div key={label} className="border-t border-ink-900/10 pt-2">
+                  <dt className="text-xs text-ink-500">{label}</dt>
+                  <dd className="mt-0.5 break-words font-medium text-ink-900">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </Section>
+
+          <Section index="02" title="Visual findings" aside={<OriginTag kind={visionOrigin(session)} />}>
+            <div className="grid gap-8 lg:grid-cols-12 print:block">
+              <div className="min-w-0 lg:col-span-6 print:mb-6 print:max-w-[60%]">
+                <InspectionCanvas
+                  imageSrc={resolveImageSource(session)}
+                  imageDimensions={result.vision.image_dimensions}
+                  detections={result.vision.detections}
+                  visibleClasses={allClasses}
+                  highlighted={null}
+                  onHighlight={noop}
+                />
+              </div>
+              <div className="min-w-0 lg:col-span-6">
+                <VisualMetricsPanel detections={result.vision.detections} scaleReference={result.vision.scale_reference} />
+              </div>
+            </div>
+          </Section>
+
+          <Section index="03" title="Engineering assessment" aside={<OriginTag kind={rulesOrigin} />}>
+            {metrics.length === 0 ? (
+              <p className="text-sm text-ink-600">The response contained no engineering scores.</p>
+            ) : (
+              <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 print:grid-cols-2">
+                {metrics.map((m) => (
+                  <ScoreCard key={m.key} label={m.label} metric={m.metric} direction={m.direction} className="break-inside-avoid" />
+                ))}
+              </div>
             )}
-          </button>
-        ))}
-      </div>
+          </Section>
 
-      {/* 1. Core Conservation Narrative Chain */}
-      {(activeTab === 'all' || activeTab === 'chain') && (
-        <Section
-          tag="Causal Lineage"
-          title="Diagnostic & Conservation Narrative Chain"
-          subtitle="Showing the step-by-step lineage from visible observation to traditional knowledge and minimum-intervention action."
-        >
-          <ConservationChain
-            damageFinding={`Observed ${primaryDamage} on historic masonry face`}
-            probableCause={rootCauses[0]?.probable_cause}
-            traditionalPrinciple="Aparajitaprccha vapor-permeability & flexible hydraulic lime cohesion"
-            materialMatch={`Original: ${result.material.original_material.replace(/_/g, ' ')}`}
-            actionTitle={primaryAction}
-            className="mb-10"
-          />
-        </Section>
-      )}
+          <Section index="04" title="Probable causes" aside={<OriginTag kind={rulesOrigin} />}>
+            <RootCauseAnalysisCard causes={causes} />
+          </Section>
 
-      {/* 2. IKS Material DNA & 7-Dimensional Compatibility */}
-      {(activeTab === 'all' || activeTab === 'material') && (
-        <Section
-          tag="IKS Material DNA"
-          title="Substrate Characterization & Multi-Dimensional Compatibility"
-          subtitle="Evaluating candidate conservation materials against the authentic historical fabric across 7 distinct physical-chemical axes."
-        >
-          <MaterialDnaCard
-            material={result.material}
-            className="mb-10"
-          />
-        </Section>
-      )}
+          <Section
+            index="05"
+            title="Material compatibility"
+            aside={
+              <>
+                <OriginTag kind={rulesOrigin} />
+                {result.material.verification_required && <OriginTag kind="expert" />}
+              </>
+            }
+          >
+            <WhyThisRecommendation material={result.material} className="mb-8 break-inside-avoid" />
+            <div className="grid gap-x-8 gap-y-8 md:grid-cols-2">
+              {result.material.candidate_interventions.map((c) => (
+                <MaterialDnaCard key={c.intervention_material} candidate={c} />
+              ))}
+            </div>
+          </Section>
 
-      {/* 3. Why This Recommendation? */}
-      {(activeTab === 'all' || activeTab === 'why') && (
-        <Section
-          tag="Engineering Rationale"
-          title="Deep Dive: Scientific & Architectural Basis"
-          subtitle="Clear justification of why traditional breathable binders prevent the catastrophic failure caused by Portland cement."
-        >
-          <WhyThisRecommendation
-            className="mb-10"
-          />
-        </Section>
-      )}
+          <Section
+            index="06"
+            title="Conservation considerations"
+            aside={
+              <>
+                <OriginTag kind={rulesOrigin} />
+                <OriginTag kind="expert" />
+              </>
+            }
+          >
+            <RestorationRoadmap restoration={result.restoration} />
+          </Section>
 
-      {/* 4. Root Cause Analysis */}
-      {(activeTab === 'all' || activeTab === 'root_cause') && (
-        <Section
-          tag="Failure Mechanisms"
-          title="Deterministic Root-Cause Deductions"
-          subtitle="Engineering rule evaluation identifying the environmental and maintenance roots of deterioration."
-        >
-          <RootCauseAnalysisCard
-            rootCauseItems={rootCauses}
-            className="mb-10"
-          />
-        </Section>
-      )}
-
-      {/* 5. Phased Restoration Roadmap */}
-      {(activeTab === 'all' || activeTab === 'roadmap') && (
-        <Section
-          tag="Intervention Plan (REVIVE)"
-          title="Prioritized Conservation Roadmap"
-          subtitle="Phased action matrix respecting prerequisite dependencies, seasonal curing windows, and strict prohibition of incompatible modern binders."
-        >
-          <RestorationRoadmap
-            restoration={result.restoration}
-            className="mb-10"
-          />
-        </Section>
-      )}
-    </PageContainer>
+          <section className="rule break-inside-avoid pt-6">
+            <h2 className="eyebrow text-ink-500">Limitations</h2>
+            <p className="mt-3 max-w-prose text-sm leading-relaxed text-ink-700">{disclaimer}</p>
+            {isFixture && (
+              <p className="mt-3 max-w-prose text-sm font-semibold text-ochre-700">
+                This document was generated from the development sample and describes no real structure.
+              </p>
+            )}
+            <p className="mt-6 font-mono text-[0.6875rem] text-ink-500">JalDrishti · Team NeuralX</p>
+          </section>
+        </div>
+      </PageContainer>
+    </div>
   );
 };
+
+export default ReportPage;

@@ -1,84 +1,57 @@
 import React from 'react';
 import { RootCauseItem } from '../types';
-import { Card } from './Card';
+import { StatusBadge, BadgeVariant } from './StatusBadge';
+import { humanize } from '../utils/analysis';
+
+const URGENCY: Record<string, BadgeVariant> = {
+  critical: 'danger',
+  high: 'danger',
+  medium: 'ochre',
+  low: 'neutral',
+};
 
 export interface RootCauseAnalysisCardProps {
-  rootCauseItems: RootCauseItem[];
+  causes: RootCauseItem[];
   className?: string;
 }
 
-export const RootCauseAnalysisCard: React.FC<RootCauseAnalysisCardProps> = ({
-  rootCauseItems,
-  className = '',
-}) => {
+/** Probable causes inferred by the rule engine, each with the evidence rules that fired. */
+export const RootCauseAnalysisCard: React.FC<RootCauseAnalysisCardProps> = ({ causes, className = '' }) => {
+  if (causes.length === 0) {
+    return <p className={`text-sm text-ink-600 ${className}`}>The rule engine did not infer any probable causes from these findings.</p>;
+  }
+
   return (
-    <Card
-      title="Root-Cause Degradation Mechanisms"
-      subtitle="Deterministic engineering rule deductions connecting visual symptoms to hydrological failure"
-      borderAccent="sandstone"
-      className={className}
-    >
-      <div className="space-y-4">
-        {rootCauseItems.map((item, idx) => {
-          const isCritical = item.urgency === 'critical';
-          const isHigh = item.urgency === 'high';
-
-          return (
-            <div
-              key={idx}
-              className={`p-4 rounded-xl border transition-all ${
-                isCritical
-                  ? 'bg-rose-950/20 border-rose-800/80'
-                  : isHigh
-                  ? 'bg-amber-950/20 border-amber-800/80'
-                  : 'bg-slate-900/60 border-slate-800'
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 pb-1.5 border-b border-slate-800/60">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">{isCritical ? '🚨' : isHigh ? '⚠️' : '🔍'}</span>
-                  <span className="text-xs font-bold text-white font-mono">
-                    {item.finding}
-                  </span>
-                </div>
-
-                <span
-                  className={`text-[9.5px] font-mono px-2 py-0.5 rounded uppercase font-bold self-start sm:self-auto ${
-                    isCritical
-                      ? 'bg-rose-950 text-rose-300 border border-rose-800'
-                      : isHigh
-                      ? 'bg-amber-950 text-amber-300 border border-amber-800'
-                      : 'bg-slate-800 text-slate-300 border border-slate-700'
-                  }`}
-                >
-                  {item.urgency || 'routine'}
-                </span>
-              </div>
-
-              <div className="text-xs text-slate-300 mb-2 leading-relaxed">
-                <strong className="text-sandstone-300">Probable Mechanism: </strong>
-                {item.probable_cause}
-              </div>
-
-              {item.evidence_rules && item.evidence_rules.length > 0 && (
-                <div className="pt-2 border-t border-slate-800/40">
-                  <span className="text-[10px] font-mono uppercase text-slate-500 block mb-1">
-                    DETERMINISTIC RULE EVIDENCE
-                  </span>
-                  <ul className="space-y-1 text-[11px] font-mono text-slate-400">
-                    {item.evidence_rules.map((rule, rIdx) => (
-                      <li key={rIdx} className="flex items-start gap-1.5">
-                        <span className="text-sandstone-400">↳</span>
-                        <span>{rule}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+    <ol className={`divide-y divide-ink-900/10 border-y border-ink-900/10 ${className}`}>
+      {causes.map((cause, i) => (
+        <li key={`${cause.finding}-${i}`} className="grid gap-3 py-5 md:grid-cols-[2.5rem_minmax(0,1fr)_auto] break-inside-avoid">
+          <span className="font-mono text-xs text-ink-500 tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+          <div>
+            <p className="text-sm font-medium text-ink-900">{cause.finding}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-ink-700">
+              <span className="text-ink-500">Probable cause — </span>
+              {cause.probable_cause}
+            </p>
+            {cause.evidence_rules.length > 0 && (
+              <ul className="mt-3 space-y-1 text-xs text-ink-600">
+                {cause.evidence_rules.map((rule) => (
+                  <li key={rule} className="flex gap-2">
+                    <span className="font-mono text-ink-500">rule</span>
+                    <span>{rule}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {cause.urgency && (
+            <div>
+              <StatusBadge label={`${humanize(cause.urgency)} urgency`} variant={URGENCY[cause.urgency] ?? 'neutral'} />
             </div>
-          );
-        })}
-      </div>
-    </Card>
+          )}
+        </li>
+      ))}
+    </ol>
   );
 };
+
+export default RootCauseAnalysisCard;

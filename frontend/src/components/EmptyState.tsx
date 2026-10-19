@@ -1,48 +1,25 @@
 import React from 'react';
-import { Button } from './Button';
 
 export interface EmptyStateProps {
   title: string;
-  description: string;
-  icon?: React.ReactNode;
-  actionLabel?: string;
-  onAction?: () => void;
-  secondaryActionLabel?: string;
-  onSecondaryAction?: () => void;
+  description?: React.ReactNode;
+  actions?: React.ReactNode;
+  /** Optional illustration or icon rendered above the title. */
+  visual?: React.ReactNode;
   className?: string;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({
-  title,
-  description,
-  icon,
-  actionLabel,
-  onAction,
-  secondaryActionLabel,
-  onSecondaryAction,
-  className = '',
-}) => {
-  return (
-    <div className={`glass-panel rounded-2xl p-10 text-center flex flex-col items-center justify-center max-w-xl mx-auto border border-dashed border-slate-800 ${className}`}>
-      <div className="w-14 h-14 rounded-2xl bg-heritage-900 border border-slate-700/60 flex items-center justify-center text-2xl text-sandstone-400 mb-4 shadow-inner">
-        {icon || '🏛️'}
-      </div>
-      <h3 className="text-lg font-bold text-white mb-2 tracking-tight">{title}</h3>
-      <p className="text-xs text-slate-400 max-w-md mb-6 leading-relaxed">
-        {description}
-      </p>
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        {actionLabel && onAction && (
-          <Button variant="sandstone" size="md" onClick={onAction}>
-            {actionLabel}
-          </Button>
-        )}
-        {secondaryActionLabel && onSecondaryAction && (
-          <Button variant="outline" size="md" onClick={onSecondaryAction}>
-            {secondaryActionLabel}
-          </Button>
-        )}
-      </div>
+export const EmptyState: React.FC<EmptyStateProps> = ({ title, description, actions, visual, className = '' }) => (
+  <div
+    className={`flex flex-col items-start gap-5 rounded-sm border border-dashed border-ink-900/20 bg-stone-100/60 px-6 py-12 sm:px-10 sm:py-16 ${className}`}
+  >
+    {visual}
+    <div className="max-w-xl">
+      <h2 className="font-display text-display-sm font-medium text-ink-900">{title}</h2>
+      {description && <div className="mt-3 text-sm leading-relaxed text-ink-600">{description}</div>}
     </div>
-  );
-};
+    {actions && <div className="flex flex-wrap items-center gap-3">{actions}</div>}
+  </div>
+);
+
+export default EmptyState;

@@ -1,203 +1,524 @@
-import React from 'react';
-import { AppRoute } from '../types';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { JalDrishtiLogo } from './JalDrishtiLogo';
+import { StepwellSection } from './home/StepwellSection';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+import type { AppRoute } from '../types';
+import type { DescentScene } from '../scene/DescentScene';
 
 export interface HeroSceneProps {
   onRouteChange: (route: AppRoute) => void;
-  onLoadDemoFixture: () => void;
+  /** id of the element that follows the descent; used by "skip". */
+  nextSectionId: string;
 }
 
-export const HeroScene: React.FC<HeroSceneProps> = ({
-  onRouteChange,
-  onLoadDemoFixture,
-}) => {
+type Tone = 'dark' | 'light';
+
+interface Chapter {
+  id: string;
+  /** progress range over which the chapter is fully visible */
+  from: number;
+  to: number;
+  tone: Tone;
+  index?: string;
+  title?: string;
+  body: string;
+}
+
+/**
+ * Narrative copy, keyed to the same scroll progress as the camera path.
+ * Claims are deliberately general and verifiable.
+ */
+const CHAPTERS: Chapter[] = [
+  {
+    id: 'opening',
+    from: 0.13,
+    to: 0.24,
+    tone: 'dark',
+    index: 'I — Through the opening',
+    body: 'Beneath the haze, a structure cut down through the ground to meet the water.',
+  },
+  {
+    id: 'descent',
+    from: 0.34,
+    to: 0.46,
+    tone: 'light',
+    index: 'II — Into the stepwell',
+    body: 'For more than a thousand years, communities in western and northern India built stepped wells down to the water table.',
+  },
+  {
+    id: 'terraces',
+    from: 0.53,
+    to: 0.63,
+    tone: 'light',
+    index: 'III — Engineering in stone',
+    body: 'Terraces and flights of steps let people follow the water as it rose after the monsoon and fell through the dry months.',
+  },
+  {
+    id: 'shade',
+    from: 0.69,
+    to: 0.79,
+    tone: 'light',
+    body: 'Depth, shade and heavy masonry kept the lower levels cool — and every course of stone and lime still records how it was built.',
+  },
+  {
+    id: 'water',
+    from: 0.86,
+    to: 0.93,
+    tone: 'light',
+    index: 'IV — The water',
+    body: 'The water is the reason the structure exists. Conserving one means understanding the other.',
+  },
+];
+
+const RAIL = [
+  { label: 'Above', at: 0 },
+  { label: 'Opening', at: 0.2 },
+  { label: 'Descent', at: 0.48 },
+  { label: 'Water', at: 0.92 },
+];
+
+const FADE = 0.035;
+
+const visibility = (p: number, from: number, to: number) => {
+  if (p < from - FADE || p > to + FADE) return 0;
+  if (p < from) return (p - (from - FADE)) / FADE;
+  if (p > to) return 1 - (p - to) / FADE;
+  return 1;
+};
+
+type Mode = 'loading' | 'immersive' | 'still' | 'fallback';
+
+export const HeroScene: React.FC<HeroSceneProps> = ({ onRouteChange, nextSectionId }) => {
+  const reducedMotion = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const sceneRef = useRef<DescentScene | null>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const chapterRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const railFillRef = useRef<HTMLDivElement>(null);
+  const veilRef = useRef<HTMLDivElement>(null);
+  const cueRef = useRef<HTMLDivElement>(null);
+  const scrimRef = useRef<HTMLDivElement>(null);
+  const [mode, setMode] = useState<Mode>('loading');
+  const [activeRail, setActiveRail] = useState(0);
+  // Chrome sits on bright sky first, then on the shadowed well.
+  const [chromeTone, setChromeTone] = useState<Tone>('dark');
+  const [sceneReady, setSceneReady] = useState(false);
+
+  const tall = mode === 'immersive' || mode === 'loading';
+  const darkBackdrop = mode === 'fallback' || mode === 'still';
+
+  // --- Create / dispose the WebGL scene -----------------------------------------
+  useEffect(() => {
+    let disposed = false;
+    let scene: DescentScene | null = null;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    (async () => {
+      const { detectWebGL, pickQualityTier } = await import('../scene/quality');
+      if (disposed) return;
+      if (!detectWebGL()) {
+        setMode('fallback');
+        return;
+      }
+      try {
+        const { DescentScene: Scene } = await import('../scene/DescentScene');
+        if (disposed) return;
+        scene = new Scene({
+          canvas,
+          tier: pickQualityTier(),
+          still: reducedMotion,
+          onContextLost: () => setMode('fallback'),
+        });
+        sceneRef.current = scene;
+        const rect = canvas.getBoundingClientRect();
+        scene.resize(rect.width, rect.height);
+        setMode(reducedMotion ? 'still' : 'immersive');
+        requestAnimationFrame(() => setSceneReady(true));
+      } catch (err) {
+        console.warn('JalDrishti: 3D scene unavailable, using static fallback.', err);
+        setMode('fallback');
+      }
+    })();
+
+    return () => {
+      disposed = true;
+      scene?.dispose();
+      sceneRef.current = null;
+      setSceneReady(false);
+    };
+  }, [reducedMotion]);
+
+  // --- Resize --------------------------------------------------------------------
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ro = new ResizeObserver(([entry]) => {
+      sceneRef.current?.resize(entry.contentRect.width, entry.contentRect.height);
+    });
+    ro.observe(canvas);
+    return () => ro.disconnect();
+  }, [mode]);
+
+  // --- Scroll → progress → camera + overlay ----------------------------------------
+  const applyProgress = useCallback(
+    (p: number) => {
+      sceneRef.current?.setProgress(mode === 'still' ? 0.62 : p);
+
+      const title = titleRef.current;
+      if (title) {
+        const t = mode === 'immersive' || mode === 'loading' ? 1 - Math.min(1, Math.max(0, (p - 0.05) / 0.06)) : 1;
+        title.style.opacity = String(t);
+        title.style.transform = `translate3d(0, ${(1 - t) * -24}px, 0)`;
+        title.style.visibility = t <= 0.001 ? 'hidden' : 'visible';
+      }
+      if (cueRef.current) cueRef.current.style.opacity = String(p < 0.03 ? 1 : Math.max(0, 1 - (p - 0.03) / 0.03));
+
+      CHAPTERS.forEach((c, i) => {
+        const el = chapterRefs.current[i];
+        if (!el) return;
+        const v = mode === 'immersive' ? visibility(p, c.from, c.to) : 0;
+        el.style.opacity = String(v);
+        el.style.transform = `translate3d(0, ${(1 - v) * 16}px, 0)`;
+        el.style.visibility = v <= 0.001 ? 'hidden' : 'visible';
+      });
+
+      if (scrimRef.current) {
+        const v = mode === 'immersive' ? Math.min(1, Math.max(0, (p - 0.27) / 0.08)) : mode === 'still' ? 1 : 0;
+        scrimRef.current.style.opacity = String(v);
+      }
+      if (railFillRef.current) railFillRef.current.style.transform = `scaleY(${p})`;
+      if (veilRef.current) {
+        const v = mode === 'immersive' ? Math.min(1, Math.max(0, (p - 0.955) / 0.045)) : 0;
+        veilRef.current.style.opacity = String(v);
+      }
+      let rail = 0;
+      RAIL.forEach((r, i) => {
+        if (p >= r.at - 0.02) rail = i;
+      });
+      setActiveRail((prev) => (prev === rail ? prev : rail));
+      const tone: Tone = mode === 'fallback' || (mode !== 'still' && p > 0.27) || mode === 'still' ? 'light' : 'dark';
+      setChromeTone((prev) => (prev === tone ? prev : tone));
+    },
+    [mode],
+  );
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    let raf = 0;
+    let visible = true;
+
+    const measure = () => {
+      raf = 0;
+      const rect = section.getBoundingClientRect();
+      const range = rect.height - window.innerHeight;
+      const p = range > 0 ? Math.min(1, Math.max(0, -rect.top / range)) : 0;
+      applyProgress(p);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(measure);
+    };
+
+    const io = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      const scene = sceneRef.current;
+      if (!scene) return;
+      if (visible && mode === 'immersive' && !document.hidden) scene.start();
+      else scene.stop();
+    });
+    io.observe(section);
+
+    const onVisibility = () => {
+      const scene = sceneRef.current;
+      if (!scene) return;
+      if (document.hidden || !visible) scene.stop();
+      else if (mode === 'immersive') scene.start();
+    };
+
+    measure();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      cancelAnimationFrame(raf);
+      io.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [applyProgress, mode, sceneReady]);
+
+  // --- Pointer parallax ---------------------------------------------------------------
+  useEffect(() => {
+    if (mode !== 'immersive') return;
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+    if (!finePointer) return;
+    const onMove = (e: PointerEvent) => {
+      sceneRef.current?.setPointer((e.clientX / window.innerWidth) * 2 - 1, -((e.clientY / window.innerHeight) * 2 - 1));
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    return () => window.removeEventListener('pointermove', onMove);
+  }, [mode]);
+
+  const scrollToProgress = (p: number) => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const range = section.offsetHeight - window.innerHeight;
+    window.scrollTo({ top: section.offsetTop + range * p, behavior: reducedMotion ? 'auto' : 'smooth' });
+  };
+
+  const skip = () => {
+    const next = document.getElementById(nextSectionId);
+    if (!next) return;
+    window.scrollTo({ top: next.offsetTop, behavior: 'auto' });
+    next.focus({ preventScroll: true });
+  };
+
+  const showCanvas = mode === 'loading' || mode === 'immersive' || mode === 'still';
+
   return (
-    <section className="relative w-full bg-[#063B63] overflow-hidden pt-28 sm:pt-36 lg:pt-40 pb-0">
-      {/* Background Layer 1: Atmospheric Water Caustics & Deep Gradient */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#063B63] via-[#0A6FB7]/80 to-[#063B63]" />
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-radial from-[#8FD5F2]/20 via-[#2498D5]/10 to-transparent blur-3xl rounded-full" />
-      </div>
+    <section
+      ref={sectionRef}
+      aria-label="A descent into an illustrative stepwell"
+      className="relative bg-ink-950"
+      style={{ height: tall ? 'max(720vh, 4200px)' : '100svh' }}
+    >
+      <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
+        {/* Scene */}
+        <canvas
+          ref={canvasRef}
+          aria-hidden="true"
+          className={`absolute inset-0 h-full w-full transition-opacity duration-slow ease-out ${
+            showCanvas && sceneReady ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
 
-      {/* Background Layer 2: Subterranean Stepwell Masonry & Geometrical Arch Silhouettes */}
-      <div className="absolute inset-0 pointer-events-none opacity-20">
-        <svg
-          viewBox="0 0 1440 700"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full object-cover"
+        {/* Pre-scene and no-WebGL composition: haze, then the section drawing */}
+        <div
+          aria-hidden="true"
+          className={`absolute inset-0 transition-opacity duration-slow ${sceneReady && showCanvas ? 'opacity-0' : 'opacity-100'}`}
+          style={{
+            background:
+              mode === 'fallback'
+                ? 'radial-gradient(120% 80% at 50% 0%, #2a241c 0%, #0E0C0A 70%)'
+                : 'linear-gradient(180deg, #8f9e9f 0%, #e9dcc4 55%, #ddd0ba 100%)',
+          }}
         >
-          {/* Ancient stepwell tiers fading into the aquatic depths */}
-          <path
-            d="M-50 480H220V420H340V360H460V300H580V250H860V300H980V360H1100V420H1220V480H1500"
-            stroke="#8FD5F2"
-            strokeWidth="1.2"
-            strokeDasharray="4 4"
-          />
-          <path
-            d="M-50 540H180V490H300V440H420V390H540V340H900V390H1020V440H1140V490H1260V540H1500"
-            stroke="#8FD5F2"
-            strokeWidth="0.8"
-            opacity="0.6"
-          />
-          {/* Submerged Archway contour */}
-          <path
-            d="M620 620V450C620 400 660 360 720 360C780 360 820 400 820 450V620"
-            stroke="#FFFFFF"
-            strokeWidth="1.5"
-            opacity="0.3"
-          />
-        </svg>
-      </div>
-
-      {/* Layer 3: Flowing ribbons, aquatic vegetation silhouettes, and gentle fish forms */}
-      <div className="absolute inset-0 pointer-events-none">
-        <svg
-          viewBox="0 0 1440 750"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full object-cover"
-        >
-          {/* Left flowing hydrodynamic ribbon */}
-          <path
-            d="M-80 340C120 280 200 480 380 430C520 390 480 220 280 260C160 280 40 400 -80 340Z"
-            fill="url(#ribbonLeft)"
-            opacity="0.3"
-          />
-
-          {/* Right aquatic stylized vegetation cluster */}
-          <g opacity="0.35">
-            <path
-              d="M1250 600C1230 450 1280 350 1270 250C1260 200 1230 180 1220 240C1210 320 1240 460 1210 600"
-              fill="#2498D5"
+          {mode === 'fallback' && (
+            <StepwellSection
+              tone="dark"
+              showLabels={false}
+              className="absolute -right-[20%] bottom-0 h-[48%] w-auto max-w-none opacity-40 sm:right-0 sm:h-[62%] lg:opacity-60"
             />
-            <path
-              d="M1320 600C1300 480 1350 380 1330 280C1320 220 1290 230 1280 290C1270 380 1310 500 1290 600"
-              fill="#063B63"
-            />
-            <path
-              d="M1380 600C1370 420 1420 320 1400 220C1390 170 1360 180 1350 240C1340 330 1380 480 1360 600"
-              fill="#2498D5"
-            />
-          </g>
-
-          {/* Left aquatic flora cluster */}
-          <g opacity="0.35">
-            <path
-              d="M60 600C40 480 90 380 70 290C60 230 30 240 20 300C10 390 50 510 30 600"
-              fill="#2498D5"
-            />
-            <path
-              d="M130 600C110 460 160 360 140 270C130 220 100 230 90 290C80 370 120 490 100 600"
-              fill="#063B63"
-            />
-          </g>
-
-          {/* Delicate swimming fish silhouettes */}
-          {/* Fish 1 (Top Left) */}
-          <path
-            d="M190 210C210 205 230 215 245 220C230 225 210 235 190 230C180 227 175 220 170 215L160 210L168 220L160 230L170 225C175 220 180 213 190 210Z"
-            fill="#FFFFFF"
-            opacity="0.75"
-            className="animate-subtle-float"
-          />
-          {/* Fish 2 (Mid Right) */}
-          <path
-            d="M1120 320C1140 315 1160 325 1175 330C1160 335 1140 345 1120 340C1110 337 1105 330 1100 325L1090 320L1098 330L1090 340L1100 335C1105 330 1110 323 1120 320Z"
-            fill="#8FD5F2"
-            opacity="0.8"
-          />
-          {/* Fish 3 (Small, Lower Left) */}
-          <path
-            d="M380 380C395 376 410 383 420 387C410 391 395 398 380 394C373 392 369 387 365 383L358 380L363 387L358 394L365 391C369 387 373 382 380 380Z"
-            fill="#FFFFFF"
-            opacity="0.6"
-          />
-          {/* Fish 4 (Small, Lower Center) */}
-          <path
-            d="M840 410C855 406 870 413 880 417C870 421 855 428 840 424C833 422 829 417 825 413L818 410L823 417L818 424L825 421C829 417 833 412 840 410Z"
-            fill="#8FD5F2"
-            opacity="0.6"
-          />
-
-          {/* Delicate water bubbles */}
-          <circle cx="280" cy="180" r="4" fill="#FFFFFF" opacity="0.5" />
-          <circle cx="295" cy="150" r="2.5" fill="#8FD5F2" opacity="0.6" />
-          <circle cx="760" cy="220" r="3.5" fill="#FFFFFF" opacity="0.4" />
-          <circle cx="775" cy="190" r="2" fill="#8FD5F2" opacity="0.5" />
-          <circle cx="1060" cy="260" r="4.5" fill="#FFFFFF" opacity="0.45" />
-
-          <defs>
-            <linearGradient id="ribbonLeft" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#8FD5F2" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#0A6FB7" stopOpacity="0.1" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-
-      {/* Main Content Area: Centered, Editorial, Restrained */}
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-4 pb-32 sm:pb-44 lg:pb-52">
-        {/* Eyebrow Label */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#EAF7FB] text-xs font-mono uppercase tracking-widest mb-6">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#8FD5F2] animate-pulse" />
-          <span>Digital Intelligence for India's Traditional Water Heritage</span>
+          )}
         </div>
 
-        {/* Central Editorial Headline */}
-        <h1 className="text-4xl sm:text-6xl lg:text-[72px] font-bold tracking-tight text-white leading-[1.08] mb-6 drop-shadow-sm font-sans">
-          <span>India's water wisdom,</span>
-          <br />
-          <span className="font-editorial italic font-normal text-[#8FD5F2] lowercase tracking-normal">
-            seen differently.
-          </span>
-        </h1>
+        {/* Legibility scrim for light-on-scene copy */}
+        <div
+          ref={scrimRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            opacity: 0,
+            background:
+              mode === 'still'
+                ? 'linear-gradient(90deg, rgba(14,12,10,0.8) 0%, rgba(14,12,10,0.45) 45%, rgba(14,12,10,0) 75%)'
+                : 'radial-gradient(110% 75% at 0% 100%, rgba(14,12,10,0.72) 0%, rgba(14,12,10,0.35) 38%, rgba(14,12,10,0) 70%)',
+          }}
+        />
 
-        {/* Concise Supporting Copy */}
-        <p className="max-w-2xl mx-auto text-base sm:text-lg text-[#EAF7FB]/90 leading-relaxed font-sans font-light mb-10">
-          JalDrishti combines computer vision, indigenous engineering knowledge, and digital conservation tools to help us understand and revive India's traditional water heritage.
+        {/* Top bar */}
+        <header className="gutter absolute inset-x-0 top-0 z-nav flex h-[var(--nav-h)] items-center justify-between">
+          <a
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'auto' });
+            }}
+            aria-label="JalDrishti home"
+          >
+            <JalDrishtiLogo tone={chromeTone === 'light' ? 'light' : 'dark'} />
+          </a>
+          <nav aria-label="Primary" className="flex items-center gap-1 sm:gap-2">
+            <button
+              type="button"
+              onClick={skip}
+              className={`hidden h-9 items-center px-3 text-xs font-medium tracking-wide sm:inline-flex ${
+                chromeTone === 'light' ? 'text-stone-100 hover:text-stone-50' : 'text-ink-900/80 hover:text-ink-900'
+              } link-underline`}
+            >
+              Skip the descent
+            </button>
+            <a
+              href="/knowledge"
+              onClick={(e) => {
+                e.preventDefault();
+                onRouteChange('/knowledge');
+              }}
+              className={`hidden h-9 items-center px-3 text-xs font-medium tracking-wide md:inline-flex ${
+                chromeTone === 'light' ? 'text-stone-100 hover:text-stone-50' : 'text-ink-900/80 hover:text-ink-900'
+              } link-underline`}
+            >
+              Knowledge
+            </a>
+            <a
+              href="/upload"
+              onClick={(e) => {
+                e.preventDefault();
+                onRouteChange('/upload');
+              }}
+              className={chromeTone === 'light' ? 'btn-light h-9 px-4 text-xs' : 'btn-primary h-9 px-4 text-xs'}
+            >
+              Start an inspection
+            </a>
+          </nav>
+        </header>
+
+        {/* Title */}
+        <div
+          ref={titleRef}
+          className="gutter pointer-events-none absolute inset-x-0 top-[18svh] z-content will-change-transform sm:top-[20svh]"
+        >
+          <div className="mx-auto max-w-wide">
+            <p
+              className={`eyebrow mb-6 ${darkBackdrop ? 'text-stone-300' : 'text-ink-700'}`}
+            >
+              <span className="font-deva text-sm normal-case tracking-normal" lang="hi">
+                जलदृष्टि
+              </span>
+              <span className="mx-3 opacity-50">/</span>
+              Water heritage intelligence
+            </p>
+            <h1
+              className={`font-display text-display-xl font-medium uppercase ${
+                darkBackdrop ? 'text-stone-50' : 'text-ink-950'
+              }`}
+            >
+              JalDrishti
+            </h1>
+            <p
+              className={`mt-6 max-w-[34rem] font-display text-display-sm italic ${
+                darkBackdrop ? 'text-stone-100' : 'text-ink-900'
+              }`}
+            >
+              Where India&rsquo;s water wisdom meets modern intelligence.
+            </p>
+            <p
+              className={`mt-4 max-w-[30rem] text-sm leading-relaxed sm:text-base ${
+                mode === 'fallback' ? 'text-stone-300' : 'text-ink-700'
+              }`}
+            >
+              Discover the engineering knowledge held in India&rsquo;s traditional water structures — and the tools
+              to help conserve it.
+            </p>
+            {mode !== 'immersive' && mode !== 'loading' && (
+              <div className="pointer-events-auto mt-8 flex flex-wrap gap-3">
+                <button type="button" onClick={skip} className={darkBackdrop ? 'btn-light' : 'btn-primary'}>
+                  Continue
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Chapters */}
+        {CHAPTERS.map((c, i) => (
+          <div
+            key={c.id}
+            ref={(el) => (chapterRefs.current[i] = el)}
+            className="gutter pointer-events-none absolute inset-x-0 bottom-[14svh] z-content will-change-transform"
+            style={{ opacity: 0, visibility: 'hidden' }}
+            aria-hidden={mode !== 'immersive'}
+          >
+            <div className="mx-auto max-w-wide">
+              <div className="max-w-[34rem]">
+                {c.index && (
+                  <p className={`eyebrow mb-4 ${c.tone === 'dark' ? 'text-ink-800' : 'text-stone-200'}`}>{c.index}</p>
+                )}
+                <p
+                  className={`font-display text-display-sm ${
+                    c.tone === 'dark' ? 'text-ink-950' : 'text-stone-50 [text-shadow:0_1px_24px_rgba(14,12,10,0.45)]'
+                  }`}
+                >
+                  {c.body}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Scroll cue */}
+        {tall && (
+          <div
+            ref={cueRef}
+            className="gutter pointer-events-none absolute bottom-8 right-0 z-content hidden items-end gap-3 text-ink-900 sm:flex"
+          >
+            <span className="eyebrow">Scroll to descend</span>
+            <span className="relative block h-12 w-px overflow-hidden bg-ink-900/20">
+              <span className="animate-scroll-cue absolute inset-0 bg-ink-900" />
+            </span>
+          </div>
+        )}
+
+        {/* Progress rail */}
+        {mode === 'immersive' && (
+          <nav
+            aria-label="Descent chapters"
+            className="absolute right-[var(--gutter)] top-1/2 z-content hidden -translate-y-1/2 md:block"
+          >
+            <div className="relative flex flex-col gap-7 pr-5">
+              <span
+                aria-hidden="true"
+                className={`absolute right-0 top-1 bottom-1 w-px ${chromeTone === 'light' ? 'bg-stone-50/25' : 'bg-ink-900/20'}`}
+              />
+              <span
+                aria-hidden="true"
+                ref={railFillRef}
+                className="absolute right-0 top-1 bottom-1 w-px origin-top bg-laterite-400"
+                style={{ transform: 'scaleY(0)' }}
+              />
+              {RAIL.map((r, i) => (
+                <button
+                  key={r.label}
+                  type="button"
+                  onClick={() => scrollToProgress(r.at)}
+                  aria-current={activeRail === i ? 'step' : undefined}
+                  className={`eyebrow text-right transition-colors duration-base ${
+                    chromeTone === 'light'
+                      ? `[text-shadow:0_1px_12px_rgba(14,12,10,0.5)] ${activeRail === i ? 'text-stone-50' : 'text-stone-50/60 hover:text-stone-50'}`
+                      : activeRail === i
+                        ? 'text-ink-950'
+                        : 'text-ink-900/55 hover:text-ink-950'
+                  }`}
+                >
+                  {String(i + 1).padStart(2, '0')} {r.label}
+                </button>
+              ))}
+            </div>
+          </nav>
+        )}
+
+        {/* Honest caption */}
+        <p
+          className="absolute bottom-3 left-[var(--gutter)] z-content mr-24 max-w-[40rem] rounded-sm bg-ink-950/45 px-2 py-1 font-mono text-[10px] leading-snug tracking-wide text-stone-100/85"
+        >
+          {mode === 'fallback'
+            ? 'Section drawing of an illustrative stepwell. The interactive 3D descent needs WebGL.'
+            : 'Illustrative composite stepwell, modelled procedurally. Not a survey of a specific site.'}
         </p>
 
-        {/* Actions: Primary Pill + Secondary Outline */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button
-            onClick={() => onRouteChange('/upload')}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#063B63] hover:bg-[#04253e] text-white font-semibold text-xs sm:text-sm tracking-wider uppercase shadow-xl shadow-[#063B63]/40 border border-[#2498D5]/40 hover:border-[#8FD5F2] transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0"
-          >
-            SCAN A DHAROHAR
-          </button>
-
-          <button
-            onClick={onLoadDemoFixture}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white/15 hover:bg-white/25 text-white font-semibold text-xs sm:text-sm tracking-wider uppercase backdrop-blur-sm border border-white/30 transition-all duration-200"
-          >
-            EXPLORE THE KNOWLEDGE
-          </button>
-        </div>
-      </div>
-
-      {/* THE SIGNATURE WHITE ORGANIC CURVED SHAPE */}
-      {/* Inspired by the reference: A bespoke sweeping organic wave cutting diagonally across the bottom */}
-      <div className="relative w-full leading-none z-20">
-        <svg
-          viewBox="0 0 1440 220"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-auto block"
-          preserveAspectRatio="none"
-        >
-          {/* Subtle soft translucent water transition rim */}
-          <path
-            d="M0 130C320 220 540 60 920 140C1160 190 1340 100 1440 80V220H0V130Z"
-            fill="#2498D5"
-            opacity="0.35"
-          />
-          {/* Main Pure White Organic Foreground Curve */}
-          <path
-            d="M0 160C280 235 520 85 880 155C1140 205 1320 120 1440 95V220H0V160Z"
-            fill="#FFFFFF"
-          />
-        </svg>
+        {/* Water veil: the descent dissolves into the water colour of the next section */}
+        <div
+          ref={veilRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-overlay bg-jade-900"
+          style={{ opacity: 0 }}
+        />
       </div>
     </section>
   );
 };
+
+export default HeroScene;

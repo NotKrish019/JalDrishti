@@ -2,91 +2,51 @@ import React from 'react';
 
 export interface JalDrishtiLogoProps {
   className?: string;
-  size?: 'sm' | 'md' | 'lg';
+  /** 'light' renders for dark backgrounds, 'dark' for parchment backgrounds. */
+  tone?: 'light' | 'dark';
   showText?: boolean;
-  light?: boolean;
+  /** Show the Devanagari name beneath the wordmark. */
+  showDevanagari?: boolean;
 }
 
+/**
+ * Mark: a stepwell in plan — three descending rings, the entry stair, and the water.
+ */
 export const JalDrishtiLogo: React.FC<JalDrishtiLogoProps> = ({
   className = '',
-  size = 'md',
+  tone = 'dark',
   showText = true,
-  light = true,
+  showDevanagari = false,
 }) => {
-  const iconDimensions = {
-    sm: 'w-7 h-7',
-    md: 'w-9 h-9',
-    lg: 'w-12 h-12',
-  }[size];
-
-  const textSize = {
-    sm: 'text-base',
-    md: 'text-lg',
-    lg: 'text-2xl',
-  }[size];
+  const stroke = tone === 'light' ? '#E2D3BA' : '#17140F';
+  const text = tone === 'light' ? 'text-stone-50' : 'text-ink-900';
+  const sub = tone === 'light' ? 'text-stone-300' : 'text-ink-600';
 
   return (
-    <div className={`flex items-center gap-2.5 select-none ${className}`}>
-      {/* Bespoke vector mark: Stepwell arch intertwined with flowing water currents */}
-      <div className={`relative ${iconDimensions} shrink-0 flex items-center justify-center`}>
-        <svg
-          viewBox="0 0 48 48"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full drop-shadow-sm"
-        >
-          {/* Subtle outer circular aura */}
-          <circle cx="24" cy="24" r="22" className="fill-[#0A6FB7]/20 stroke-[#2498D5]/40" strokeWidth="1.5" />
-          
-          {/* Architectural stepwell arch silhouette */}
-          <path
-            d="M14 36V23C14 17.477 18.477 13 24 13C29.523 13 34 17.477 34 23V36"
-            stroke={light ? '#FFFFFF' : '#063B63'}
-            strokeWidth="2.2"
-            strokeLinecap="round"
-          />
-
-          {/* Stepped terrace contour */}
-          <path
-            d="M17 36V28H21V22H27V28H31V36"
-            stroke={light ? '#8FD5F2' : '#0A6FB7'}
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity="0.85"
-          />
-
-          {/* Flowing water wave intersecting the masonry base */}
-          <path
-            d="M10 33C14 30 18 35 24 32C30 29 34 34 38 31"
-            stroke={light ? '#2498D5' : '#2498D5'}
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-
-          {/* Concentric subterranean water droplet */}
-          <circle cx="24" cy="18" r="2.5" fill={light ? '#8FD5F2' : '#0A6FB7'} />
-        </svg>
-      </div>
-
+    <span className={`inline-flex items-center gap-3 select-none ${className}`}>
+      <svg viewBox="0 0 32 32" className="h-7 w-7 shrink-0" aria-hidden="true">
+        <g fill="none" stroke={stroke} strokeWidth="1.4">
+          <circle cx="16" cy="16" r="14" />
+          <circle cx="16" cy="16" r="10" strokeOpacity="0.75" />
+          <circle cx="16" cy="16" r="6.5" strokeOpacity="0.55" />
+          <path d="M16 2v7.5" />
+        </g>
+        <circle cx="16" cy="16" r="3.6" fill="#2F6152" />
+      </svg>
       {showText && (
-        <div className="flex flex-col">
-          <span
-            className={`font-display font-bold tracking-tight leading-none ${textSize} ${
-              light ? 'text-white' : 'text-[#063B63]'
-            }`}
-          >
+        <span className="flex flex-col leading-none">
+          <span className={`font-sans text-[0.8125rem] font-semibold uppercase tracking-[0.22em] ${text}`}>
             JalDrishti
           </span>
-          <span
-            className={`text-[9.5px] font-mono tracking-wider uppercase mt-0.5 ${
-              light ? 'text-[#8FD5F2]' : 'text-[#0A6FB7]'
-            }`}
-          >
-            Water Heritage Intelligence
-          </span>
-        </div>
+          {showDevanagari && (
+            <span className={`mt-1 font-deva text-[0.8125rem] ${sub}`} lang="hi">
+              जलदृष्टि
+            </span>
+          )}
+        </span>
       )}
-    </div>
+    </span>
   );
 };
+
+export default JalDrishtiLogo;
