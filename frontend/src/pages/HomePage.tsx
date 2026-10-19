@@ -2,12 +2,14 @@ import React, { useRef } from 'react';
 import { HeroScene } from '../components/HeroScene';
 import {
   ApproachSection,
-  ChallengeSection,
-  DescentResolution,
-  EngineeringStory,
+  ContextsSection,
+  DiversitySection,
+  DocumentationSection,
+  ReviveSection,
+  UnderstandSection,
 } from '../components/home/StorySections';
 import { MaterialSection } from '../components/home/MaterialSection';
-import { ClosingSection, ProductSection } from '../components/home/ProductSections';
+import { ClosingSection, SeeSection } from '../components/home/ProductSections';
 import { useReveal } from '../hooks/useReveal';
 import { AppRoute } from '../types';
 
@@ -16,8 +18,10 @@ export interface HomePageProps {
 }
 
 /**
- * Landing narrative: the 3D descent resolves into the water, and the water
- * into the method, the materials and the workspace.
+ * Landing narrative: the brand over one illustrative stepwell, the descent to its
+ * water, then the wider story — the diversity of India's water heritage, why
+ * documentation matters, SEE → UNDERSTAND → ASSESS → REVIVE, and the difference
+ * between the mission and what is built today.
  */
 export const HomePage: React.FC<HomePageProps> = ({ onRouteChange }) => {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -30,12 +34,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onRouteChange }) => {
       </a>
       <main>
         <HeroScene onRouteChange={onRouteChange} nextSectionId="after-descent" />
-        <DescentResolution id="after-descent" />
-        <EngineeringStory />
-        <ChallengeSection />
-        <ApproachSection />
+        <DiversitySection id="after-descent" />
+        <DocumentationSection />
+        <SeeSection onRouteChange={onRouteChange} />
+        <UnderstandSection onRouteChange={onRouteChange} />
         <MaterialSection />
-        <ProductSection onRouteChange={onRouteChange} />
+        <ReviveSection />
+        <ContextsSection />
+        <ApproachSection />
       </main>
       <ClosingSection onRouteChange={onRouteChange} />
     </div>

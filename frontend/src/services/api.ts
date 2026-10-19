@@ -19,9 +19,11 @@ import {
 } from '../types';
 import { MOCK_ANALYSIS_FIXTURE } from '../mocks/fixtures';
 
+const LOCAL_HOSTS = ['localhost', '127.0.0.1', '[::1]'];
+
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ??
-  (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '' : 'http://localhost:8000');
+  (typeof window !== 'undefined' && !LOCAL_HOSTS.includes(window.location.hostname) ? '' : 'http://localhost:8000');
 
 /** Mirrors the backend default MAX_UPLOAD_SIZE_BYTES (10 MB). */
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;

@@ -21,8 +21,10 @@ const easeInOut = (k: number) => k * k * (3 - 2 * k);
  * same values so the narrative stays in step with the camera.
  */
 export const PHASES = {
-  cloudsStart: 0.05,
-  cloudsOpen: 0.3,
+  /** The whole site, held while the visitor takes it in. */
+  siteHold: 0.06,
+  /** Arriving over the rim. */
+  rim: 0.22,
   descentStart: 0.3,
   descentEnd: 0.86,
   water: 1,
@@ -47,8 +49,19 @@ export const DESCENT_HELIX: HelixParams = {
   yEnd: WATER_Y + 9.5,
 };
 
+/**
+ * Fraction of the helix's rotation completed at s. The turn rate ramps up from
+ * zero over the first stretch instead of starting at full speed, so the hand-off
+ * from the straight approach over the rim into the spiral has no sudden whip.
+ */
+const HELIX_RAMP = 0.1;
+const helixTurn = (s: number) => {
+  const c = 1 / (1 - HELIX_RAMP / 2);
+  return s < HELIX_RAMP ? (c * s * s) / (2 * HELIX_RAMP) : c * (s - HELIX_RAMP / 2);
+};
+
 export const helixPoint = (h: HelixParams, s: number): CameraPose => {
-  const theta = h.theta0 + s * h.turns * Math.PI * 2;
+  const theta = h.theta0 + helixTurn(s) * h.turns * Math.PI * 2;
   const r = lerp(h.radiusStart, h.radiusEnd, easeInOut(s));
   const y = lerp(h.yStart, h.yEnd, s);
   // Gaze crosses the void towards the far wall, dropping towards the water as we descend.
@@ -61,31 +74,45 @@ export const helixPoint = (h: HelixParams, s: number): CameraPose => {
   };
 };
 
-/** Builds the full, deterministic set of camera keys from cloud sea to water. */
+/** Opening view: elevated three-quarter aerial over the whole site. */
+export const OPENING = {
+  /** Azimuth offset from the descent's entry azimuth; the approach swings round to it. */
+  azimuth: -0.2,
+  distance: 92,
+  height: 64,
+} as const;
+
+/** Builds the full, deterministic set of camera keys from the site overview to the water. */
 export const buildCameraKeys = (): CameraKey[] => {
   const h = DESCENT_HELIX;
   const entry = helixPoint(h, 0);
   const entryTheta = h.theta0;
   const c = Math.cos(entryTheta);
   const s = Math.sin(entryTheta);
-
-  const keys: CameraKey[] = [
-    // Above the cloud sea, horizon in the upper third.
-    { t: 0, position: [c * 150, 112, s * 150], target: [c * 10, 72, s * 10] },
-    { t: 0.08, position: [c * 130, 104, s * 130], target: [c * 6, 52, s * 6] },
-    // The clouds part; the opening comes into view below.
-    { t: 0.17, position: [c * 84, 76, s * 84], target: [0, 0, 0] },
-    { t: 0.25, position: [c * 44, 34, s * 44], target: [-c * 4, -12, -s * 4] },
-    // Settling over the rim, just before the turn inwards.
-    { t: PHASES.descentStart, position: [c * 24, 12, s * 24], target: [-c * 6, -9, -s * 6] },
+  const at = (azimuth: number, r: number, y: number): Vec3 => [
+    Math.cos(entryTheta + azimuth) * r,
+    y,
+    Math.sin(entryTheta + azimuth) * r,
   ];
 
-  const helixSamples = 16;
+  const keys: CameraKey[] = [
+    // The whole site from above: well, enclosure, approach and landscape.
+    { t: 0, position: at(OPENING.azimuth, OPENING.distance, OPENING.height), target: [0, -4, 0] },
+    { t: PHASES.siteHold, position: at(OPENING.azimuth * 0.9, OPENING.distance - 4, OPENING.height - 2.5), target: [0, -4.5, 0] },
+    // A slow, weighted approach that swings round towards the descent's entry.
+    { t: 0.15, position: at(OPENING.azimuth * 0.45, 64, 46), target: [-c * 2, -8, -s * 2] },
+    { t: PHASES.rim, position: [c * 42, 30, s * 42], target: [-c * 4, -12, -s * 4] },
+    // Settling over the rim, just before the turn inwards.
+    { t: PHASES.descentStart, position: [c * 20, 8, s * 20], target: [-c * 6, -9, -s * 6] },
+  ];
+
+  // Dense enough that the spline follows the helix (and its eased turn) closely.
+  const helixSamples = 28;
   for (let i = 0; i <= helixSamples; i += 1) {
     const k = i / helixSamples;
     const pose = i === 0 ? entry : helixPoint(h, k);
     keys.push({
-      t: lerp(PHASES.descentStart + 0.035, PHASES.descentEnd, k),
+      t: lerp(PHASES.descentStart + 0.045, PHASES.descentEnd, k),
       position: pose.position,
       target: pose.target,
     });

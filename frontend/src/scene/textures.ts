@@ -6,7 +6,7 @@ import * as THREE from 'three';
  */
 
 /** Small deterministic PRNG so the masonry pattern is identical on every load. */
-const mulberry32 = (seed: number) => () => {
+export const mulberry32 = (seed: number) => () => {
   let t = (seed += 0x6d2b79f5);
   t = Math.imul(t ^ (t >>> 15), t | 1);
   t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
@@ -256,12 +256,20 @@ export const createGroundTexture = (seed: number, anisotropy: number, size = 512
     const r = 6 + rand() * 40;
     const x = rand() * size;
     const y = rand() * size;
-    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
     const tone = rand() > 0.5 ? '196,184,160' : '120,108,90';
-    g.addColorStop(0, `rgba(${tone},0.18)`);
-    g.addColorStop(1, `rgba(${tone},0)`);
-    ctx.fillStyle = g;
-    ctx.fillRect(x - r, y - r, r * 2, r * 2);
+    // Draw wrapped copies so blobs crossing an edge continue on the opposite side: no tile seams.
+    for (const ox of [-size, 0, size]) {
+      for (const oy of [-size, 0, size]) {
+        const cx = x + ox;
+        const cy = y + oy;
+        if (cx + r < 0 || cx - r > size || cy + r < 0 || cy - r > size) continue;
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        g.addColorStop(0, `rgba(${tone},0.18)`);
+        g.addColorStop(1, `rgba(${tone},0)`);
+        ctx.fillStyle = g;
+        ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+      }
+    }
   }
   speckle(ctx, size, size, rand, size * 20, 0.3);
   return finish(canvas, true, anisotropy);

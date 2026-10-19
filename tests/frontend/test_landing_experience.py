@@ -15,6 +15,8 @@ def test_scene_modules_exist() -> None:
     """The 3D descent is split into focused, reusable modules."""
     for name in [
         "stepwellSpec.ts",
+        "siteSpec.ts",
+        "environment.ts",
         "cameraPath.ts",
         "stepwell.ts",
         "atmosphere.ts",
@@ -67,3 +69,60 @@ def test_no_fabricated_marketing_statistics() -> None:
 def test_illustrative_model_is_disclosed() -> None:
     hero = (SRC / "components" / "HeroScene.tsx").read_text(encoding="utf-8")
     assert "Not a survey of a specific site" in hero
+
+
+def test_opening_frame_is_the_site_not_clouds() -> None:
+    """The descent opens on the stepwell and its surroundings; the cloud prelude is gone."""
+    scene = (SRC / "scene" / "DescentScene.ts").read_text(encoding="utf-8")
+    atmosphere = (SRC / "scene" / "atmosphere.ts").read_text(encoding="utf-8")
+    assert "buildEnvironment" in scene
+    assert "createClouds" not in scene
+    assert "createClouds" not in atmosphere
+
+
+def test_poster_still_backs_loading_and_fallback() -> None:
+    hero = (SRC / "components" / "HeroScene.tsx").read_text(encoding="utf-8")
+    assert "/hero/opening.jpg" in hero
+    assert (FRONTEND / "public" / "hero" / "opening.jpg").exists()
+
+
+def test_narrative_and_method_sections_present() -> None:
+    hero = (SRC / "components" / "HeroScene.tsx").read_text(encoding="utf-8")
+    for label in ["01 / The place", "02 / The approach", "03 / The descent", "04 / The craft", "05 / The water", "06 / JalDrishti"]:
+        assert label in hero, f"Missing descent chapter: {label}"
+    home = "".join(p.read_text(encoding="utf-8") for p in (SRC / "components" / "home").glob("*.tsx"))
+    for stage in ['label="See"', 'label="Understand"', 'label="Assess"', 'label="Revive"']:
+        assert stage in home, f"Missing method section: {stage}"
+
+
+def test_hero_leads_with_brand_and_broad_mission() -> None:
+    """The first viewport names the brand and frames the stepwell as one example of a wider heritage."""
+    hero = (SRC / "components" / "HeroScene.tsx").read_text(encoding="utf-8")
+    assert "<h1" in hero and "JalDrishti" in hero
+    assert "A deeper understanding of India&rsquo;s water heritage." in hero
+    for form in ["stepwells", "kunds", "historic tanks"]:
+        assert form in hero, f"Hero copy should name {form}"
+
+
+def test_typology_scope_is_honest() -> None:
+    """Forms without knowledge records must be labelled as scope, not as implemented coverage."""
+    story = (SRC / "components" / "home" / "StorySections.tsx").read_text(encoding="utf-8")
+    assert "Within the intended scope" in story
+    assert "Knowledge records today" in story
+    recorded = {p.stem for p in (FRONTEND.parent / "knowledge" / "structures").glob("*.json")} - {"index", "structure.schema"}
+    for typology in recorded:
+        assert typology in story.lower(), f"Recorded typology {typology} not acknowledged on the landing page"
+
+
+def test_overlay_follows_camera_progress() -> None:
+    """Chapter copy is driven by the scene's eased progress so it cannot drift from the camera."""
+    scene = (SRC / "scene" / "DescentScene.ts").read_text(encoding="utf-8")
+    hero = (SRC / "components" / "HeroScene.tsx").read_text(encoding="utf-8")
+    assert "onProgress" in scene and "initialProgress" in scene
+    assert "onProgress: (p) => overlayRef.current(p)" in hero
+
+
+def test_reduced_motion_keeps_the_story() -> None:
+    """Without the animated descent, the same chapters are rendered as a readable list."""
+    hero = (SRC / "components" / "HeroScene.tsx").read_text(encoding="utf-8")
+    assert 'id="descent-chapters"' in hero

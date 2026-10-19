@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SectionIndex } from './SectionIndex';
+import { PointList } from './StorySections';
 import { evaluateMaterialCompatibility } from '../../services/api';
 import type { CandidateIntervention, CompatibilityDimensions } from '../../types';
 
@@ -65,22 +66,33 @@ export const MaterialSection: React.FC = () => {
   const flagged = candidates.find((c) => c.recommendation === 'prohibited_incompatible');
 
   return (
-    <section aria-labelledby="materials-title" className="gutter grain bg-stone-50 py-28 sm:py-36">
+    <section aria-labelledby="materials-title" className="gutter bg-stone-100 py-28 sm:py-36">
       <div className="mx-auto max-w-wide">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
           <div className="lg:col-span-5">
-            <SectionIndex number="05" label="Material compatibility" />
-            <h2 id="materials-title" data-reveal="mask" className="mt-10 font-display text-display-md font-medium text-ink-950">
-              The right repair is the one the original can live with.
+            <SectionIndex number="03" label="Assess" />
+            <h2 id="materials-title" data-reveal="mask" className="mt-10 font-display text-display-lg font-medium text-ink-950">
+              Consider the material, the context, and the cause.
             </h2>
-            <p data-reveal className="mt-8 max-w-prose text-base leading-relaxed text-ink-700">
-              A conservation repair is judged against the material it touches: its strength, how it handles moisture
-              and heat, how it reacts chemically, and whether it can be undone. JalDrishti scores candidate materials
-              on seven such dimensions and explains each warning.
+            <p data-reveal className="mt-8 max-w-prose text-[1.0625rem] leading-relaxed text-ink-700">
+              Conservation decisions depend on more than the appearance of a damaged surface. Existing materials,
+              construction, moisture, drainage, prior repairs, local practices, and possible causes of deterioration all
+              deserve consideration. JalDrishti is intended to support this thinking with organised observations and
+              conservation-oriented material considerations.
             </p>
-            <p data-reveal className="mt-6 max-w-prose border-l-2 border-laterite-400 pl-4 text-sm leading-relaxed text-ink-700">
-              These are rule-based indications from documented material properties, not laboratory results. The
-              original material must be identified on site — for example by petrographic or salt analysis — before any
+            <PointList
+              className="mt-10"
+              points={[
+                'Present candidate material or intervention considerations where implemented.',
+                'Explain relevant compatibility factors and evidence.',
+                'Flag cases that require inspection, testing, or professional review.',
+                'Keep consequential decisions with qualified practitioners.',
+              ]}
+            />
+            <p data-reveal className="mt-8 max-w-prose border-l-2 border-laterite-400 pl-4 text-sm leading-relaxed text-ink-700">
+              The example on this page compares two candidate mortars against a lime substrate using rule-based
+              indications from documented material properties, not laboratory results. Photographs alone cannot establish
+              mortar chemistry or structural capacity; the original material must be identified on site before any
               recommendation is acted on.
             </p>
           </div>

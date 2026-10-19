@@ -5,8 +5,10 @@ export interface QualitySettings {
   antialias: boolean;
   shadows: boolean;
   shadowMapSize: number;
-  cloudLayers: number;
-  cloudOctaves: number;
+  /** Foliage icosahedron detail. */
+  foliageDetail: number;
+  /** Multiplier on distant trees and shrubs. */
+  density: number;
   segments: number;
   textureSize: number;
   dust: number;
@@ -17,9 +19,9 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
     maxPixelRatio: 2,
     antialias: true,
     shadows: true,
-    shadowMapSize: 2048,
-    cloudLayers: 5,
-    cloudOctaves: 5,
+    shadowMapSize: 4096,
+    foliageDetail: 2,
+    density: 1,
     segments: 160,
     textureSize: 1024,
     dust: 520,
@@ -28,9 +30,9 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
     maxPixelRatio: 1.5,
     antialias: true,
     shadows: true,
-    shadowMapSize: 1024,
-    cloudLayers: 4,
-    cloudOctaves: 4,
+    shadowMapSize: 2048,
+    foliageDetail: 1,
+    density: 0.75,
     segments: 112,
     textureSize: 1024,
     dust: 320,
@@ -40,8 +42,8 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
     antialias: false,
     shadows: false,
     shadowMapSize: 0,
-    cloudLayers: 3,
-    cloudOctaves: 3,
+    foliageDetail: 1,
+    density: 0.45,
     segments: 72,
     textureSize: 512,
     dust: 140,

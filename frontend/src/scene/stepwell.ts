@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { STEPWELL, WATER_Y, terraceRadius, terraceY } from './stepwellSpec';
-import { createAshlarTextures, createFriezeTextures, createGroundTexture, createPavingTextures } from './textures';
+import { SITE, courtWallArcs, onCourtWall } from './siteSpec';
+import { createAshlarTextures, createFriezeTextures, createPavingTextures } from './textures';
 import { createStoneMaterial } from './materials';
 
 export interface StepwellOptions {
@@ -12,25 +13,52 @@ export interface StepwellOptions {
   shadows: boolean;
 }
 
+export interface StepwellMaterials {
+  /** Coursed ashlar walling. */
+  wall: THREE.MeshStandardMaterial;
+  /** Paving slabs and treads. */
+  paving: THREE.MeshStandardMaterial;
+  /** Lighter dressed stone for columns, balusters and trim. */
+  trim: THREE.MeshStandardMaterial;
+}
+
 export interface StepwellBuild {
   group: THREE.Group;
+  /** Shared with the surrounding site so the whole place reads as one material language. */
+  materials: StepwellMaterials;
   dispose: () => void;
 }
 
 const ASHLAR_TILE_M = 8;
 const PAVING_TILE_M = 4;
 const FRIEZE_TILE_M = 14;
-const COURT_RADIUS = 38;
-const COURT_WALL_H = 5.5;
+const COURT_RADIUS = SITE.courtRadius;
+const COURT_WALL_H = SITE.courtWallHeight;
+const COURT_WALL_T = SITE.courtWallThickness;
 
 const SANDSTONE = ['#c9ad86', '#bfa078', '#d3b991', '#b8966c', '#c4a47c', '#ad8c64'];
 const PAVING = ['#c0aa88', '#b9a27f', '#c6b090', '#b49c7a'];
 
-/** Inward-facing wall band. UVs are rescaled so texture density is constant. */
-const wallBand = (radius: number, top: number, height: number, segments: number, tileWidth: number, tileHeight: number) => {
-  const geo = new THREE.CylinderGeometry(radius, radius, height, segments, 1, true);
+/**
+ * Inward-facing wall band, optionally limited to the polar arc [arcStart, arcEnd].
+ * UVs are rescaled so texture density is constant.
+ */
+const wallBand = (
+  radius: number,
+  top: number,
+  height: number,
+  segments: number,
+  tileWidth: number,
+  tileHeight: number,
+  arcStart = 0,
+  arcEnd = Math.PI * 2,
+) => {
+  const arc = arcEnd - arcStart;
+  const segs = Math.max(4, Math.round((segments * arc) / (Math.PI * 2)));
+  // CylinderGeometry measures θ from +z towards +x; polar a is measured from +x towards +z.
+  const geo = new THREE.CylinderGeometry(radius, radius, height, segs, 1, true, Math.PI / 2 - arcEnd, arc);
   geo.translate(0, top - height / 2, 0);
-  const repeatsAround = Math.max(1, Math.round((Math.PI * 2 * radius) / tileWidth));
+  const repeatsAround = Math.max(1, Math.round((arc * radius) / tileWidth));
   const uv = geo.attributes.uv as THREE.BufferAttribute;
   for (let i = 0; i < uv.count; i += 1) {
     uv.setXY(i, uv.getX(i) * repeatsAround, uv.getY(i) * (height / tileHeight));
@@ -38,9 +66,20 @@ const wallBand = (radius: number, top: number, height: number, segments: number,
   return geo;
 };
 
-/** Horizontal ring facing up, with world-scaled planar UVs. */
-const flatRing = (inner: number, outer: number, y: number, segments: number, tile: number) => {
-  const geo = new THREE.RingGeometry(inner, outer, segments, 1);
+/** Horizontal ring facing up, with world-scaled planar UVs, optionally limited to a polar arc. */
+const flatRing = (
+  inner: number,
+  outer: number,
+  y: number,
+  segments: number,
+  tile: number,
+  arcStart = 0,
+  arcEnd = Math.PI * 2,
+) => {
+  const arc = arcEnd - arcStart;
+  const segs = Math.max(4, Math.round((segments * arc) / (Math.PI * 2)));
+  // After rotateX(-π/2) the ring's θ runs opposite to the polar angle.
+  const geo = new THREE.RingGeometry(inner, outer, segs, 1, -arcEnd, arc);
   geo.rotateX(-Math.PI / 2);
   geo.translate(0, y, 0);
   const pos = geo.attributes.position as THREE.BufferAttribute;
@@ -84,8 +123,7 @@ export const buildStepwell = ({ segments, anisotropy, textureSize, shadows }: St
   const ashlar = createAshlarTextures(SANDSTONE, 7, anisotropy, textureSize);
   const paving = createPavingTextures(PAVING, 11, anisotropy, textureSize / 2);
   const frieze = createFriezeTextures(23, anisotropy, textureSize);
-  const ground = createGroundTexture(31, anisotropy, textureSize / 2);
-  [ashlar.map, ashlar.bump, paving.map, paving.bump, frieze.map, frieze.bump, ground].forEach(track);
+  [ashlar.map, ashlar.bump, paving.map, paving.bump, frieze.map, frieze.bump].forEach(track);
 
   const wallMat = track(createStoneMaterial({ map: ashlar.map, bump: ashlar.bump, side: THREE.DoubleSide }));
   const floorMat = track(createStoneMaterial({ map: paving.map, bump: paving.bump, side: THREE.DoubleSide, bumpScale: 1 }));
@@ -93,7 +131,6 @@ export const buildStepwell = ({ segments, anisotropy, textureSize, shadows }: St
     createStoneMaterial({ map: frieze.map, bump: frieze.bump, side: THREE.DoubleSide, bumpScale: 2.2, roughness: 0.88 }),
   );
   const columnMat = track(createStoneMaterial({ map: ashlar.map, bump: ashlar.bump, color: '#e8dcc8' }));
-  const groundMat = track(createStoneMaterial({ map: ground, color: '#cbbfa9', side: THREE.FrontSide }));
 
   const { terraceCount, tierHeight, galleryTiers, galleryHeight, rimRadius } = STEPWELL;
   const friezeTiers = new Set([terraceCount - 1, terraceCount - 2]);
@@ -139,11 +176,16 @@ export const buildStepwell = ({ segments, anisotropy, textureSize, shadows }: St
     floorGeos.push(wallBand(inner, y, 0.42, segments, PAVING_TILE_M, PAVING_TILE_M));
   });
 
-  // Paved courtyard around the opening, enclosed by a perimeter wall
+  // Paved courtyard around the opening, enclosed by a perimeter wall. The wall
+  // breaks for the gateway and the pavilion range, which the site module builds.
   floorGeos.push(flatRing(rimRadius, COURT_RADIUS, 0, segments, PAVING_TILE_M));
-  wallGeos.push(wallBand(COURT_RADIUS, COURT_WALL_H, COURT_WALL_H, segments, ASHLAR_TILE_M, ASHLAR_TILE_M / 2));
-  wallGeos.push(wallBand(COURT_RADIUS + 1.4, COURT_WALL_H, COURT_WALL_H, segments, ASHLAR_TILE_M, ASHLAR_TILE_M / 2));
-  floorGeos.push(flatRing(COURT_RADIUS - 0.2, COURT_RADIUS + 1.6, COURT_WALL_H, segments, PAVING_TILE_M));
+  courtWallArcs().forEach(([a0, a1]) => {
+    wallGeos.push(wallBand(COURT_RADIUS, COURT_WALL_H, COURT_WALL_H, segments, ASHLAR_TILE_M, ASHLAR_TILE_M / 2, a0, a1));
+    wallGeos.push(
+      wallBand(COURT_RADIUS + COURT_WALL_T, COURT_WALL_H, COURT_WALL_H, segments, ASHLAR_TILE_M, ASHLAR_TILE_M / 2, a0, a1),
+    );
+    floorGeos.push(flatRing(COURT_RADIUS - 0.2, COURT_RADIUS + COURT_WALL_T + 0.2, COURT_WALL_H, segments, PAVING_TILE_M, a0, a1));
+  });
   floorGeos.push(flatRing(rimRadius + 0.15, rimRadius + 0.5, 0.92, segments, PAVING_TILE_M));
   floorGeos.push(wallBand(rimRadius + 0.15, 0.92, 0.14, segments, PAVING_TILE_M, PAVING_TILE_M));
 
@@ -160,12 +202,6 @@ export const buildStepwell = ({ segments, anisotropy, textureSize, shadows }: St
   addMerged(wallGeos, wallMat, 'walls');
   addMerged(friezeGeos, friezeMat, 'frieze');
   addMerged(floorGeos, floorMat, 'terraces');
-
-  // Ground beyond the plaza, fading into haze
-  const groundGeo = track(flatRing(COURT_RADIUS + 1.4, 480, -0.02, segments, 18));
-  const groundMesh = new THREE.Mesh(groundGeo, groundMat);
-  groundMesh.receiveShadow = shadows;
-  group.add(groundMesh);
 
   // --- Gallery columns (instanced: base, shaft, capital) ---------------------
   type T = { x: number; y: number; z: number; rotY: number };
@@ -188,6 +224,7 @@ export const buildStepwell = ({ segments, anisotropy, textureSize, shadows }: St
   const courtCount = Math.round((Math.PI * 2 * COURT_RADIUS) / 3.2);
   for (let i = 0; i < courtCount; i += 1) {
     const a = (i / courtCount) * Math.PI * 2;
+    if (!onCourtWall(a)) continue;
     const r = COURT_RADIUS - 0.3;
     shafts.push({ x: r * Math.cos(a), y: galleryHeight / 2, z: r * Math.sin(a), rotY: -a });
     caps.push({ x: r * Math.cos(a), y: galleryHeight - 0.12, z: r * Math.sin(a), rotY: -a });
@@ -254,6 +291,7 @@ export const buildStepwell = ({ segments, anisotropy, textureSize, shadows }: St
 
   return {
     group,
+    materials: { wall: wallMat, paving: floorMat, trim: columnMat },
     dispose: () => {
       disposables.forEach((d) => d.dispose());
       [shaftMesh, capMesh, stepMesh, balMesh].forEach((m) => m.dispose());
