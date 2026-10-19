@@ -126,3 +126,42 @@ def test_reduced_motion_keeps_the_story() -> None:
     """Without the animated descent, the same chapters are rendered as a readable list."""
     hero = (SRC / "components" / "HeroScene.tsx").read_text(encoding="utf-8")
     assert 'id="descent-chapters"' in hero
+
+
+def test_workspace_theme_is_scoped_to_internal_pages() -> None:
+    """The internal-page theme lives under .ws (AppShell) and never reaches the landing page."""
+    import re
+
+    shell = (SRC / "components" / "AppShell.tsx").read_text(encoding="utf-8")
+    assert 'className="ws ' in shell
+    landing = (SRC / "pages" / "HomePage.tsx").read_text(encoding="utf-8")
+    landing += (SRC / "components" / "HeroScene.tsx").read_text(encoding="utf-8")
+    landing += "".join(p.read_text(encoding="utf-8") for p in (SRC / "components" / "home").glob("*.tsx"))
+    classes = " ".join(re.findall(r'className=[{"`\'][^>]*', landing))
+    used = re.findall(r"(?<![\w-])ws(?:-[a-z-]+)?(?![\w-])", classes)
+    assert not used, f"landing must not use workspace theme classes: {sorted(set(used))}"
+    assert "AppShell" not in (SRC / "pages" / "HomePage.tsx").read_text(encoding="utf-8")
+    css = (SRC / "index.css").read_text(encoding="utf-8")
+    assert ".ws {" in css and "@supports not ((backdrop-filter" in css and "@media print" in css
+
+
+def test_inspect_page_is_one_workspace_without_step_cards() -> None:
+    page = (SRC / "pages" / "UploadPage.tsx").read_text(encoding="utf-8")
+    assert "Step 1" not in page and "Step 2" not in page and "<Card" not in page
+    assert "Inspect a heritage water structure" in page
+
+
+def test_reference_plates_are_unmodified_copies() -> None:
+    """Pages use the supplied sample photographs byte-for-byte, never a re-encoded or edited copy."""
+    import hashlib
+
+    root = FRONTEND.parent
+    pairs = {"sample4.jpeg": "stepwell-reflection.jpg", "sample0.jpeg": "well-octagon.jpg", "sample2.jpeg": "tank-mist.jpg"}
+    for sample, plate in pairs.items():
+        asset = FRONTEND / "public" / "plates" / plate
+        assert asset.exists(), f"missing plate {plate}"
+        original = root / sample
+        if original.exists():
+            assert hashlib.sha256(original.read_bytes()).digest() == hashlib.sha256(asset.read_bytes()).digest()
+    container = (SRC / "components" / "PageContainer.tsx").read_text(encoding="utf-8")
+    assert "reference photograph" in container

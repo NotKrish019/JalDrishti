@@ -90,7 +90,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
   );
 
   const errorLine = error && (
-    <p role="alert" className="mt-3 flex items-start gap-2 text-sm text-danger-700">
+    <p role="alert" className="mt-3 flex items-start gap-2 text-sm text-laterite-300">
       <Icon name="alert" className="mt-0.5 h-4 w-4 shrink-0" />
       {error}
     </p>
@@ -100,29 +100,29 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
     return (
       <div className={className}>
         {previewSlot ?? (
-          <div className="flex items-center justify-center bg-ink-900">
+          <div key={selected.previewUrl} className="ws-reveal flex items-center justify-center overflow-hidden rounded-[10px] bg-ws-night">
             <img
               src={selected.previewUrl}
               alt={`Preview of ${selected.file.name}`}
-              className="block max-h-[34rem] w-auto max-w-full object-contain"
+              className="block max-h-[32rem] w-auto max-w-full object-contain"
             />
           </div>
         )}
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <p className="min-w-0 text-sm">
-            <span className="block truncate font-medium text-ink-900">{selected.file.name}</span>
-            <span className="font-mono text-xs text-ink-500 tabular-nums">
+            <span className="block truncate font-medium text-ws-text">{selected.file.name}</span>
+            <span className="font-mono text-xs tabular-nums text-ws-faint">
               {selected.width} × {selected.height} px · {formatBytes(selected.file.size)}
             </span>
           </p>
           {locked ? (
-            lockedReason && <p className="text-xs text-ink-500">{lockedReason}</p>
+            lockedReason && <p className="text-[0.8125rem] text-ws-muted">{lockedReason}</p>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               {input}
               <label
                 htmlFor={inputId}
-                className="inline-flex h-8 cursor-pointer items-center rounded-sm border border-ink-900/25 px-3 text-xs font-medium text-ink-900 transition-colors duration-fast hover:border-ink-900 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-laterite-400"
+                className="inline-flex h-8 cursor-pointer items-center rounded-lg px-3 text-[0.8125rem] font-medium text-ws-text transition-colors duration-fast hover:bg-ws-text/[0.08] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-ws-moss"
               >
                 Replace
               </label>
@@ -132,7 +132,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
                   setError(null);
                   onClear();
                 }}
-                className="inline-flex h-8 items-center gap-1.5 rounded-sm px-3 text-xs font-medium text-ink-600 transition-colors duration-fast hover:bg-ink-900/[0.05] hover:text-ink-900"
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-[0.8125rem] font-medium text-ws-muted transition-colors duration-fast hover:bg-ws-text/[0.08] hover:text-ws-text"
               >
                 <Icon name="close" className="h-3.5 w-3.5" />
                 Remove
@@ -163,25 +163,54 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
           setDragging(false);
           accept(event.dataTransfer.files?.[0]);
         }}
-        className={`group flex aspect-[4/3] cursor-pointer flex-col items-start justify-end border p-6 transition-colors duration-base ease-out sm:aspect-[16/10] sm:p-10 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-laterite-400 ${
-          dragging ? 'border-jade-500 bg-jade-50' : 'border-ink-900/20 bg-white hover:border-ink-900/50'
+        className={`group flex cursor-pointer flex-col items-start gap-7 rounded-[14px] p-5 transition-colors duration-base ease-out sm:flex-row sm:items-center sm:gap-10 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-ws-moss ${
+          dragging ? 'bg-ws-moss/[0.1]' : 'hover:bg-ws-text/[0.03]'
         }`}
       >
-        <span
-          className={`mb-auto flex h-12 w-12 items-center justify-center rounded-full border transition-colors duration-base ${
-            dragging ? 'border-jade-500 text-jade-600' : 'border-ink-900/20 text-ink-700 group-hover:border-ink-900'
-          }`}
-        >
-          <Icon name="upload" className="h-5 w-5" />
+        {/* An empty niche: the photograph will be placed into it. */}
+        <span aria-hidden="true" className="relative block h-56 w-44 shrink-0 sm:h-64 sm:w-52">
+          <svg viewBox="0 0 100 125" preserveAspectRatio="none" className="absolute inset-0 h-full w-full overflow-visible">
+            <defs>
+              <linearGradient id={`${inputId}-water`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="#2f6a5c" stopOpacity="0" />
+                <stop offset="1" stopColor="#2f6a5c" stopOpacity={dragging ? 0.85 : 0.55} />
+              </linearGradient>
+            </defs>
+            <path d="M0 125V46C0 22 21 4.5 50 0C79 4.5 100 22 100 46V125Z" fill={`url(#${inputId}-water)`} />
+            <path
+              d="M0.5 124.5V46C0.5 22 21 5 50 0.8C79 5 99.5 22 99.5 46V124.5"
+              fill="none"
+              vectorEffect="non-scaling-stroke"
+              strokeDasharray="5 5"
+              className={`transition-colors duration-base ${dragging ? 'stroke-ws-moss' : 'stroke-ws-text/35 group-hover:stroke-ws-text/60'}`}
+              strokeWidth="1.25"
+            />
+            {[104, 112, 120].map((y, i) => (
+              <path key={y} d={`M${10 + i * 4} ${y}H${90 - i * 4}`} vectorEffect="non-scaling-stroke" className="stroke-ws-text/20" strokeWidth="1" />
+            ))}
+          </svg>
+          <span className="absolute inset-x-0 top-[38%] flex justify-center">
+            <span
+              className={`flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-base ${
+                dragging ? 'border-ws-moss text-ws-moss' : 'border-ws-text/30 text-ws-text group-hover:border-ws-text/60'
+              }`}
+            >
+              <Icon name="upload" className="h-4 w-4" />
+            </span>
+          </span>
         </span>
-        <span className="font-display text-display-sm font-medium text-ink-900">
-          {dragging ? 'Release to add the photograph' : 'Drop a photograph of the structure'}
-        </span>
-        <span className="mt-2 text-sm text-ink-600">
-          or <span className="font-medium text-ink-900 underline decoration-ink-900/30 underline-offset-4">choose a file</span>
-        </span>
-        <span id={hintId} className="mt-6 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-ink-500">
-          JPEG · PNG · WebP — up to {formatBytes(MAX_UPLOAD_BYTES)}
+        <span className="max-w-[22rem]">
+          <span className="block font-display text-[1.875rem] font-medium leading-[1.1] text-ws-text">
+            {dragging ? 'Release to place the photograph' : 'Place a photograph in the niche'}
+          </span>
+          <span className="mt-3 block text-[0.9375rem] leading-relaxed text-ws-muted">
+            Drag an image here, or{' '}
+            <span className="font-medium text-ws-text underline decoration-ws-text/40 underline-offset-4">choose a file</span>. A
+            square-on view of a wall, flight of steps or surface works best.
+          </span>
+          <span id={hintId} className="mt-4 block text-[0.8125rem] text-ws-faint">
+            JPEG, PNG or WebP · up to {formatBytes(MAX_UPLOAD_BYTES)}
+          </span>
         </span>
       </label>
       {errorLine}

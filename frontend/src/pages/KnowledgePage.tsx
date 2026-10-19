@@ -234,9 +234,12 @@ export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onRouteChange }) =
 
   return (
     <PageContainer
-      eyebrow="04 — Knowledge"
-      title="Water structure knowledge"
-      subtitle="Curated records of traditional Indian water structures — how they were built, why they work, and how they decay — with the sources each record cites."
+      eyebrow="JalDrishti / Knowledge"
+      title="Knowledge rooted in place and practice"
+      subtitle="Documented records of traditional Indian water structures — how they were built, why they work, and how they decay — with the sources each record cites."
+      plate="tank-mist"
+      treatment="panel"
+      ground="dark"
       actions={
         <Button variant="secondary" onClick={() => onRouteChange('/upload')}>
           Start an inspection
@@ -286,10 +289,10 @@ export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onRouteChange }) =
                     tabIndex={active ? 0 : -1}
                     onClick={() => setSelectedId(s.id)}
                     onKeyDown={(event) => handleTabKey(event, i)}
-                    className={`flex shrink-0 items-baseline gap-3 whitespace-nowrap rounded-sm px-3 py-2.5 text-left transition-colors duration-fast lg:border-l-2 lg:rounded-none ${
+                    className={`flex shrink-0 items-baseline gap-3 whitespace-nowrap rounded-lg px-3 py-2.5 text-left transition-colors duration-fast lg:rounded-none lg:border-l-2 ${
                       active
-                        ? 'bg-ink-900 text-stone-50 lg:border-laterite-500 lg:bg-transparent lg:text-ink-900'
-                        : 'text-ink-600 hover:text-ink-900 lg:border-transparent'
+                        ? 'bg-ws-stone text-ws-text lg:border-ws-moss-deep lg:bg-transparent lg:text-ink-900'
+                        : 'text-ink-600 hover:text-ink-900 lg:border-ink-900/10'
                     }`}
                   >
                     <span className="font-mono text-[0.625rem] tabular-nums opacity-70">{String(i + 1).padStart(2, '0')}</span>
@@ -303,7 +306,7 @@ export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onRouteChange }) =
             )}
           </div>
 
-          <div id="typology-panel" role="tabpanel" aria-labelledby={`tab-${selected.id}`} tabIndex={0} className="min-w-0 focus:outline-none">
+          <div id="typology-panel" role="tabpanel" aria-labelledby={`tab-${selected.id}`} tabIndex={0} className="min-w-0 max-w-[48rem] focus:outline-none">
             <StructureDetail record={selected} sources={state.sources} />
           </div>
         </div>

@@ -77,7 +77,7 @@ export const ROISelector: React.FC<ROISelectorProps> = ({
     <div className={className}>
       <div
         ref={frameRef}
-        className="relative cursor-crosshair touch-none select-none overflow-hidden bg-ink-900"
+        className="relative cursor-crosshair touch-none select-none overflow-hidden rounded-[10px] bg-ws-night"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -88,7 +88,7 @@ export const ROISelector: React.FC<ROISelectorProps> = ({
           <>
             {/* Dim everything outside the region */}
             <div
-              className="pointer-events-none absolute border border-stone-50"
+              className="pointer-events-none absolute border border-ws-text"
               style={{
                 left: pct(roi.x, naturalWidth),
                 top: pct(roi.y, naturalHeight),
@@ -102,13 +102,13 @@ export const ROISelector: React.FC<ROISelectorProps> = ({
       </div>
 
       <fieldset className="mt-3">
-        <legend className="mb-2 text-xs text-ink-600">
+        <legend className="mb-2 text-[0.8125rem] text-ws-muted">
           Region in image pixels ({naturalWidth} × {naturalHeight})
         </legend>
         <div className="grid grid-cols-4 gap-2">
           {(['x', 'y', 'width', 'height'] as const).map((key) => (
             <label key={key} className="block">
-              <span className="mb-1 block font-mono text-[0.625rem] uppercase tracking-[0.08em] text-ink-500">{key}</span>
+              <span className="mb-1 block font-mono text-[0.6875rem] text-ws-faint">{key}</span>
               <input
                 type="number"
                 inputMode="numeric"

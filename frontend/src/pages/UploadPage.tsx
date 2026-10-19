@@ -5,7 +5,6 @@ import { ROISelector } from '../components/ROISelector';
 import { PipelineStages, PipelineStage, StageStatus } from '../components/PipelineStages';
 import { Button } from '../components/Button';
 import { Icon } from '../components/Icon';
-import { Section } from '../components/Section';
 import {
   AnalysisResultContract,
   AppRoute,
@@ -69,6 +68,7 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onComplete, onRouteChang
   const [deleting, setDeleting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const openFindingsRef = useRef<HTMLButtonElement>(null);
+  const statusRef = useRef<HTMLElement>(null);
 
   const busy = storage.status === 'active' || analysis.status === 'active';
   const fileLocked = busy || stored !== null;
@@ -76,6 +76,14 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onComplete, onRouteChang
   useEffect(() => {
     if (result) openFindingsRef.current?.focus();
   }, [result]);
+
+  // A failure must not go unseen below the fold.
+  const failed = storage.status === 'failed' || analysis.status === 'failed';
+  useEffect(() => {
+    if (!failed) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    statusRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' });
+  }, [failed]);
 
   const resetPipeline = () => {
     setStorage({ status: 'pending' });
@@ -202,22 +210,22 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onComplete, onRouteChang
             </Button>
           </div>
         ) : stored ? (
-          <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 text-xs">
-            <dt className="text-ink-500">Image ID</dt>
-            <dd className="truncate font-mono text-ink-900">{stored.image_id}</dd>
+          <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 text-[0.8125rem]">
+            <dt className="text-ws-faint">Image ID</dt>
+            <dd className="truncate font-mono text-ws-text">{stored.image_id}</dd>
             {stored.inspection_id && (
               <>
-                <dt className="text-ink-500">Inspection ID</dt>
-                <dd className="truncate font-mono text-ink-900">{stored.inspection_id}</dd>
+                <dt className="text-ws-faint">Inspection ID</dt>
+                <dd className="truncate font-mono text-ws-text">{stored.inspection_id}</dd>
               </>
             )}
-            <dt className="text-ink-500">Stored</dt>
-            <dd className="font-mono text-ink-900 tabular-nums">
+            <dt className="text-ws-faint">Stored</dt>
+            <dd className="font-mono tabular-nums text-ws-text">
               {stored.width} × {stored.height} · {stored.format} · {formatBytes(stored.bytes)}
             </dd>
           </dl>
         ) : storage.status === 'skipped' ? (
-          <p className="text-xs text-ink-600">This image was analysed without being stored. It will not appear in inspection history.</p>
+          <p className="text-[0.8125rem] text-ws-muted">This image was analysed without being stored. It will not appear in inspection history.</p>
         ) : undefined,
     },
     {
@@ -235,9 +243,9 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onComplete, onRouteChang
                 Retry analysis
               </Button>
             </div>
-            <p className="text-xs leading-relaxed text-ink-600">
+            <p className="text-[0.8125rem] leading-relaxed text-ws-muted">
               No result was produced. To explore the interface with the labelled development sample instead,{' '}
-              <button type="button" className="font-medium text-ink-900 underline underline-offset-2" onClick={() => onRouteChange('/analysis')}>
+              <button type="button" className="font-medium text-ws-text underline underline-offset-2" onClick={() => onRouteChange('/analysis')}>
                 open the Findings page
               </button>
               .
@@ -251,7 +259,7 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onComplete, onRouteChang
       description: 'Shown only once the API has returned a complete response.',
       status: result ? 'done' : 'pending',
       detail: result ? (
-        <p className="text-xs text-ink-600">
+        <p className="text-[0.8125rem] text-ws-muted">
           {result.vision.detections.length === 0
             ? 'The vision service returned no detections for this image.'
             : `${result.vision.detections.length} detection${result.vision.detections.length === 1 ? '' : 's'} returned.`}
@@ -264,12 +272,19 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onComplete, onRouteChang
 
   return (
     <PageContainer
-      eyebrow="01 — Inspect"
-      title="New inspection"
-      subtitle="Add a photograph of the structure, describe what it is, and run it through the pipeline. Every stage below reflects a real response from the API."
+      eyebrow="JalDrishti / Inspection"
+      title="Inspect a heritage water structure."
+      subtitle="Document a traditional water structure through photographs and contextual observations, creating a useful starting point for closer examination — not a diagnosis."
+      plate="stepwell-reflection"
+      treatment="panel"
+      ground="dark"
     >
-      <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
-        <div className="lg:col-span-7">
+      <div className="grid gap-x-16 gap-y-12 lg:grid-cols-12">
+        <section aria-labelledby={`${formId}-photo`} className="lg:col-span-7">
+          <h2 id={`${formId}-photo`} className="mb-5 font-display text-[1.75rem] font-medium leading-tight text-ws-text">
+            Photograph
+          </h2>
+
           <UploadZone
             selected={selected}
             onSelect={handleSelect}
@@ -290,183 +305,190 @@ export const UploadPage: React.FC<UploadPageProps> = ({ onComplete, onRouteChang
           />
 
           {selected && (
-            <div className="mt-6 border-t border-ink-900/10 pt-5">
-              <label className="flex cursor-pointer items-start gap-3">
-                <input
-                  type="checkbox"
-                  className="mt-1 h-4 w-4 accent-jade-600"
-                  checked={roiEnabled}
-                  disabled={busy}
-                  onChange={(event) => {
-                    setRoiEnabled(event.target.checked);
-                    if (!event.target.checked) setRoi(null);
-                  }}
-                />
-                <span>
-                  <span className="block text-sm font-medium text-ink-900">Limit analysis to a region (optional)</span>
-                  <span className="mt-0.5 block text-xs leading-relaxed text-ink-600">
-                    Off by default — the whole photograph is analysed. If enabled, drag on the image or type pixel values.
-                  </span>
+            <label className="mt-6 flex cursor-pointer items-start gap-3 border-t border-[var(--ws-line-dark)] pt-5">
+              <input
+                type="checkbox"
+                className="mt-1 h-4 w-4 accent-ws-moss"
+                checked={roiEnabled}
+                disabled={busy}
+                onChange={(event) => {
+                  setRoiEnabled(event.target.checked);
+                  if (!event.target.checked) setRoi(null);
+                }}
+              />
+              <span>
+                <span className="block text-[0.9375rem] font-medium text-ws-text">Limit analysis to a region (optional)</span>
+                <span className="mt-1 block text-[0.8125rem] leading-relaxed text-ws-muted">
+                  Off by default — the whole photograph is analysed. If enabled, drag on the image or type pixel values.
                 </span>
-              </label>
-            </div>
+              </span>
+            </label>
           )}
-        </div>
+        </section>
 
         <div className="lg:col-span-5">
-          <form
-            id={formId}
-            onSubmit={(event) => {
-              event.preventDefault();
-              handleStart();
-            }}
-            className="space-y-5"
-          >
-            <fieldset disabled={busy} className="space-y-5">
-              <legend className="eyebrow mb-1 text-ink-500">Structure</legend>
-              <div>
-                <label htmlFor={`${formId}-type`} className="field-label">
-                  Typology
-                </label>
-                <select
-                  id={`${formId}-type`}
-                  className="field"
-                  value={structureType}
-                  onChange={(event) => setStructureType(event.target.value as StructureTypology)}
-                >
-                  {TYPOLOGIES.map((t) => (
-                    <option key={t.value} value={t.value}>
-                      {t.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label htmlFor={`${formId}-name`} className="field-label">
-                    Name <span className="font-normal text-ink-500">(optional)</span>
-                  </label>
-                  <input
-                    id={`${formId}-name`}
-                    className="field"
-                    value={structureName}
-                    placeholder="e.g. Agrasen ki Baoli"
-                    onChange={(event) => setStructureName(event.target.value)}
-                  />
-                </div>
-                <div>
-                  <label htmlFor={`${formId}-region`} className="field-label">
-                    Region <span className="font-normal text-ink-500">(optional)</span>
-                  </label>
-                  <input
-                    id={`${formId}-region`}
-                    className="field"
-                    list={`${formId}-regions`}
-                    value={region}
-                    placeholder="e.g. Delhi NCR"
-                    onChange={(event) => setRegion(event.target.value)}
-                  />
-                  <datalist id={`${formId}-regions`}>
-                    {REGION_SUGGESTIONS.map((r) => (
-                      <option key={r} value={r} />
-                    ))}
-                  </datalist>
-                </div>
-              </div>
-              <div>
-                <label htmlFor={`${formId}-notes`} className="field-label">
-                  Field notes <span className="font-normal text-ink-500">(optional)</span>
-                </label>
-                <textarea
-                  id={`${formId}-notes`}
-                  className="field h-24 resize-y py-2.5 leading-relaxed"
-                  value={notes}
-                  placeholder="Observed water level, recent repairs, access conditions…"
-                  onChange={(event) => setNotes(event.target.value)}
-                />
-              </div>
-            </fieldset>
-
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full"
-              disabled={!selected || busy || result !== null || (roiEnabled && !roi)}
-              isLoading={busy}
+          <section aria-labelledby={`${formId}-details`}>
+            <h2 id={`${formId}-details`} className="mb-5 font-display text-[1.75rem] font-medium leading-tight text-ws-text">
+              About the structure
+            </h2>
+            <form
+              id={formId}
+              onSubmit={(event) => {
+                event.preventDefault();
+                handleStart();
+              }}
             >
-              {busy ? 'Running…' : startLabel}
-            </Button>
-            {!selected && <p className="text-xs text-ink-500">Add a photograph to begin.</p>}
-            {roiEnabled && !roi && selected && (
-              <p className="text-xs text-ink-500">Draw a region on the image, or switch the region option off.</p>
-            )}
-          </form>
+              <fieldset disabled={busy} className="space-y-5">
+                <legend className="sr-only">Structure details</legend>
+                <div>
+                  <label htmlFor={`${formId}-type`} className="field-label">
+                    Typology
+                  </label>
+                  <select
+                    id={`${formId}-type`}
+                    className="field"
+                    value={structureType}
+                    onChange={(event) => setStructureType(event.target.value as StructureTypology)}
+                  >
+                    {TYPOLOGIES.map((t) => (
+                      <option key={t.value} value={t.value}>
+                        {t.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor={`${formId}-name`} className="field-label">
+                      Name <span className="text-ws-faint">(optional)</span>
+                    </label>
+                    <input
+                      id={`${formId}-name`}
+                      className="field"
+                      value={structureName}
+                      placeholder="e.g. Agrasen ki Baoli"
+                      onChange={(event) => setStructureName(event.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor={`${formId}-region`} className="field-label">
+                      Region <span className="text-ws-faint">(optional)</span>
+                    </label>
+                    <input
+                      id={`${formId}-region`}
+                      className="field"
+                      list={`${formId}-regions`}
+                      value={region}
+                      placeholder="e.g. Delhi NCR"
+                      onChange={(event) => setRegion(event.target.value)}
+                    />
+                    <datalist id={`${formId}-regions`}>
+                      {REGION_SUGGESTIONS.map((r) => (
+                        <option key={r} value={r} />
+                      ))}
+                    </datalist>
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor={`${formId}-notes`} className="field-label">
+                    Field notes <span className="text-ws-faint">(optional)</span>
+                  </label>
+                  <textarea
+                    id={`${formId}-notes`}
+                    className="field h-28 resize-y py-2.5 leading-relaxed"
+                    value={notes}
+                    placeholder="Observed water level, recent repairs, access conditions…"
+                    onChange={(event) => setNotes(event.target.value)}
+                  />
+                </div>
+              </fieldset>
 
-          <div className="mt-8 border-t border-ink-900/10 pt-6">
-            <PipelineStages stages={stages} />
-          </div>
-
-          {result && (
-            <div className="mt-6">
-              <Button ref={openFindingsRef} onClick={handleOpenFindings} size="lg" className="w-full">
-                Open findings
-                <Icon name="arrowRight" className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-
-          {(stored || notice) && (
-            <div className="mt-6 space-y-3 border-t border-ink-900/10 pt-5">
-              {notice && (
-                <p role="status" className="text-xs text-ink-700">
-                  {notice}
-                </p>
-              )}
-              {stored && (
+              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
                 <Button
-                  size="sm"
-                  variant="danger"
-                  onClick={handleDeleteStored}
-                  isLoading={deleting}
-                  disabled={busy}
-                  icon={<Icon name="trash" className="h-3.5 w-3.5" />}
+                  type="submit"
+                  size="lg"
+                  className="min-w-[13rem]"
+                  disabled={!selected || busy || result !== null || (roiEnabled && !roi)}
+                  isLoading={busy}
                 >
-                  Delete stored image
+                  {busy ? 'Running…' : startLabel}
                 </Button>
-              )}
-            </div>
-          )}
+                {!selected && <p className="text-[0.8125rem] text-ws-muted">Add a photograph to begin.</p>}
+                {roiEnabled && !roi && selected && (
+                  <p className="text-[0.8125rem] text-ws-muted">Draw a region on the image, or switch the region option off.</p>
+                )}
+              </div>
+            </form>
+          </section>
         </div>
       </div>
 
-      <Section
-        index="A"
-        title="What the current pilot can see"
-        description="So that results are read for what they are."
-        className="mt-20"
-      >
-        <dl className="grid gap-x-10 gap-y-6 text-sm md:grid-cols-3">
+      <section ref={statusRef} aria-labelledby={`${formId}-status`} className="mt-14 scroll-mb-8">
+        <div className="ws-terrace mb-7 text-ws-sandstone/80" aria-hidden="true">
+          <span />
+        </div>
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <h2 id={`${formId}-status`} className="font-display text-[1.75rem] font-medium leading-tight text-ws-text">
+              Status
+            </h2>
+            <p className="text-[0.8125rem] text-ws-faint">Storing an image and analysing it are separate steps; each shows the API&rsquo;s real response.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            {stored && (
+              <Button
+                size="sm"
+                variant="danger"
+                onClick={handleDeleteStored}
+                isLoading={deleting}
+                disabled={busy}
+                icon={<Icon name="trash" className="h-3.5 w-3.5" />}
+              >
+                Delete stored image
+              </Button>
+            )}
+            {result && (
+              <Button ref={openFindingsRef} onClick={handleOpenFindings} size="lg">
+                Open findings
+                <Icon name="arrowRight" className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+        <PipelineStages stages={stages} tone="dark" orientation="horizontal" />
+        {notice && (
+          <p role="status" className="mt-6 text-[0.8125rem] text-ws-muted">
+            {notice}
+          </p>
+        )}
+      </section>
+
+      <section aria-labelledby={`${formId}-limits`} className="mt-20 border-t border-[var(--ws-line-dark)] pt-10">
+        <h2 id={`${formId}-limits`} className="font-display text-[1.75rem] font-medium leading-tight text-ws-text">
+          What the current pilot can see
+        </h2>
+        <dl className="mt-6 grid gap-x-12 gap-y-6 text-[0.9375rem] md:grid-cols-3">
           <div>
-            <dt className="font-medium text-ink-900">Live detection</dt>
-            <dd className="mt-1 leading-relaxed text-ink-600">
-              A pilot YOLOv8n model trained for surface cracks. Other defect classes in the contract are not yet produced by a
-              trained model.
+            <dt className="font-medium text-ws-text">Live detection</dt>
+            <dd className="mt-1.5 leading-relaxed text-ws-muted">
+              A pilot YOLOv8n crack model. It has not been validated on held-out, human-annotated data, so treat its boxes
+              as prompts for review. Other defect classes in the contract are not produced by a trained model.
             </dd>
           </div>
           <div>
-            <dt className="font-medium text-ink-900">Image-space only</dt>
-            <dd className="mt-1 leading-relaxed text-ink-600">
+            <dt className="font-medium text-ws-text">Image-space only</dt>
+            <dd className="mt-1.5 leading-relaxed text-ws-muted">
               Measurements are in pixels of this photograph. Without a calibrated scale they are not physical dimensions.
             </dd>
           </div>
           <div>
-            <dt className="font-medium text-ink-900">Better photographs</dt>
-            <dd className="mt-1 leading-relaxed text-ink-600">
+            <dt className="font-medium text-ws-text">Better photographs</dt>
+            <dd className="mt-1.5 leading-relaxed text-ws-muted">
               Face the wall squarely, use even daylight, keep the surface sharp, and avoid strong shadow across joints.
             </dd>
           </div>
         </dl>
-      </Section>
+      </section>
     </PageContainer>
   );
 };

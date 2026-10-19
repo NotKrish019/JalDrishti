@@ -35,7 +35,14 @@ export const ReportPage: React.FC<ReportPageProps> = ({ session, onRouteChange, 
 
   if (!session) {
     return (
-      <PageContainer eyebrow="03 — Report" title="Conservation dossier" subtitle="A printable record of one inspection.">
+      <PageContainer
+        eyebrow="JalDrishti / Report"
+        title="Conservation dossier"
+        subtitle="A printable record of one inspection."
+        plate="tank-stepped"
+        treatment="panel"
+        ground="dark"
+      >
         <EmptyState
           title="Nothing to report yet"
           description="A dossier is assembled from a completed inspection. Run one first, or open the labelled development sample to preview the layout."
@@ -74,7 +81,7 @@ export const ReportPage: React.FC<ReportPageProps> = ({ session, onRouteChange, 
       )}
 
       <PageContainer
-        eyebrow="03 — Report"
+        eyebrow="JalDrishti / Report"
         title="Conservation dossier"
         subtitle={
           <>
@@ -94,10 +101,13 @@ export const ReportPage: React.FC<ReportPageProps> = ({ session, onRouteChange, 
           </>
         }
         banner={<ProvenanceBanner session={session} />}
-        className="relative z-[2] print:max-w-none print:px-0 print:pb-0"
+        plate="tank-stepped"
+        treatment="panel"
+        ground="dark"
+        className="relative z-[2]"
       >
         <div className="space-y-14 print:space-y-10">
-          <Section index="01" title="Record">
+          <Section index="01" title="Record" rule={false}>
             <dl className="grid gap-x-10 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
               {[
                 ['Structure', result.structure.name || 'Not named'],

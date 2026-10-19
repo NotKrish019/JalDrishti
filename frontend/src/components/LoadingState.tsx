@@ -17,12 +17,12 @@ export const LoadingState: React.FC<LoadingStateProps> = ({ label, progress, cla
 
   return (
     <div className={className} role="status" aria-live="polite">
-      <div className="mb-2 flex items-baseline justify-between gap-3 text-xs text-ink-600">
+      <div className="mb-2 flex items-baseline justify-between gap-3 text-[0.8125rem] opacity-80">
         <span>{label}</span>
-        {known && <span className="font-mono tabular-nums text-ink-900">{pct}%</span>}
+        {known && <span className="font-mono tabular-nums">{pct}%</span>}
       </div>
       <div
-        className="relative h-[3px] w-full overflow-hidden bg-ink-900/10"
+        className="relative h-[3px] w-full overflow-hidden rounded-full [background-color:color-mix(in_srgb,currentColor_15%,transparent)]"
         role="progressbar"
         aria-label={label}
         aria-valuemin={known ? 0 : undefined}
@@ -30,9 +30,9 @@ export const LoadingState: React.FC<LoadingStateProps> = ({ label, progress, cla
         aria-valuenow={pct}
       >
         {known ? (
-          <div className="h-full bg-jade-500 transition-[width] duration-base ease-out" style={{ width: `${pct}%` }} />
+          <div className="h-full rounded-full bg-ws-moss transition-[width] duration-base ease-out" style={{ width: `${pct}%` }} />
         ) : (
-          <div className="animate-indeterminate absolute inset-y-0 left-0 w-2/5 bg-jade-500" />
+          <div className="animate-indeterminate absolute inset-y-0 left-0 w-2/5 rounded-full bg-ws-moss" />
         )}
       </div>
     </div>

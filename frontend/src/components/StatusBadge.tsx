@@ -30,7 +30,7 @@ const DOTS: Record<BadgeVariant, string> = {
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ label, variant = 'neutral', dot = false, className = '' }) => (
   <span
-    className={`inline-flex max-w-full items-center gap-1.5 rounded-sm border px-2 py-[3px] leading-tight font-mono text-[0.6875rem] uppercase tracking-[0.08em] ${STYLES[variant]} ${className}`}
+    className={`inline-flex max-w-full items-center gap-1.5 rounded-md border px-2 py-[3px] leading-tight font-mono text-[0.6875rem] uppercase tracking-[0.08em] ${STYLES[variant]} ${className}`}
   >
     {dot && <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOTS[variant]}`} aria-hidden="true" />}
     {label}

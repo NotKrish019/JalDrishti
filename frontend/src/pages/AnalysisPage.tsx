@@ -46,7 +46,14 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ session, onRouteChan
 
   if (!session) {
     return (
-      <PageContainer eyebrow="02 — Findings" title="Findings" subtitle="Detections, engineering scores and conservation considerations for one inspection.">
+      <PageContainer
+        eyebrow="JalDrishti / Findings"
+        title="Findings"
+        subtitle="Detections, engineering scores and conservation considerations for one inspection."
+        plate="well-octagon"
+        treatment="panel"
+        ground="dark"
+      >
         <EmptyState
           title="No inspection loaded"
           description={
@@ -87,7 +94,7 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ session, onRouteChan
 
   return (
     <PageContainer
-      eyebrow="02 — Findings"
+      eyebrow="JalDrishti / Findings"
       title={title}
       subtitle={
         <>
@@ -95,6 +102,9 @@ export const AnalysisPage: React.FC<AnalysisPageProps> = ({ session, onRouteChan
           {result.structure.region ? ` · ${result.structure.region}` : ''}
         </>
       }
+      plate="well-octagon"
+      treatment="panel"
+      ground="dark"
       actions={
         <>
           <Button variant="secondary" onClick={() => onRouteChange('/upload')}>

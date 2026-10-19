@@ -32,11 +32,16 @@ const useBackendStatus = (): { status: BackendStatus; version?: string } => {
 const BackendIndicator: React.FC = () => {
   const { status, version } = useBackendStatus();
   const label = { checking: 'Checking API', connected: 'API connected', unreachable: 'API unreachable' }[status];
-  const dot = { checking: 'bg-ink-500', connected: 'bg-jade-500', unreachable: 'bg-danger-500' }[status];
+  const dot = { checking: 'bg-ws-faint', connected: 'bg-ws-jade-light', unreachable: 'bg-laterite-300' }[status];
+  const tone = {
+    checking: 'border-ws-text/15 text-ws-muted',
+    connected: 'border-ws-jade-light/30 text-ws-jade-light',
+    unreachable: 'border-laterite-300/40 text-laterite-300',
+  }[status];
 
   return (
     <span
-      className="inline-flex items-center gap-2 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-ink-600"
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[0.8125rem] ${tone}`}
       role="status"
       title={version ? `Backend version ${version}` : undefined}
     >
@@ -65,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, has
   }, [menuOpen]);
 
   return (
-    <header className="sticky top-0 z-nav border-b border-ink-900/10 bg-stone-50/95 backdrop-blur-sm print:hidden">
+    <header className="ws-chrome sticky top-0 z-nav border-b print:hidden">
       <div className="gutter mx-auto flex h-16 max-w-wide items-center justify-between gap-6">
         <a
           href="/"
@@ -77,7 +82,7 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, has
           className="shrink-0"
           aria-label="JalDrishti home"
         >
-          <JalDrishtiLogo tone="dark" />
+          <JalDrishtiLogo tone="light" />
         </a>
 
         <nav aria-label="Application" className="hidden md:block">
@@ -90,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, has
 
         <button
           type="button"
-          className="-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-sm text-ink-900 md:hidden"
+          className="-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-lg text-ws-text hover:bg-ws-text/10 md:hidden"
           aria-expanded={menuOpen}
           aria-controls="mobile-nav"
           onClick={() => setMenuOpen((open) => !open)}
@@ -101,7 +106,7 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onRouteChange, has
       </div>
 
       {menuOpen && (
-        <nav id="mobile-nav" aria-label="Application" className="gutter border-t border-ink-900/10 bg-stone-50 pb-6 md:hidden">
+        <nav id="mobile-nav" aria-label="Application" className="gutter border-t border-[var(--ws-line-dark)] pb-6 md:hidden">
           <Navigation
             currentRoute={currentRoute}
             onRouteChange={onRouteChange}

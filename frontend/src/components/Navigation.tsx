@@ -49,23 +49,20 @@ export const Navigation: React.FC<NavigationProps> = ({
               }}
               className={
                 vertical
-                  ? `flex items-baseline gap-4 border-b border-ink-900/10 py-4 text-2xl font-display ${
-                      active ? 'text-ink-900' : 'text-ink-600'
+                  ? `flex items-baseline gap-4 border-b border-[var(--ws-line-dark)] py-4 font-display text-2xl ${
+                      active ? 'text-ws-text' : 'text-ws-muted'
                     }`
-                  : `relative flex h-10 items-center gap-2 rounded-sm px-3 text-sm transition-colors duration-fast ${
-                      active ? 'text-ink-900' : 'text-ink-600 hover:text-ink-900'
+                  : `relative flex h-9 items-center gap-2 rounded-full px-3.5 text-sm transition-colors duration-fast ${
+                      active ? 'bg-ws-text/[0.1] text-ws-text' : 'text-ws-muted hover:bg-ws-text/[0.05] hover:text-ws-text'
                     }`
               }
             >
-              <span className={`font-mono text-[0.625rem] tabular-nums ${active ? 'text-laterite-500' : 'text-ink-500'}`}>
+              <span className={`font-mono text-[0.625rem] tabular-nums ${active ? 'text-ws-moss' : 'text-ws-faint'}`}>
                 {item.index}
               </span>
               <span>{item.label}</span>
               {showSessionDot && (
-                <span className="h-1.5 w-1.5 rounded-full bg-jade-500" aria-label="(inspection loaded)" />
-              )}
-              {active && !vertical && (
-                <span className="absolute inset-x-3 -bottom-[13px] h-px bg-ink-900" aria-hidden="true" />
+                <span className="h-1.5 w-1.5 rounded-full bg-ws-moss" aria-label="(inspection loaded)" />
               )}
             </a>
           </li>

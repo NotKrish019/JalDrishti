@@ -6,6 +6,24 @@
  * Motion and layering tokens (colour/type tokens live in tailwind.config.js)
  * ------------------------------------------------------------------ */
 :root {
+  /* Base colours behind Tailwind's ink / stone-50..200 / white (tailwind.config.js). */
+  --c-white: 255 255 255;
+  --c-ink-950: 14 12 10;
+  --c-ink-900: 23 20 15;
+  --c-ink-800: 34 29 23;
+  --c-ink-700: 58 49 40;
+  --c-ink-600: 87 74 61;
+  --c-ink-500: 118 103 90;
+  --c-stone-50: 247 242 233;
+  --c-stone-100: 239 230 214;
+  --c-stone-200: 226 211 186;
+  --c-jade-50: 231 239 234;
+  --c-jade-700: 23 54 47;
+  --c-laterite-600: 134 65 44;
+  --c-ochre-100: 243 228 196;
+  --c-ochre-700: 125 90 34;
+  --c-danger-100: 242 217 211;
+  --c-danger-700: 116 38 29;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-fast: 160ms;
@@ -111,6 +129,378 @@
   .link-underline:hover,
   .link-underline:focus-visible {
     background-size: 100% 1px;
+  }
+}
+
+/* ------------------------------------------------------------------
+ * Workspace theme — internal application pages only (AppShell sets `.ws`).
+ * The landing page never renders AppShell, so none of this reaches it.
+ *
+ * Art direction from sample1–3 (photographs of stepped wells and tanks):
+ * water held at the centre of stone, cool moss-and-granite colour, depth
+ * seen from above, and nested terraces. Typography and controls continue
+ * the landing page (Cormorant Garamond, Instrument Sans, IBM Plex Mono).
+ *
+ * Two grounds, both full-bleed, never boxed inside each other:
+ *   .ws-dark   granite: the inside of the well (chrome, Inspect)
+ *   .ws-light  limestone: reading and results (Findings, Report, Knowledge)
+ * Each page sits on one ground from header to footer; photographs are framed
+ * plates at close to native resolution, never stretched as wallpaper.
+ * ------------------------------------------------------------------ */
+.ws {
+  --ws-night: #121512;
+  --ws-stone: #181c18;
+  --ws-stone-raised: #1f2420;
+  --ws-stone-field: #232923;
+  --ws-line-dark: rgba(214, 224, 206, 0.13);
+  --ws-line-dark-strong: rgba(214, 224, 206, 0.26);
+  --ws-text-dark: #eef0ea;
+  --ws-muted-dark: #b3bbae;
+  --ws-faint-dark: #868f82;
+
+  /* Light ground: warm limestone, the landing page's parchment, not a neutral grey. */
+  --ws-mist: #efe9de;
+  --ws-paper: #fbf8f2;
+  --ws-line-light: rgba(24, 28, 24, 0.12);
+  --ws-line-light-strong: rgba(24, 28, 24, 0.24);
+
+  --ws-moss: #8fa25f;
+  --ws-moss-deep: #56653a;
+  --ws-jade: #2f6a5c;
+  --ws-jade-light: #8cc1ac;
+  --ws-sandstone: #cdb38f;
+
+  --ws-radius: 10px;
+  --ws-radius-control: 8px;
+  --ws-focus-dark: 0 0 0 3px rgba(143, 162, 95, 0.4);
+  --ws-focus-light: 0 0 0 3px rgba(86, 101, 58, 0.28);
+
+  background-color: var(--ws-stone);
+  color: var(--ws-text-dark);
+}
+
+.ws-dark {
+  background-color: var(--ws-stone);
+  color: var(--ws-text-dark);
+}
+
+/* On the dark ground, shared components written for light paper invert in place:
+   ink becomes the light text scale, the light stones and white become raised
+   granite surfaces, and the pale status tints become dark tints with light text. */
+.ws-dark {
+  --c-ink-950: 246 247 242;
+  --c-ink-900: 238 240 234;
+  --c-ink-800: 222 226 216;
+  --c-ink-700: 200 207 194;
+  --c-ink-600: 179 187 174;
+  --c-ink-500: 140 149 136;
+  --c-white: 31 36 32;
+  --c-stone-50: 24 28 24;
+  --c-stone-100: 35 41 36;
+  --c-stone-200: 48 55 49;
+  --c-jade-50: 26 48 41;
+  --c-jade-700: 140 193 172;
+  --c-laterite-600: 217 153 124;
+  --c-ochre-100: 54 45 28;
+  --c-ochre-700: 226 192 128;
+  --c-danger-100: 60 31 27;
+  --c-danger-700: 234 154 140;
+}
+
+.ws-light {
+  background-color: var(--ws-mist);
+  color: theme('colors.ink.900');
+}
+
+/* Reference photographs. Images are slightly oversized inside their frames so they
+   can drift with scroll (usePlateMotion) without exposing an edge. */
+.ws-panel,
+.ws-arch {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.ws-panel img,
+.ws-arch img {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+/* Panel: no frame at all. The photograph dissolves into the ground on its left and
+   at its foot, so the title can overlap it and the page continues without a seam. */
+.ws-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--ws-stone) 0%, rgba(24, 28, 24, 0.55) 22%, rgba(24, 28, 24, 0) 48%),
+    linear-gradient(0deg, var(--ws-stone) 0%, rgba(24, 28, 24, 0) 32%),
+    linear-gradient(180deg, var(--ws-stone) 0%, rgba(24, 28, 24, 0) 12%);
+}
+
+/* Keep the working content within reach: the panel is capped and cropped, never stretched. */
+.ws-panel {
+  max-height: 82vw;
+  width: 100%;
+}
+/* Keep the inspection form within reach: on desktop the panel is capped and cropped. */
+@media (min-width: 1024px) {
+  .ws-panel {
+    max-height: min(32rem, 62vh);
+    width: 100%;
+  }
+}
+
+@media (max-width: 1023px) {
+  .ws-panel::after {
+    background: linear-gradient(0deg, var(--ws-stone) 0%, rgba(24, 28, 24, 0.6) 30%, rgba(24, 28, 24, 0) 62%);
+  }
+}
+
+/* Arch: a pointed (two-centred) arch, the form of a stepwell gallery niche. */
+.ws-arch {
+  aspect-ratio: 4 / 5;
+  transform-style: preserve-3d;
+  transition: transform 600ms var(--ease-out);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 125' preserveAspectRatio='none'%3E%3Cpath d='M0 125V46C0 22 21 4.5 50 0C79 4.5 100 22 100 46V125Z'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 125' preserveAspectRatio='none'%3E%3Cpath d='M0 125V46C0 22 21 4.5 50 0C79 4.5 100 22 100 46V125Z'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+}
+
+.ws-arch-light {
+  background: #d9d2c4;
+}
+
+.ws-arch-dark {
+  background: var(--ws-night);
+}
+
+.ws-arch-outline {
+  position: absolute;
+  inset: 6px;
+  height: calc(100% - 12px);
+  width: calc(100% - 12px);
+  fill: none;
+  stroke: rgba(255, 252, 245, 0.55);
+  stroke-width: 1;
+  pointer-events: none;
+}
+
+/* Entrance: the photograph is revealed from its foot upwards, like water rising. */
+@keyframes ws-unveil {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.ws-unveil {
+  animation: ws-unveil 1100ms var(--ease-inout) both;
+}
+
+/* One-time entrance: content rises a few pixels into place. Nothing animates after load. */
+@keyframes ws-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ws-rise {
+  animation: ws-rise 700ms var(--ease-out) both;
+}
+
+.ws-rise-late {
+  animation-delay: 120ms;
+}
+
+/* A newly selected photograph settles in rather than popping. */
+@keyframes ws-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ws-reveal {
+  animation: ws-reveal 500ms var(--ease-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-rise,
+  .ws-reveal,
+  .ws-unveil {
+    animation: none;
+  }
+  .ws-arch {
+    transition: none;
+  }
+}
+
+/* Terraces: three stepped hairlines, after the nested tank edges in sample3. */
+.ws-terrace {
+  position: relative;
+  height: 13px;
+}
+
+.ws-terrace::before,
+.ws-terrace::after,
+.ws-terrace > span {
+  content: '';
+  position: absolute;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+}
+
+.ws-terrace::before {
+  top: 0;
+  width: 100%;
+  opacity: 0.22;
+}
+
+.ws-terrace > span {
+  top: 6px;
+  width: 66%;
+  opacity: 0.35;
+}
+
+.ws-terrace::after {
+  top: 12px;
+  width: 33%;
+  opacity: 0.6;
+}
+
+/* Printable document: one paper sheet on the mist ground (Report). */
+.ws-doc {
+  background: var(--ws-paper);
+  border: 1px solid var(--ws-line-light);
+  box-shadow: 0 1px 2px rgba(18, 21, 18, 0.05), 0 24px 48px -32px rgba(18, 21, 18, 0.35);
+}
+
+/* Header chrome: solid stone with a whisper of blur only where it overlaps the band. */
+.ws-chrome {
+  background: rgba(18, 21, 18, 0.86);
+  border-color: var(--ws-line-dark);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* Form controls. Opaque, never blurred; labels are normal-case and readable. */
+.ws-dark .field {
+  border-radius: var(--ws-radius-control);
+  border-color: var(--ws-line-dark-strong);
+  background: var(--ws-stone-field);
+  color: var(--ws-text-dark);
+  font-size: 0.9375rem;
+}
+
+.ws-dark .field::placeholder {
+  color: var(--ws-faint-dark);
+}
+
+.ws-dark select.field {
+  color-scheme: dark;
+}
+
+.ws-dark .field:hover:not(:disabled) {
+  border-color: rgba(214, 224, 206, 0.42);
+}
+
+.ws-dark .field:focus {
+  border-color: var(--ws-moss);
+  box-shadow: var(--ws-focus-dark);
+  --tw-ring-color: transparent;
+}
+
+.ws-dark .field:disabled {
+  opacity: 0.55;
+}
+
+.ws-dark .field-label {
+  margin-bottom: 0.45rem;
+  font-size: 0.875rem;
+  color: var(--ws-muted-dark);
+}
+
+.ws-light .field {
+  border-radius: var(--ws-radius-control);
+  border-color: var(--ws-line-light-strong);
+  background: var(--ws-paper);
+}
+
+.ws-light .field:focus {
+  border-color: var(--ws-moss-deep);
+  box-shadow: var(--ws-focus-light);
+  --tw-ring-color: transparent;
+}
+
+.ws :focus-visible {
+  outline-color: var(--ws-moss);
+}
+
+.ws-light :focus-visible {
+  outline-color: var(--ws-moss-deep);
+}
+
+/* Without backdrop-filter the chrome is simply solid. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ws-chrome {
+    background: var(--ws-night);
+  }
+}
+
+@media print {
+  .ws-dark {
+    --c-ink-950: 14 12 10;
+    --c-ink-900: 23 20 15;
+    --c-ink-800: 34 29 23;
+    --c-ink-700: 58 49 40;
+    --c-ink-600: 87 74 61;
+    --c-ink-500: 118 103 90;
+    --c-white: 255 255 255;
+    --c-stone-50: 247 242 233;
+    --c-stone-100: 239 230 214;
+    --c-stone-200: 226 211 186;
+    --c-jade-50: 231 239 234;
+    --c-jade-700: 23 54 47;
+    --c-laterite-600: 134 65 44;
+    --c-ochre-100: 243 228 196;
+    --c-ochre-700: 125 90 34;
+    --c-danger-100: 242 217 211;
+    --c-danger-700: 116 38 29;
+  }
+  .ws,
+  .ws-dark,
+  .ws-light {
+    background: #fff !important;
+    color: theme('colors.ink.900') !important;
+  }
+  .ws-doc {
+    border: 0;
+    box-shadow: none;
+    background: #fff;
+  }
+  .ws-dark * {
+    color: theme('colors.ink.900') !important;
+    text-shadow: none !important;
   }
 }
 

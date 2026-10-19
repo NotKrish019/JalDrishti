@@ -37,15 +37,15 @@ export const InspectionCanvas: React.FC<InspectionCanvasProps> = ({
   const showImage = imageSrc && !imageFailed;
 
   return (
-    <figure className={`overflow-hidden rounded-sm bg-ink-900 ${className}`}>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-50/10 px-4 py-2.5">
-        <p className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-stone-300 tabular-nums">
+    <figure className={`overflow-hidden rounded-sm bg-ws-night ${className}`}>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ws-text/10 px-4 py-2.5">
+        <p className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-ws-muted tabular-nums">
           {w} × {h} px · {visible.length} of {detections.length} shown
         </p>
-        <label className="flex cursor-pointer items-center gap-2 text-xs text-stone-200">
+        <label className="flex cursor-pointer items-center gap-2 text-xs text-ws-text">
           <input
             type="checkbox"
-            className="h-3.5 w-3.5 accent-stone-200"
+            className="h-3.5 w-3.5 accent-ws-mist"
             checked={showLabels}
             onChange={(event) => setShowLabels(event.target.checked)}
           />
@@ -116,7 +116,7 @@ export const InspectionCanvas: React.FC<InspectionCanvasProps> = ({
         })}
       </svg>
 
-      <figcaption className="border-t border-stone-50/10 px-4 py-2.5 text-xs text-stone-300">
+      <figcaption className="border-t border-ws-text/10 px-4 py-2.5 text-xs text-ws-muted">
         Boxes mark regions returned by the vision service. Percentages are detection confidence, not severity.
       </figcaption>
     </figure>
