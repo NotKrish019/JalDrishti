@@ -50,10 +50,10 @@ class Settings(BaseModel):
         in ("true", "1", "yes")
     )
 
-    # Image upload policy configuration
+    # Image upload policy configuration (25 MB max upload size)
     max_upload_size_bytes: int = Field(
         default_factory=lambda: int(
-            os.getenv("MAX_UPLOAD_SIZE_BYTES", str(10 * 1024 * 1024))
+            os.getenv("MAX_UPLOAD_SIZE_BYTES", str(25 * 1024 * 1024))
         )
     )
     allowed_image_formats: List[str] = Field(
