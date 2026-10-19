@@ -34,6 +34,60 @@
       "topic": {
         "type": "string"
       },
+      "author": {
+        "type": "string",
+        "description": "Primary author, editor, technical committee, or issuing institution"
+      },
+      "evidence_type": {
+        "type": "string",
+        "enum": [
+          "documented_historical_practice",
+          "traditional_knowledge_recorded",
+          "modern_conservation_guidance",
+          "experimental_findings",
+          "unverified_claim_hypothesis"
+        ],
+        "description": "Methodological basis of the source evidence"
+      },
+      "historical_period": {
+        "type": "string",
+        "description": "Historical epoch or modern statutory era"
+      },
+      "relevant_region": {
+        "type": "string",
+        "description": "Geographical or geological region to which the evidence applies"
+      },
+      "applicable_structure_types": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Heritage water structure typologies validated by this source"
+      },
+      "confidence_limitations": {
+        "type": "string",
+        "description": "Scientific limitations, uncertainties, or boundary assumptions of the source"
+      },
+      "practical_conservation_relevance": {
+        "type": "string",
+        "description": "Direct application of this source to on-site conservation engineering"
+      },
+      "non_generalizable_conditions": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Conditions or environments under which claims from this source must NOT be generalized"
+      },
+      "expert_verification_status": {
+        "type": "string",
+        "enum": [
+          "verified_authoritative",
+          "provisional_guidance",
+          "needs_field_validation"
+        ],
+        "description": "Conservation domain review and verification status"
+      },
       "claim_supported": {
         "type": "string",
         "description": "Specific conservation principle or material rule substantiated by this source"

@@ -174,3 +174,87 @@ class TestMaterialCompatibilityDeterministicLogic:
         with pytest.raises(MaterialCompatibilityError) as exc_info:
             engine.evaluate("alien_polymer_composite_2050")
         assert "not found" in str(exc_info.value)
+
+
+class TestMissingAndConflictingMaterialData:
+    """Validate graceful handling, warnings, and normalization for missing or conflicting data."""
+
+    def test_missing_properties_triggers_warning_and_uses_baseline(self) -> None:
+        engine = MaterialCompatibilityEngine(MATERIALS_DIR, CONTRACT_PATH)
+        mock_incomplete_substrate = {
+            "material_id": "incomplete_sandstone",
+            "material_family": "stone",
+            "category": "historic_substrate",
+            "known_properties": {},  # completely missing strength and permeability
+        }
+        res = engine.evaluate_intervention(mock_incomplete_substrate, "surkhi_lime_mortar")
+        warnings_str = " ".join(res["warnings"])
+        assert "MISSING DATA" in warnings_str
+        assert "compressive_strength_mpa_range" in warnings_str or "assumed" in warnings_str
+        assert 0.0 <= res["compatibility_score"] <= 100.0
+
+    def test_conflicting_inverted_bounds_normalized_with_warning(self) -> None:
+        engine = MaterialCompatibilityEngine(MATERIALS_DIR, CONTRACT_PATH)
+        mock_conflicting_substrate = {
+            "material_id": "inverted_sandstone",
+            "material_family": "stone",
+            "category": "historic_substrate",
+            "known_properties": {
+                "compressive_strength_mpa_range": [25.0, 5.0],  # inverted: max < min
+                "vapor_permeability_perm_range": [30.0, 10.0],
+            },
+        }
+        res = engine.evaluate_intervention(mock_conflicting_substrate, "surkhi_lime_mortar")
+        warnings_str = " ".join(res["warnings"])
+        assert "CONFLICTING DATA" in warnings_str
+        assert "inverted bounds" in warnings_str
+
+    def test_negative_bounds_clamped_with_warning(self) -> None:
+        engine = MaterialCompatibilityEngine(MATERIALS_DIR, CONTRACT_PATH)
+        mock_negative_substrate = {
+            "material_id": "negative_sandstone",
+            "material_family": "stone",
+            "category": "historic_substrate",
+            "known_properties": {
+                "compressive_strength_mpa_range": [-5.0, 8.0],
+            },
+        }
+        res = engine.evaluate_intervention(mock_negative_substrate, "surkhi_lime_mortar")
+        warnings_str = " ".join(res["warnings"])
+        assert "CONFLICTING DATA" in warnings_str
+        assert "negative values" in warnings_str
+
+
+class TestExplainabilityAndDecisionSupport:
+    """Validate rationales, provisional weight documentation, and safety caps."""
+
+    def test_dimension_rationales_populated_for_all_dimensions(self, lime_evaluation: dict) -> None:
+        surkhi = next(c for c in lime_evaluation["candidate_interventions"] if c["intervention_material"] == "surkhi_lime_mortar")
+        assert "dimension_rationales" in surkhi
+        rationales = surkhi["dimension_rationales"]
+        required_dims = ["mechanical", "moisture", "thermal", "chemical", "reversibility", "heritage", "visual"]
+        for dim in required_dims:
+            assert dim in rationales
+            assert len(rationales[dim].strip()) > 15, f"Rationale too brief for {dim}"
+
+    def test_provisional_weights_and_screening_notice(self, lime_evaluation: dict) -> None:
+        assert lime_evaluation.get("provisional_weights") is True
+        assert "weight_validation_requirements" in lime_evaluation
+        assert len(lime_evaluation["weight_validation_requirements"]) >= 2
+        assert "evaluation_notice" in lime_evaluation
+        assert "screening" in lime_evaluation["evaluation_notice"].lower()
+
+    def test_low_confidence_substrate_triggers_safety_cap(self) -> None:
+        """When substrate confidence is low (<0.60), recommendation must not be strongly_recommended."""
+        engine = MaterialCompatibilityEngine(MATERIALS_DIR, CONTRACT_PATH)
+        # Probabilistic identification is low (e.g. 0.40)
+        result = engine.evaluate(
+            original_material="hydraulic_lime_mortar",
+            original_material_confidence=0.40
+        )
+        surkhi = next(c for c in result["candidate_interventions"] if c["intervention_material"] == "surkhi_lime_mortar")
+        assert surkhi["recommendation"] == "acceptable_conditional"
+        warnings_str = " ".join(surkhi["warnings"])
+        assert "SAFETY CAP APPLIED" in warnings_str
+        assert "acceptable_conditional" in warnings_str
+

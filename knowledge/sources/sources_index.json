@@ -2,10 +2,28 @@
   {
     "source_id": "SRC_ASI_CONSERVATION_MANUAL_2020",
     "title": "Architectural Conservation: Principles and Practice in India",
+    "author": "Archaeological Survey of India (ASI) & INTACH",
     "publisher": "Archaeological Survey of India / INTACH",
     "year": 2020,
     "url": "https://intach.org/conservation-guidelines.php",
     "topic": "Lime mortar compatibility, stone masonry conservation, and non-destructive intervention",
+    "evidence_type": "modern_conservation_guidance",
+    "historical_period": "Modern statutory guidance (2020 revision)",
+    "relevant_region": "Pan-Indian / Subcontinental Heritage",
+    "applicable_structure_types": [
+      "baoli",
+      "bawari",
+      "kund",
+      "vav",
+      "tank"
+    ],
+    "confidence_limitations": "National guidelines establish authoritative policy standards and ethical boundaries, but do not replace site-specific petrographic, XRD, and moisture testing on historic stone/mortar samples.",
+    "practical_conservation_relevance": "Provides regulatory basis for prohibiting Ordinary Portland Cement (OPC) on historic lime masonry; mandates sacrificial breathability and minimum intervention.",
+    "non_generalizable_conditions": [
+      "Not applicable to mid-20th-century reinforced concrete heritage structures.",
+      "Cannot be applied without adjusting binder-aggregate ratios to local quarry stones."
+    ],
+    "expert_verification_status": "verified_authoritative",
     "claim_supported": "Use of Ordinary Portland Cement (OPC) on historic lime mortar masonry causes moisture entrapment, salt crystallization, and accelerated stone spalling.",
     "claims_supported": [
       "Use of Ordinary Portland Cement (OPC) on historic lime mortar masonry causes moisture entrapment, salt crystallization, and accelerated stone spalling.",
@@ -16,10 +34,28 @@
   {
     "source_id": "SRC_INTACH_CHARTER_2004",
     "title": "INTACH Charter for the Conservation of Unprotected Architectural Heritage and Sites in India",
+    "author": "Indian National Trust for Art and Cultural Heritage (INTACH)",
     "publisher": "Indian National Trust for Art and Cultural Heritage (INTACH)",
     "year": 2004,
     "url": "http://intach.org/pdf/charter.pdf",
     "topic": "Indigenous master-builder traditions, vernacular craftsmanship, and minimum intervention ethics",
+    "evidence_type": "modern_conservation_guidance",
+    "historical_period": "Modern conservation charter (adopted 2004)",
+    "relevant_region": "Pan-Indian (special focus on vernacular and unprotected community water heritage)",
+    "applicable_structure_types": [
+      "baoli",
+      "bawari",
+      "kund",
+      "vav",
+      "tank"
+    ],
+    "confidence_limitations": "Ethical and procedural charter; does not provide quantitative structural equations, finite element thresholds, or laboratory testing procedures.",
+    "practical_conservation_relevance": "Affirms the priority of local traditional craftsmanship (e.g., Sompura, Chettiar, or local mistri guilds) and indigenous material systems over industrialized replacements.",
+    "non_generalizable_conditions": [
+      "Guidelines do not supersede statutory safety evacuations when active structural collapse is imminent.",
+      "Traditional building knowledge must be verified for the specific regional geology before application."
+    ],
+    "expert_verification_status": "verified_authoritative",
     "claim_supported": "Preservation of indigenous craftsmanship traditions and traditional material systems takes precedence over modern industrial replacements.",
     "claims_supported": [
       "Preservation of indigenous craftsmanship traditions and traditional material systems takes precedence over modern industrial replacements.",
@@ -30,10 +66,26 @@
   {
     "source_id": "SRC_LIVINGSTON_2002",
     "title": "Steps to Water: The Ancient Stepwells of India",
+    "author": "Morna Livingston",
     "publisher": "Princeton Architectural Press",
     "year": 2002,
     "url": "https://www.papress.com",
     "topic": "Stepwell typological evolution, subterranean microclimates, and stepped hydraulic access",
+    "evidence_type": "traditional_knowledge_recorded",
+    "historical_period": "7th Century CE to 19th Century CE",
+    "relevant_region": "Western and Northern India (Gujarat, Rajasthan, Delhi, Madhya Pradesh)",
+    "applicable_structure_types": [
+      "baoli",
+      "bawari",
+      "vav"
+    ],
+    "confidence_limitations": "Architectural and spatial documentation based on field surveys; lacks destructive core testing, chemical binder assays, and geotechnical pore-water calculations.",
+    "practical_conservation_relevance": "Documents functional geometries of descending multi-tier galleries, structural pavilion cross-struts (kutas), and passive subterranean thermal buffering.",
+    "non_generalizable_conditions": [
+      "Architectural configurations documented in semi-arid alluvial plains cannot be generalized to rock-cut plateau cisterns or wet tropical stepped tanks.",
+      "Assumptions regarding historical groundwater levels reflect pre-industrial water tables and must be recalibrated against modern over-extracted aquifer depths."
+    ],
+    "expert_verification_status": "verified_authoritative",
     "claim_supported": "Stepped geometry enables direct, safe pedestrian descent to fluctuating seasonal groundwater levels across 10 to 25 meter ranges.",
     "claims_supported": [
       "Stepped geometry enables direct, safe pedestrian descent to fluctuating seasonal groundwater levels across 10 to 25 meter ranges.",
@@ -44,10 +96,24 @@
   {
     "source_id": "SRC_JAIN_NEUBAUER_1981",
     "title": "The Stepwells of Gujarat: In Art-Historical Perspective",
+    "author": "Jutta Jain-Neubauer",
     "publisher": "Abhinav Publications",
     "year": 1981,
     "url": "https://archive.org/details/stepwellsofgujar0000jain",
     "topic": "Vav subterranean architectural morphology, structural pavilions (kutas), and hydraulic design",
+    "evidence_type": "documented_historical_practice",
+    "historical_period": "Solanki / Chaulukya to Sultanate periods (10th to 16th Century CE)",
+    "relevant_region": "Gujarat (Patan, Adalaj, Ahmedabad, Viramgam)",
+    "applicable_structure_types": [
+      "vav"
+    ],
+    "confidence_limitations": "Primarily an art-historical and typological treatise; does not provide structural failure criteria, petrographic classifications, or hydraulic runoff modelling.",
+    "practical_conservation_relevance": "Identifies the structural mechanics of kutas (multi-storey pillared pavilions) acting as retaining struts that counterbalance lateral soil thrust on long stepped corridors.",
+    "non_generalizable_conditions": [
+      "Findings apply specifically to Gujarat vav typologies in alluvial soils; they cannot be generalized to basalt-rubble kunds of the Deccan Traps.",
+      "Orientation rules documented in historical texts represent ideal treatises (Vastu/Shilpa Shastras) and may vary based on local site topography."
+    ],
+    "expert_verification_status": "verified_authoritative",
     "claim_supported": "The structural layout of Gujarat vavs incorporates multi-tiered pavilions (kutas) that counterbalance lateral soil thrust on stepped corridors.",
     "claims_supported": [
       "The structural layout of Gujarat vavs incorporates multi-tiered pavilions (kutas) that counterbalance lateral soil thrust on stepped corridors.",
@@ -58,10 +124,27 @@
   {
     "source_id": "SRC_CSE_DYING_WISDOM_1997",
     "title": "Dying Wisdom: Rise, Fall and Potential of India's Traditional Water Harvesting Systems",
+    "author": "Anil Agarwal and Sunita Narain (Eds.)",
     "publisher": "Centre for Science and Environment (CSE), New Delhi",
     "year": 1997,
     "url": "https://www.cseindia.org/dying-wisdom-470",
     "topic": "Traditional water harvesting typologies: Baoli, Bawari, Kund, Johad, and micro-catchment ecology",
+    "evidence_type": "traditional_knowledge_recorded",
+    "historical_period": "Traditional indigenous practices (Antiquity to 20th Century)",
+    "relevant_region": "Pan-Indian (Thar Desert, Central Highlands, Deccan, Indo-Gangetic Plains)",
+    "applicable_structure_types": [
+      "baoli",
+      "bawari",
+      "kund",
+      "tank"
+    ],
+    "confidence_limitations": "Comprehensive socio-ecological and technical field survey; hydrological discharge figures and recharge estimates are representative rather than instrumented telemetry data.",
+    "practical_conservation_relevance": "Demonstrates the necessity of conserving the complete hydrological ecosystem (catchment apron, feeder channels, silt traps) rather than treating the monument as an isolated architectural shell.",
+    "non_generalizable_conditions": [
+      "Catchment revival recommendations assume available surrounding open catchment; severely encroached dense urban environments require engineered diversion retrofits.",
+      "Traditional runoff collection practices cannot be deployed without water quality testing in industrialized or pesticide-laden agricultural catchments."
+    ],
+    "expert_verification_status": "verified_authoritative",
     "claim_supported": "Inverted pyramid step geometries in arid regions maximize water volume retention while minimizing exposed evaporative surface area.",
     "claims_supported": [
       "Inverted pyramid step geometries in arid regions maximize water volume retention while minimizing exposed evaporative surface area.",
@@ -72,10 +155,24 @@
   {
     "source_id": "SRC_UNESCO_RANI_KI_VAV_2014",
     "title": "Rani-ki-Vav (the Queen’s Stepwell) at Patan, Gujarat - World Heritage Inscription Dossier",
+    "author": "Archaeological Survey of India (ASI) & UNESCO World Heritage Centre",
     "publisher": "UNESCO World Heritage Centre / Archaeological Survey of India",
     "year": 2014,
     "url": "https://whc.unesco.org/en/list/1301",
     "topic": "Subterranean stepwell engineering, deep aquifer shaft mechanics, and structural conservation",
+    "evidence_type": "documented_historical_practice",
+    "historical_period": "11th Century CE (Chaulukya dynasty)",
+    "relevant_region": "Gujarat (Patan, Saraswati river basin)",
+    "applicable_structure_types": [
+      "vav"
+    ],
+    "confidence_limitations": "Presents empirical conservation history of a single exceptional monumental site; foundation behavior under deep riverbed alluvium cannot be directly mapped to shallow bedrock stepwells.",
+    "practical_conservation_relevance": "Detailed documentation of multi-tier retaining walls, ashlar sandstone joinery, horizontal stone struts, and the structural risks of groundwater table depression.",
+    "non_generalizable_conditions": [
+      "Subterranean hydraulic equilibrium observed at Patan reflects Saraswati river plain alluvial hydrology and does not apply to hard-rock Deccan aquifers.",
+      "Conservation techniques deployed for monumental state-protected sites may require adaptation for resource-constrained community-managed structures."
+    ],
+    "expert_verification_status": "verified_authoritative",
     "claim_supported": "Deep circular masonry shafts in stepwells tap perennial alluvial aquifers, functioning under seasonal hydraulic equilibrium with regional water tables.",
     "claims_supported": [
       "Deep circular masonry shafts in stepwells tap perennial alluvial aquifers, functioning under seasonal hydraulic equilibrium with regional water tables.",
@@ -86,10 +183,28 @@
   {
     "source_id": "SRC_CPWD_HERITAGE_2013",
     "title": "Handbook of Conservation of Heritage Buildings",
+    "author": "Directorate General, Central Public Works Department (CPWD)",
     "publisher": "Directorate General, Central Public Works Department (CPWD), Government of India",
     "year": 2013,
     "url": "https://cpwd.gov.in",
     "topic": "Traditional lime mortar preparation, surkhi pozzolanic ratios, and organic herbal additives",
+    "evidence_type": "modern_conservation_guidance",
+    "historical_period": "Modern engineering handbook (2013 edition)",
+    "relevant_region": "Pan-Indian",
+    "applicable_structure_types": [
+      "baoli",
+      "bawari",
+      "kund",
+      "vav",
+      "tank"
+    ],
+    "confidence_limitations": "Standard field specifications based on historical PWD and ASI restoration protocols; exact durability of traditional organic additives (e.g. jaggery, urad dal) under modern acidic rain requires continued research.",
+    "practical_conservation_relevance": "Provides standardized batching ratios for hydraulic lime-surkhi mortars, traditional slaking cycles, and wet-jute curing requirements.",
+    "non_generalizable_conditions": [
+      "Fermented organic admixtures (jaggery, urad dal) must be avoided in poorly ventilated, stagnant subterranean chambers prone to biological fungal growth.",
+      "Mortar recipes must be adjusted based on the porosity and softness of the host stone (e.g., soft sandstones require higher sand/surkhi ratios than hard quartzites)."
+    ],
+    "expert_verification_status": "verified_authoritative",
     "claim_supported": "Hydraulic lime mortars blended with surkhi (calcined clay pozzolana) and herbal extracts provide water resistance and flexible jointing without brittleness.",
     "claims_supported": [
       "Hydraulic lime mortars blended with surkhi (calcined clay pozzolana) and herbal extracts provide water resistance and flexible jointing without brittleness.",
@@ -100,10 +215,27 @@
   {
     "source_id": "SRC_CGWB_TRADITIONAL_2021",
     "title": "Traditional Water Harvesting Structures and Sustainable Groundwater Management in India",
+    "author": "Central Ground Water Board (CGWB), Ministry of Jal Shakti",
     "publisher": "Central Ground Water Board (CGWB), Ministry of Jal Shakti, Government of India",
     "year": 2021,
     "url": "http://cgwb.gov.in",
     "topic": "Hydrogeology, unconfined aquifer recharge, and siltation dynamics in stepwells and tanks",
+    "evidence_type": "experimental_findings",
+    "historical_period": "Modern hydrogeological monitoring report (2021)",
+    "relevant_region": "Pan-Indian (emphasis on northwestern arid and semi-arid states)",
+    "applicable_structure_types": [
+      "baoli",
+      "bawari",
+      "kund",
+      "tank"
+    ],
+    "confidence_limitations": "Hydrogeological data based on regional observation well networks; site-specific recharge efficiency depends on local lithology, aquifer depth, and soil infiltration rates.",
+    "practical_conservation_relevance": "Quantifies the barrier effect of bed siltation: compacted silt acts as an impervious hydraulic barrier, cutting off unconfined aquifer recharge and inducing stagnation.",
+    "non_generalizable_conditions": [
+      "Stepwell recharge mechanisms only function if the structure intersects an unconfined or semi-confined aquifer with permeable strata.",
+      "Desiltation in contaminated urban areas must not be carried out without runoff quality analysis to prevent groundwater contamination."
+    ],
+    "expert_verification_status": "verified_authoritative",
     "claim_supported": "Stepwells serve dual hydrological roles: groundwater extraction points during dry seasons and artificial recharge nodes during monsoon inundation.",
     "claims_supported": [
       "Stepwells serve dual hydrological roles: groundwater extraction points during dry seasons and artificial recharge nodes during monsoon inundation.",
@@ -114,10 +246,28 @@
   {
     "source_id": "SRC_BIS_IS712_LIME",
     "title": "IS 712: Specification for Building Limes",
+    "author": "Civil Engineering Division Council (CEDC), Bureau of Indian Standards",
     "publisher": "Bureau of Indian Standards (BIS), Government of India",
     "year": 1984,
     "url": "https://standardsbis.bsbedge.com",
     "topic": "Building lime classification: Class A (eminently hydraulic), Class B (semi-hydraulic), Class C (fat lime)",
+    "evidence_type": "modern_conservation_guidance",
+    "historical_period": "Indian Standard specification (1984 reaffirmed)",
+    "relevant_region": "Pan-Indian",
+    "applicable_structure_types": [
+      "baoli",
+      "bawari",
+      "kund",
+      "vav",
+      "tank"
+    ],
+    "confidence_limitations": "Standard specifies properties for modern manufactured commercial limes; traditional historic field-slaked limes exhibit wider variations in unslaked residue, free CaO, and hydraulic index.",
+    "practical_conservation_relevance": "Provides technical classification for specifying heritage mortars: Class A (hydraulic) for submerged water structures, Class B for structural masonry, and Class C (fat lime) for finishes.",
+    "non_generalizable_conditions": [
+      "Class C fat limes cannot set in submerged or persistently damp underground masonry without pozzolanic activation (such as surkhi).",
+      "Standard values must be adjusted for historic soft lime putty aged in pits over multiple months or years."
+    ],
+    "expert_verification_status": "verified_authoritative",
     "claim_supported": "Class A and B limes yield low modulus of elasticity (1.0-4.0 GPa) and moderate compressive strength (1.5-5.0 MPa) compatible with historic soft stones.",
     "claims_supported": [
       "Class A and B limes yield low modulus of elasticity (1.0-4.0 GPa) and moderate compressive strength (1.5-5.0 MPa) compatible with historic soft stones.",
@@ -127,10 +277,28 @@
   {
     "source_id": "SRC_BIS_IS3115_POZZOLANA",
     "title": "IS 3115: Specification for Lime Pozzolana Mixture",
+    "author": "Civil Engineering Division Council (CEDC), Bureau of Indian Standards",
     "publisher": "Bureau of Indian Standards (BIS), Government of India",
     "year": 1992,
     "url": "https://standardsbis.bsbedge.com",
     "topic": "Lime-calcined clay pozzolana (surkhi) reactive blending and durability in hydraulic structures",
+    "evidence_type": "experimental_findings",
+    "historical_period": "Indian Standard specification (1992 reaffirmed)",
+    "relevant_region": "Pan-Indian",
+    "applicable_structure_types": [
+      "baoli",
+      "bawari",
+      "kund",
+      "vav",
+      "tank"
+    ],
+    "confidence_limitations": "Laboratory test specification based on standardized clay calcination; on-site crushed historic brick-bats may possess variable pozzolanic activity depending on original kiln firing temperatures.",
+    "practical_conservation_relevance": "Verifies that reactive calcined clay (surkhi) binds free calcium hydroxide from lime hydration, producing insoluble calcium silicate hydrates (C-S-H) that resist water leaching while maintaining high vapor permeability.",
+    "non_generalizable_conditions": [
+      "Over-burnt or vitrified industrial brick powder exhibits very low pozzolanic reactivity and cannot replace properly calcined clay surkhi.",
+      "Surkhi-lime mixtures require longer setting times than cement and must not be subjected to fast-flowing hydraulic wash during early cure."
+    ],
+    "expert_verification_status": "verified_authoritative",
     "claim_supported": "Calcined clay (surkhi) reacts with free calcium hydroxide released during lime hydration, forming insoluble calcium silicate hydrates that resist water leaching.",
     "claims_supported": [
       "Calcined clay (surkhi) reacts with free calcium hydroxide released during lime hydration, forming insoluble calcium silicate hydrates that resist water leaching.",
@@ -140,10 +308,28 @@
   {
     "source_id": "SRC_RILEM_HISTORIC_MORTARS_2012",
     "title": "Historic Mortars: Characterisation, Assessment and Repair (RILEM TC 203-RHM)",
+    "author": "P. Groom, J. Hughes, et al. (RILEM Technical Committee 203-RHM)",
     "publisher": "Springer RILEM Bookseries",
     "year": 2012,
     "url": "https://link.springer.com/book/10.1007/978-94-007-4635-0",
     "topic": "Multi-dimensional compatibility criteria: mechanical, hygric, thermal, chemical, and reversibility",
+    "evidence_type": "experimental_findings",
+    "historical_period": "International scientific state-of-the-art report (2012)",
+    "relevant_region": "International / Arid and Temperate Heritage Environments",
+    "applicable_structure_types": [
+      "baoli",
+      "bawari",
+      "kund",
+      "vav",
+      "tank"
+    ],
+    "confidence_limitations": "Peer-reviewed international consensus synthesis; specific physical constants and test protocols must be calibrated against Indian regional sandstones and traditional mortar admixtures.",
+    "practical_conservation_relevance": "Defines multi-dimensional compatibility criteria: mechanical sacrificality (mortar weaker than stone), hygric vapor matching, thermal dilation compatibility, and chemical inertness.",
+    "non_generalizable_conditions": [
+      "Test benchmarks developed for European calcareous stones cannot be directly applied to highly siliceous Indian quartzites without adjustment.",
+      "Reversibility criteria must consider that hydraulic lime-surkhi mortars achieve high final hardness over multi-decade carbonation."
+    ],
+    "expert_verification_status": "verified_authoritative",
     "claim_supported": "Mortar repairs on historic masonry must satisfy sacrificality: mortar compressive strength and stiffness must be lower than the historic stone unit.",
     "claims_supported": [
       "Mortar repairs on historic masonry must satisfy sacrificality: mortar compressive strength and stiffness must be lower than the historic stone unit.",

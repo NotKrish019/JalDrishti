@@ -80,7 +80,7 @@ Cloudinary credentials must reside **strictly on the backend**. Never expose API
 
 | Variable | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `MAX_UPLOAD_SIZE_BYTES` | int | `10485760` (10 MB) | Maximum upload size threshold |
+| `MAX_UPLOAD_SIZE_BYTES` | int | `26214400` (25 MB) | Maximum upload size threshold |
 | `ALLOWED_IMAGE_FORMATS` | csv | `jpeg,jpg,png,webp` | Whitelisted image file formats |
 | `SQLITE_DB_PATH` | string | `data/jaldrishti.db` | Local SQLite database file location |
 
@@ -101,7 +101,7 @@ All image endpoints are served under `/images` and `/inspections`.
   - `structure_name` *(optional, string)*: Monument or site designation
   - `notes` *(optional, string)*: Surveyor field notes
 - **Supported File Formats:** JPEG, PNG, WEBP
-- **Maximum File Size:** 10 MB (configurable via `MAX_UPLOAD_SIZE_BYTES`)
+- **Maximum File Size:** 25 MB (configurable via `MAX_UPLOAD_SIZE_BYTES`)
 
 #### Request Example (cURL):
 ```bash
