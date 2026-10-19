@@ -1,0 +1,44 @@
+# Crack detection pilot on the published Darbhanga Fort brick-masonry crack dataset (YOLO boxes).
+#
+# Label review (2026-10-19, see vision/docs/DATASET_AUDIT.md):
+#   * all 3,843 label files parse; 1 class ("crack"); no out-of-range or zero-area boxes
+#   * a visual sample shows boxes drawn around visible cracks, with some loose or questionable
+#     boxes (e.g. along mortar courses); treat labels as useful but noisy
+#   * train images without a label file (203) are close-up brick with no visible crack:
+#     used as background (negative) images
+# What a "crack" box asserts: a person marked a region of brick masonry containing a visible
+# crack. It says nothing about crack depth, width, cause, activity or structural significance.
+
+name: darbhanga_crack_detection_pilot
+task: object_detection
+classes: [crack]
+label_semantics: >-
+  Box = region of brick masonry where an annotator marked a visible crack (published dataset
+  labels, spot-checked, noisy). No box on a train-folder image without a label file = no crack
+  annotated (close-up background brick).
+labels_verified: true
+
+# Extracted from DrabhangaDataset.zip; data/raw/ is gitignored.
+dataset_root: "data/raw/darbhanga_crack/Crack Data-Darbhanga Fort"
+manifest: vision/outputs/audit/detection_manifest_split.jsonl
+negatives_without_label_file: [train]
+
+arch: fasterrcnn_mobilenet_v3_large_fpn
+pretrained: true
+weights_source: "torchvision FasterRCNN_MobileNet_V3_Large_FPN_Weights.COCO_V1 (download.pytorch.org, sha256 prefix fb6a3cc7)"
+
+image_size: 512          # 768 px source images are resized to 512 inside the model
+batch_size: 8
+epochs: 8
+learning_rate: 0.01
+momentum: 0.9
+weight_decay: 0.0001
+warmup_iters: 200
+seed: 42
+device: cpu              # MPS was not faster for this model and showed an early loss spike
+num_threads: 8
+early_stopping_patience: 3
+hflip: true
+color_jitter: 0.2
+
+output_dir: vision/outputs/experiments

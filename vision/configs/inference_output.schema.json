@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jaldrishti.org/schemas/vision/inference_output.schema.json",
+  "title": "VisionImageClassificationResult",
+  "description": "Output of vision.inference.ImageClassifierPredictor.predict(). Image-level classification only: there are no bounding boxes, masks, severity or safety fields because the model does not produce them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "task_type", "schema_version", "predictions", "warnings", "disclaimer"],
+  "properties": {
+    "status": {"enum": ["ok", "error"]},
+    "task_type": {"const": "image_classification"},
+    "schema_version": {"type": "string"},
+    "model_name": {"type": ["string", "null"]},
+    "model_version": {"type": ["string", "null"]},
+    "label_status": {
+      "enum": ["verified", "unverified", null],
+      "description": "Whether the class definitions used in training were confirmed by a reviewer. 'unverified' models are pipeline tests, not pilot models."
+    },
+    "preprocessing_version": {"type": ["string", "null"]},
+    "image": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {"width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1}}
+    },
+    "predictions": {
+      "type": "array",
+      "description": "Every class with its model score, sorted by score descending. Empty when status is error.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["class_id", "class_name", "score"],
+        "properties": {
+          "class_id": {"type": "integer", "minimum": 0},
+          "class_name": {"type": "string"},
+          "score": {"type": "number", "minimum": 0, "maximum": 1, "description": "Softmax output. Not a calibrated probability of physical damage unless the model card says so."}
+        }
+      }
+    },
+    "top_class": {"type": ["string", "null"]},
+    "decision": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["rule", "positive_class", "threshold", "positive"],
+      "properties": {
+        "rule": {"const": "score_threshold"},
+        "positive_class": {"type": "string"},
+        "threshold": {"type": "number", "minimum": 0, "maximum": 1, "description": "Selected on the validation split during training."},
+        "positive": {"type": "boolean", "description": "True when the positive-class score is at or above the threshold: a candidate observation to review, not a confirmed defect."}
+      }
+    },
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "error": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": {"enum": ["not_found", "empty_input", "too_large", "too_small", "unsupported_format", "unsupported_input", "unsupported_array", "unreadable_image", "inference_failed"]},
+        "message": {"type": "string"}
+      }
+    },
+    "timing_ms": {
+      "type": ["object", "null"],
+      "additionalProperties": {"type": "number", "minimum": 0}
+    },
+    "disclaimer": {"type": "string"}
+  }
+}

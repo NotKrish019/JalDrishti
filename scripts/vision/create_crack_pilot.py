@@ -2,6 +2,11 @@
 
 BaoliGuard Vision - Emergency Phase 2 Sprint
 Owner: Krish (Computer Vision / AI Lead)
+
+LEGACY. The boxes written here come from an OpenCV black-hat heuristic (with a fixed centre
+box as fallback), not from human annotation, so a detector trained on them learns to imitate
+the heuristic. Kept for traceability of vision/models/crack_pilot_yolov8n.pt; see
+vision/docs/MODEL_CARD_crack_pilot_v0.md. New work uses vision/ and scripts/vision/train_classifier.py.
 """
 
 import os

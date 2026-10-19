@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jaldrishti.org/schemas/vision/inference_output_detection.schema.json",
+  "title": "VisionCrackDetectionResult",
+  "description": "Output of vision.inference.DetectionPredictor.predict(). Boxes are candidate regions for review. There are no width, depth, severity or safety fields because the model does not estimate them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "task_type", "schema_version", "detections", "warnings", "disclaimer"],
+  "properties": {
+    "status": {"enum": ["ok", "error"]},
+    "task_type": {"const": "object_detection"},
+    "schema_version": {"type": "string"},
+    "model_name": {"type": ["string", "null"]},
+    "model_version": {"type": ["string", "null"]},
+    "label_status": {"enum": ["verified", "unverified", null]},
+    "preprocessing_version": {"type": ["string", "null"]},
+    "image": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {"width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1}}
+    },
+    "score_threshold": {"type": ["number", "null"], "minimum": 0, "maximum": 1, "description": "Box score cut-off selected on the validation split."},
+    "detections": {
+      "type": "array",
+      "description": "Boxes at or above score_threshold, highest confidence first. Empty when none, or on error.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["class_id", "class_name", "confidence", "bbox"],
+        "properties": {
+          "class_id": {"type": "integer", "minimum": 0},
+          "class_name": {"type": "string"},
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1, "description": "Detector score; not a calibrated probability."},
+          "bbox": {
+            "type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "number", "minimum": 0},
+            "description": "[x_min, y_min, x_max, y_max] in pixels of the decoded input image."
+          }
+        }
+      }
+    },
+    "image_level": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["max_score", "threshold", "candidate_present"],
+      "properties": {
+        "max_score": {"type": "number", "minimum": 0, "maximum": 1},
+        "threshold": {"type": "number", "minimum": 0, "maximum": 1},
+        "candidate_present": {"type": "boolean", "description": "Whether any box scores at or above the image-level threshold: review this image. Not a confirmed defect."}
+      }
+    },
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "error": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": {"enum": ["not_found", "empty_input", "too_large", "too_small", "unsupported_format", "unsupported_input", "unsupported_array", "unreadable_image", "inference_failed"]},
+        "message": {"type": "string"}
+      }
+    },
+    "timing_ms": {"type": ["object", "null"], "additionalProperties": {"type": "number", "minimum": 0}},
+    "disclaimer": {"type": "string"}
+  }
+}

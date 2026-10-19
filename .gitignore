@@ -37,6 +37,8 @@ frontend/.vercel/
 runs/
 wandb/
 !vision/models/crack_pilot_yolov8n.pt
+# Crack detection pilot v1 (trained 2026-10-19; see vision/docs/MODEL_CARD_crack_detector.md)
+!vision/models/crack_detector_pilot_v1/model.pt
 
 # Datasets and Large Folders
 data/raw/*
@@ -46,6 +48,8 @@ vision/datasets/*
 vision/model/*
 vision/outputs/*
 Darbhanga_Fort/
+# Supplied dataset archive (extract to data/raw/darbhanga_crack/; licence not yet recorded)
+/DrabhangaDataset.zip
 
 # Local Persistence / Database
 *.db

@@ -1,0 +1,81 @@
+{
+  "run_id": "pilot_v1",
+  "status": "completed",
+  "started_utc": "20261019T130329Z",
+  "label_status": "verified",
+  "config": {
+    "name": "darbhanga_crack_detection_pilot",
+    "task": "object_detection",
+    "classes": [
+      "crack"
+    ],
+    "dataset_root": "data/raw/darbhanga_crack/Crack Data-Darbhanga Fort",
+    "manifest": "vision/outputs/audit/detection_manifest_split.jsonl",
+    "label_semantics": "Box = region of brick masonry where an annotator marked a visible crack (published dataset labels, spot-checked, noisy). No box on a train-folder image without a label file = no crack annotated (close-up background brick).",
+    "labels_verified": true,
+    "negatives_without_label_file": [
+      "train"
+    ],
+    "arch": "fasterrcnn_mobilenet_v3_large_fpn",
+    "pretrained": true,
+    "weights_source": "torchvision FasterRCNN_MobileNet_V3_Large_FPN_Weights.COCO_V1 (download.pytorch.org, sha256 prefix fb6a3cc7)",
+    "image_size": 512,
+    "batch_size": 8,
+    "epochs": 8,
+    "learning_rate": 0.01,
+    "momentum": 0.9,
+    "weight_decay": 0.0001,
+    "warmup_iters": 200,
+    "seed": 42,
+    "device": "cpu",
+    "num_threads": 8,
+    "max_train_batches": null,
+    "max_val_images": null,
+    "early_stopping_patience": 3,
+    "hflip": true,
+    "color_jitter": 0.2,
+    "output_dir": "vision/outputs/experiments"
+  },
+  "device": "cpu",
+  "torch_threads": 8,
+  "initial_weights": "FasterRCNN_MobileNet_V3_Large_FPN_Weights.COCO_V1",
+  "versions": {
+    "python": "3.14.3",
+    "torch": "2.14.0",
+    "torchvision": "0.29.0",
+    "numpy": "2.4.3",
+    "pillow": "12.1.1",
+    "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O"
+  },
+  "manifest_sha256": "f98b51596173b58de40197e5c2a0f1e82fa5ac167bd4de80fb67a81acaede906",
+  "train_images": 2822,
+  "train_images_with_boxes": 2680,
+  "train_boxes": 3875,
+  "val_images": 226,
+  "best_epoch": 7,
+  "best_val_map50": 0.8263522307109831,
+  "epochs_run": 8,
+  "training_seconds": 5587.241766583,
+  "score_threshold": {
+    "threshold": 0.7,
+    "precision": 0.8958333333333334,
+    "recall": 0.7846715328467153,
+    "f1": 0.8365758754863813,
+    "criterion": "max box F1 @ IoU 0.5"
+  },
+  "image_threshold": {
+    "criterion": "f1",
+    "target": null,
+    "threshold": 0.052042894065380096,
+    "precision": 0.9899497487437185,
+    "recall": 1.0,
+    "f1": 0.9949494949494949
+  },
+  "artefacts": [
+    "model.pt",
+    "best_weights.pt",
+    "last_weights.pt",
+    "history.json",
+    "val_report.json"
+  ]
+}

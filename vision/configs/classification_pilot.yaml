@@ -1,0 +1,66 @@
+# Image-classification pilot on the Darbhanga Fort folder dataset.
+#
+# SUPERSEDED for now: the dataset actually provided (DrabhangaDataset.zip) has YOLO crack boxes
+# and train/val/test folders, not Damaged_images/Background_images, so the detection pilot
+# (detection_pilot.yaml) is the primary task. This config is kept for the folder layout described
+# in the earlier report, should that dataset be supplied.
+#
+# STATUS: labels NOT verified. Training will refuse to start until a reviewer has inspected the
+# contact sheets (scripts/vision/make_contact_sheets.py), confirmed what each folder asserts,
+# written that down in `labels.semantics`, and set `labels.verified: true`.
+#
+# Class names describe what the folders are believed to assert, not "damaged vs healthy":
+# sampled Background_images ("ND ...") still show weathering and surface loss, so the negative
+# class cannot be called healthy or undamaged without further evidence.
+
+name: darbhanga_image_level_pilot
+task: image_classification
+
+labels:
+  classes:
+    - background_folder_unconfirmed      # 0: images from Background_images ("ND" = no damage? unconfirmed)
+    - visible_deterioration_folder       # 1: images from Damaged_images (cracks, vegetation, material loss observed in samples)
+  folder_to_class:
+    Background_images: background_folder_unconfirmed
+    Damaged_images: visible_deterioration_folder
+  positive_class: visible_deterioration_folder
+  verified: false
+  semantics: ""
+
+data:
+  # Relative to the repository root. The dataset itself is never committed (see .gitignore).
+  dataset_root: Darbhanga_Fort/Darbhanga_Fort
+  manifest: vision/outputs/audit/manifest_split.jsonl
+  near_duplicate_distance: 6
+  split_seed: 1337
+  split_ratios: {train: 0.70, val: 0.15, test: 0.15}
+
+model:
+  arch: resnet18
+  pretrained: true
+  weights_source: "torchvision ResNet18_Weights.IMAGENET1K_V1 (download.pytorch.org); see torchvision docs for terms"
+
+train:
+  image_size: 224
+  batch_size: 16          # fits comfortably in 4 GB VRAM at 224px with resnet18
+  epochs: 15
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  seed: 42
+  device: auto            # cuda, then mps, then cpu
+  num_workers: 2
+  class_weighting: inverse_frequency   # the folders are heavily imbalanced (~17:1 in the earlier report)
+  early_stopping_patience: 4
+  selection_metric: val_average_precision
+  threshold_criterion: f1
+  mixed_precision: true   # CUDA only
+  augmentation:
+    min_crop_area: 0.8
+    hflip: true
+    rotate_degrees: 8
+    brightness: 0.2
+    contrast: 0.2
+    saturation: 0.15
+    hue: 0.02
+
+output_dir: vision/outputs/experiments

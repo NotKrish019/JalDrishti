@@ -1,0 +1,55 @@
+{
+  "n_images": 226,
+  "class_names": [
+    "crack"
+  ],
+  "map50": 0.8549634809646064,
+  "map50_95": 0.6053565777271217,
+  "per_class": [
+    {
+      "class_id": 0,
+      "class_name": "crack",
+      "n_ground_truth": 261,
+      "ap50": 0.8549634809646064,
+      "ap75": 0.6373377389085652,
+      "ap50_95": 0.6053565777271217,
+      "operating_point": {
+        "score_threshold": 0.7,
+        "iou": 0.5,
+        "true_positives": 210,
+        "false_positives": 21,
+        "missed": 51,
+        "precision": 0.9090909090909091,
+        "recall": 0.8045977011494253
+      }
+    }
+  ],
+  "ap_method": "COCO 101-point interpolation, greedy matching by score",
+  "image_level": {
+    "n_images": 226,
+    "with_ground_truth_boxes": 197,
+    "average_precision": 1.0,
+    "roc_auc": 1.0,
+    "threshold": 0.052042894065380096,
+    "confusion_matrix": {
+      "tp": 197,
+      "fp": 1,
+      "fn": 0,
+      "tn": 28
+    },
+    "precision": 0.9949494949494949,
+    "recall": 1.0,
+    "specificity": 0.9655172413793104
+  },
+  "split": "test",
+  "checkpoint": "model.pt",
+  "model_version": "pilot_v1",
+  "label_status": "verified",
+  "score_threshold": 0.7,
+  "image_threshold": 0.052042894065380096,
+  "error_analysis_counts": {
+    "images_all_gt_matched": 158,
+    "images_with_missed_gt": 39,
+    "images_with_unmatched_predictions": 16
+  }
+}
