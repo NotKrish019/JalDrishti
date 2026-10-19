@@ -3,6 +3,12 @@
 Generates phased, prioritized conservation roadmaps adhering to
 /contracts/restoration_result.schema.json and /contracts/engineering_result.schema.json.
 Integrates IKS traditional material specifications with modern conservation ethics.
+
+CONSERVATION PRINCIPLE:
+This planner is a decision-support tool. It organizes interventions into safe, sequenced
+phases (Phase 1 Immediate Stabilization -> Phase 2 Hydrological Remediation ->
+Phase 3 Masonry Consolidation -> Phase 4 Long-Term Monitoring) and enforces mandatory
+expert engineering review before any physical structural intervention.
 """
 
 from __future__ import annotations
@@ -11,8 +17,6 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from jsonschema import Draft202012Validator
-
-from engineering.material_compatibility.engine import MaterialCompatibilityEngine
 
 
 class RestorationPlanningEngine:
@@ -67,7 +71,8 @@ class RestorationPlanningEngine:
             "confidence": 0.85,
             "limitations": [
                 "Priority score is a decision-support heuristic combining visual degradation, hydraulic impairment, and qualitative root causes.",
-                "Public safety hazards, seismic micro-zonation, and legal monument status must be factored into municipal work scheduling."
+                "Public safety hazards, seismic micro-zonation, and legal monument status must be factored into municipal work scheduling.",
+                "Mandatory expert structural inspection required prior to allocating restoration capital budgets."
             ],
         }
 
@@ -122,7 +127,10 @@ class RestorationPlanningEngine:
                 ),
                 "material_specification": "Eco-friendly root devitalizing agent; temporary dry timber wedges",
                 "urgency": "immediate" if vegetation_burden > 0.15 else "high",
-                "preconditions": ["Install perimeter safety barricading around unstable descending stair flights."],
+                "preconditions": [
+                    "Install perimeter safety barricading around unstable descending stair flights.",
+                    "Review by qualified heritage conservator required before cutting roots exceeding 80mm trunk diameter."
+                ],
             })
             step_counter += 1
 
@@ -138,7 +146,10 @@ class RestorationPlanningEngine:
                 ),
                 "material_specification": "Treated structural timber props, neoprene interface pads, crack displacement calipers",
                 "urgency": "immediate",
-                "preconditions": ["Structural stabilization prior to pedestrian clearance."],
+                "preconditions": [
+                    "Mandatory structural engineering on-site audit before permitting worker access into deep trench corridors.",
+                    "Tell-tale monitoring must be established to verify crack movement dormancy."
+                ],
             })
             step_counter += 1
 
@@ -155,7 +166,10 @@ class RestorationPlanningEngine:
                 ),
                 "material_specification": "Dressed local sandstone baffle slabs; clean washed gravel filter bedding",
                 "urgency": "high",
-                "preconditions": ["Complete Phase 1 immediate root removal."],
+                "preconditions": [
+                    "Complete Phase 1 immediate root and loose block stabilization.",
+                    "Verify non-contamination of upstream catchment runoff."
+                ],
             })
             step_counter += 1
 
@@ -171,7 +185,10 @@ class RestorationPlanningEngine:
                 ),
                 "material_specification": "Manual hoist rigging, soft rubber spades, geotechnical silt disposal containers",
                 "urgency": "high" if siltation_level == "severe" else "medium",
-                "preconditions": ["Verify groundwater table depth and secure side retaining wall props."],
+                "preconditions": [
+                    "Geotechnical stability audit of well cylinder retaining walls before dewatering.",
+                    "Verify groundwater table depth and secure lateral shoring props."
+                ],
             })
             step_counter += 1
 
@@ -190,7 +207,10 @@ class RestorationPlanningEngine:
                 "tempered with fermented jaggery (gur) and urad dal paste."
             ),
             "urgency": "medium",
-            "preconditions": ["Desiltation complete; substrate cleared of debris and pre-wetted."],
+            "preconditions": [
+                "Desiltation complete; substrate cleared of debris and pre-wetted.",
+                "Laboratory characterization of original historic mortar completed to confirm aggregate grading."
+            ],
         })
         step_counter += 1
 
@@ -206,7 +226,10 @@ class RestorationPlanningEngine:
                 ),
                 "material_specification": "Sepiolite clay pulp, demineralized water, NHL 2 micro-injection grout",
                 "urgency": "medium",
-                "preconditions": ["Eliminate external rising damp / drainage sources first."],
+                "preconditions": [
+                    "Laboratory soluble salt ion chromatography completed to determine salt profile.",
+                    "Eliminate external rising damp / drainage leak sources first."
+                ],
             })
             step_counter += 1
 
@@ -222,7 +245,7 @@ class RestorationPlanningEngine:
             ),
             "material_specification": "Calibrated optical crack monitoring plates, piezometric groundwater data logger",
             "urgency": "routine",
-            "preconditions": ["Phase 3 masonry consolidation successfully cured."],
+            "preconditions": ["Phase 3 masonry consolidation successfully cured for minimum 28 days."],
         })
 
         # Explicit warnings against destructive modern practices
@@ -260,22 +283,26 @@ class RestorationPlanningEngine:
             },
         ]
 
-        # IKS Traditional Guidelines
+        # IKS Traditional Guidelines with explicit caveats
         iks_guidelines = {
             "traditional_mortar_recipe": (
                 "Authentic Hydraulic Lime-Surkhi Mortar: 1 part slaked fat lime putty (Class C, cured >90 days) : "
-                "2 parts finely pulverized calcined terracotta surkhi (particle size 0.15-2.0mm) : 1 part sieved river quartz sand. "
-                "Slaked with 5% fermented jaggery (gur) decoction, 2% black gram paste (urad dal), and bael fruit pulp mucilage."
+                "2 parts finely pulverized calcined terracotta surkhi (particle size 0.15-2.0mm, IS 1344) : 1 part sieved river quartz sand. "
+                "Slaked with 5% fermented jaggery (gur) decoction, 2% black gram paste (urad dal), and bael fruit pulp mucilage. "
+                "CAVEAT: This recipe provides traditional regional guidance for northwestern sandstone structures. Proportions must "
+                "be verified against petrographic testing of original mortar samples and adjusted for regional quarry sands."
             ),
             "craftsmanship_references": [
                 "Shilpa Shastras & Manasara: Indigenous treatises on subterranean masonry joinery and hydraulic orientation.",
                 "INTACH Charter (2004) Section 5: Traditional Craftsmanship and Living Heritage Stewardship.",
                 "ASI Architectural Conservation Manual (2020): Traditional Lime Preparation and Slaking Protocols.",
+                "CPWD Handbook of Conservation of Heritage Buildings (2013): Mortar Batching & Organic Additives.",
             ],
             "seasonal_curing_rules": (
-                "Slow carbonation curing: Fresh lime joints must be protected from direct sunlight and desiccating winds. "
+                "Slow carbonation curing: Fresh lime joints must be protected from direct sunlight, freezing, and desiccating winds. "
                 "Maintain continuous dampness using double-layer wet hessian/jute sacking for a minimum of 21 consecutive days. "
-                "Never allow rapid air drying; do not apply during frost or when temperatures exceed 42°C."
+                "Never allow rapid air drying; do not apply during frost or when temperatures exceed 40°C. "
+                "In deep unventilated subterranean shafts, monitor for fungal growth if organic herbal admixtures are used."
             ),
         }
 

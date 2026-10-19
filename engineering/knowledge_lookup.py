@@ -120,11 +120,24 @@ class KnowledgeRepository:
             data = json.load(f)
         return data.get("principles", [])
 
+    def get_sources_by_evidence_type(self, evidence_type: str) -> List[Dict[str, Any]]:
+        """Filter sources by evidence category (e.g. 'documented_historical_practice', 'modern_conservation_guidance')."""
+        return [s for s in self.list_sources() if s.get("evidence_type") == evidence_type]
+
+    def get_sources_by_structure_type(self, structure_type: str) -> List[Dict[str, Any]]:
+        """Filter sources applicable to a specific structure typology."""
+        norm_type = structure_type.strip().lower()
+        return [
+            s for s in self.list_sources()
+            if norm_type in [t.lower() for t in s.get("applicable_structure_types", [])]
+        ]
+
     def validate_knowledge_base(self) -> Dict[str, Any]:
         """Perform comprehensive consistency and schema verification."""
         results: Dict[str, Any] = {
             "sources_valid": False,
             "structures_valid": {},
+            "hydrology_principles_valid": False,
             "unresolved_source_references": [],
             "status": "pending"
         }
@@ -142,13 +155,24 @@ class KnowledgeRepository:
                 # Check for dangling source citations
                 for src_ref in struct_data.get("sources", []):
                     if src_ref not in known_source_ids:
-                        results["unresolved_source_references"].append((sid, src_ref))
+                        results["unresolved_source_references"].append((f"structure:{sid}", src_ref))
             except Exception as e:
                 results["structures_valid"][sid] = str(e)
+
+        # Validate IKS hydrology principles source references
+        principles = self.get_iks_principles()
+        if principles:
+            for p in principles:
+                p_code = p.get("code", "unknown")
+                for s_ref in p.get("source_references", []):
+                    if s_ref not in known_source_ids:
+                        results["unresolved_source_references"].append((f"principle:{p_code}", s_ref))
+            results["hydrology_principles_valid"] = True
 
         is_all_valid = (
             results["sources_valid"]
             and all(v is True for v in results["structures_valid"].values())
+            and results["hydrology_principles_valid"]
             and len(results["unresolved_source_references"]) == 0
         )
         results["status"] = "passed" if is_all_valid else "failed"

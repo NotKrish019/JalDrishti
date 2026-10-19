@@ -121,6 +121,38 @@ class TestRootCauseDeduction:
         causes = deduce_root_causes(crack_burden=0.01, vegetation_burden=0.01)
         assert len(causes) == 1
         assert causes[0]["urgency"] == "low"
+        assert causes[0]["expert_review_required"] is False
+        assert "preventative" in causes[0]["probable_cause"].lower()
+
+    def test_root_cause_transparency_and_evidence_chain(self) -> None:
+        """Verify that observed indicators are strictly decoupled from inferred mechanisms and investigations."""
+        causes = deduce_root_causes(
+            crack_burden=0.15,
+            vegetation_burden=0.10,
+            siltation_level="severe",
+            recent_repair_type="portland_cement_opc",
+        )
+        assert len(causes) >= 3
+        for c in causes:
+            assert "finding" in c
+            assert "observed_indicator" in c
+            assert "probable_cause" in c
+            assert "evidence_rules" in c
+            assert "additional_investigation_required" in c
+            assert len(c["additional_investigation_required"]) >= 1
+            assert "supporting_sources" in c
+            assert len(c["supporting_sources"]) >= 1
+            assert "uncertainty_note" in c
+            assert "expert_review_required" in c
+
+    def test_structural_cracking_triggers_expert_review_flag(self) -> None:
+        causes = deduce_root_causes(crack_burden=0.18)
+        crack_cause = next(c for c in causes if "cracking" in c["finding"].lower())
+        assert crack_cause["expert_review_required"] is True
+        assert "structural" in crack_cause["expert_specialty"].lower()
+        assert crack_cause["urgency"] in ["high", "critical"]
+        assert any("geotechnical" in inv.lower() or "tell-tale" in inv.lower() for inv in crack_cause["additional_investigation_required"])
+
 
 
 class TestRestorationPlanningEngineContract:

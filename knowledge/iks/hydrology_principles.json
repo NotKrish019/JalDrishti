@@ -1,6 +1,6 @@
 {
   "title": "Indigenous Hydrological and Conservation Engineering Principles",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "domain": "Indian Knowledge Systems (IKS)",
   "principles": [
     {
@@ -8,35 +8,85 @@
       "name": "Gradient-Driven Gravity Flow (Dhal-Yojana)",
       "concept": "Complete reliance on natural topography, elevation head, and micro-catchment slopes to guide, decelerate, and store water without external energy.",
       "application": "Inflow feeder channels, settling basins, and overflow sluices in Baolis, Bawaris, and Kunds.",
-      "engineering_significance": "Zero operational carbon footprint; self-regulating discharge velocities preventing bank erosion."
+      "engineering_significance": "Zero operational carbon footprint; self-regulating discharge velocities preventing bank erosion.",
+      "evidence_type": "traditional_knowledge_recorded",
+      "source_references": [
+        "SRC_CSE_DYING_WISDOM_1997",
+        "SRC_LIVINGSTON_2002"
+      ],
+      "regional_context": "Northwestern and Central India (Rajasthan, Gujarat, Delhi NCR)",
+      "practical_relevance": "Guides restoration of historic catchment topography and feeder drains (aagore) rather than relying on pump-driven infill.",
+      "limitations": [
+        "Principle assumes an intact peripheral micro-catchment; dense modern urban encroachments require engineered diversion channels to bypass contaminated street runoff."
+      ]
     },
     {
       "code": "IKS_HYDRO_02",
       "name": "Subterranean Thermal Dampening (Bhugarbha Sheetalata)",
       "concept": "Leveraging soil thermal inertia and underground excavation to buffer surface heat extremes and suppress evaporation.",
       "application": "Deep stepped shafts, enclosed pavilion galleries, and shaded water cylinders in Vavs and Baolis.",
-      "engineering_significance": "Reduces evaporation losses by up to 75% in arid summers while providing passive 22-26°C microclimatic cooling."
+      "engineering_significance": "Reduces evaporation losses by up to 75% in arid summers while providing passive 22-26°C microclimatic cooling.",
+      "evidence_type": "traditional_knowledge_recorded",
+      "source_references": [
+        "SRC_LIVINGSTON_2002",
+        "SRC_JAIN_NEUBAUER_1981"
+      ],
+      "regional_context": "Arid and semi-arid plains of Gujarat, Rajasthan, and Delhi",
+      "practical_relevance": "Preserves subterranean air-exchange dynamics; informs against enclosing open stepwell pavilions with artificial glazed barriers that disrupt natural thermal stack ventilation.",
+      "limitations": [
+        "Thermal dampening efficiency requires adequate subterranean depth (>8m); shallow cisterns (<3m) do not achieve significant soil-temperature isolation."
+      ]
     },
     {
       "code": "IKS_HYDRO_03",
       "name": "Multi-Stage Gravity Siltation Interception (Gadh-Niyantran)",
       "concept": "Sequenced settlement sumps, perforated stone screens, and deceleration terraces prior to primary reservoir entry.",
       "application": "Outer settling pits in Kund paytan aprons and forebays of Bawaris.",
-      "engineering_significance": "Protects deep aquifers and storage cisterns from premature siltation without synthetic filtration media."
+      "engineering_significance": "Protects deep aquifers and storage cisterns from premature siltation without synthetic filtration media.",
+      "evidence_type": "traditional_knowledge_recorded",
+      "source_references": [
+        "SRC_CSE_DYING_WISDOM_1997",
+        "SRC_CGWB_TRADITIONAL_2021"
+      ],
+      "regional_context": "Alluvial river basins and sandy desert catchments",
+      "practical_relevance": "Mandates manual restoration of stone silt settling traps and gravel filters before permitting inflow to recharge the main monument basin.",
+      "limitations": [
+        "Settling sumps require regular seasonal desiltation by local stewards; neglected sumps choke and allow sediment carry-over into the main reservoir."
+      ]
     },
     {
       "code": "IKS_HYDRO_04",
       "name": "Two-Way Aquifer Equilibrium (Jal-Samanvaya)",
       "concept": "Hydraulic integration with unconfined or fractured bedrock aquifers, acting as monsoon recharge sinks and summer withdrawal nodes.",
       "application": "Porous unmortared bedrock basements and well shafts of Baolis and Bawaris.",
-      "engineering_significance": "Recharges regional groundwater tables during flood events and provides continuous potable access during droughts."
+      "engineering_significance": "Recharges regional groundwater tables during flood events and provides continuous potable access during droughts.",
+      "evidence_type": "documented_historical_practice",
+      "source_references": [
+        "SRC_CGWB_TRADITIONAL_2021",
+        "SRC_UNESCO_RANI_KI_VAV_2014"
+      ],
+      "regional_context": "Unconfined alluvial and fractured rock aquifers across northern and western India",
+      "practical_relevance": "Prioritizes non-destructive desiltation of the bed down to porous historic strata over artificial concrete base sealing.",
+      "limitations": [
+        "Cannot restore aquifer connectivity if regional water table has dropped significantly below the well foundation depth (e.g. >30m depression from industrial borewells)."
+      ]
     },
     {
       "code": "IKS_HYDRO_05",
       "name": "Functional Hydraulic Zoning (Pavitrata-Bhedana)",
       "concept": "Physical and hydraulic separation between public access stepped basins (washing, community) and deep vertical well cylinders (potable abstraction).",
       "application": "Divided well shafts in Baolis and Vavs equipped with overhead pulley brackets.",
-      "engineering_significance": "Prevents microbial cross-contamination of potable drinking water from pedestrian bathing contact."
+      "engineering_significance": "Prevents microbial cross-contamination of potable drinking water from pedestrian bathing contact.",
+      "evidence_type": "documented_historical_practice",
+      "source_references": [
+        "SRC_JAIN_NEUBAUER_1981",
+        "SRC_LIVINGSTON_2002"
+      ],
+      "regional_context": "Western and Northern India (Gujarat, Rajasthan, Delhi)",
+      "practical_relevance": "Informs modern community reuse and visitor management: public pedestrian access should be restricted to upper terraces or stepped tanks, while well shafts are protected from direct immersion.",
+      "limitations": [
+        "Hydraulic segregation cannot prevent contamination if airborne trash or uncontrolled storm runoff enters the vertical shaft."
+      ]
     }
   ]
 }
