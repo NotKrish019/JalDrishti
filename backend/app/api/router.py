@@ -5,15 +5,39 @@ Integrates live Vision, Engineering, Material Compatibility, Restoration Plannin
 and Knowledge subsystems.
 """
 
+from datetime import datetime, timezone
 import json
+import logging
 from typing import Any, Dict, List, Optional, Union
-from fastapi import APIRouter, Body, HTTPException, Request, status
+import uuid
+
+from fastapi import (
+    APIRouter,
+    Body,
+    File,
+    Form,
+    HTTPException,
+    Request,
+    UploadFile,
+    status,
+)
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 
+from backend.app.core.config import settings
+from backend.app.db.image_repository import (
+    MetadataPersistenceError,
+    image_repository,
+)
 from backend.app.schemas.analysis import AnalysisResult
 from backend.app.schemas.engineering import EngineeringResult
 from backend.app.schemas.health import HealthResponse
+from backend.app.schemas.image import (
+    ImageDeleteResponse,
+    ImageMetadata,
+    ImageUploadResponse,
+    InspectionImagesListResponse,
+)
 from backend.app.schemas.material import MaterialCompatibilityResult
 from backend.app.schemas.requests import (
     AnalysisPipelineRequest,
@@ -22,10 +46,24 @@ from backend.app.schemas.requests import (
     RestorationPlanRequest,
 )
 from backend.app.schemas.restoration import RestorationResult
-from backend.app.schemas.vision import StructureType, VisionResult
+from backend.app.schemas.vision import ImageDimensions, StructureType, VisionResult
 from backend.app.services.analysis_service import analysis_service
+from backend.app.services.cloudinary_service import (
+    CloudinaryConfigError,
+    CloudinaryDeleteError,
+    CloudinaryUploadError,
+    cloudinary_service,
+)
 from backend.app.services.engineering_service import engineering_service
 from backend.app.services.vision_service import vision_service
+from backend.app.utils.image_validator import (
+    ImageDecodeError,
+    ImageEmptyError,
+    ImageFormatError,
+    ImageSizeLimitError,
+    ImageValidationError,
+    read_and_validate_image_upload,
+)
 from engineering import (
     default_repository,
     evaluate_compatibility,
@@ -34,6 +72,8 @@ from engineering import (
     list_structures,
     plan_restoration,
 )
+
+logger = logging.getLogger(__name__)
 
 api_router = APIRouter()
 
@@ -77,12 +117,35 @@ async def _extract_pipeline_request(
             req_model = AnalysisPipelineRequest.model_validate(body_json)
         except ValidationError as e:
             raise RequestValidationError(e.errors()) from e
+
+        # If registered image_id is referenced, resolve metadata from repository
+        if req_model.image_id:
+            record = image_repository.get_by_id(req_model.image_id)
+            if record:
+                if req_model.source_images == ["survey_image_01.jpg"]:
+                    req_model.source_images = [record.preview_url]
+                if req_model.image_dimensions is None:
+                    req_model.image_dimensions = ImageDimensions(
+                        width_pixels=record.width,
+                        height_pixels=record.height,
+                    )
         return req_model, None, None
 
     # Handle multipart/form-data or application/x-www-form-urlencoded
     form = await request.form()
-    uploaded_file = form.get("images")
+    uploaded_file = form.get("images") or form.get("file") or form.get("image")
     source_images: List[str] = ["survey_image_01.jpg"]
+
+    form_image_id = form.get("image_id")
+    resolved_dims: Optional[ImageDimensions] = None
+    if form_image_id and isinstance(form_image_id, str):
+        record = image_repository.get_by_id(form_image_id)
+        if record:
+            source_images = [record.preview_url]
+            resolved_dims = ImageDimensions(
+                width_pixels=record.width,
+                height_pixels=record.height,
+            )
 
     if uploaded_file is not None and hasattr(uploaded_file, "read"):
         image_bytes = await uploaded_file.read()
@@ -111,6 +174,11 @@ async def _extract_pipeline_request(
         "region": form.get("region") or "Northern India",
         "source_images": source_images,
     }
+
+    if form_image_id and isinstance(form_image_id, str):
+        req_dict["image_id"] = form_image_id
+    if resolved_dims is not None:
+        req_dict["image_dimensions"] = resolved_dims
 
     notes = form.get("notes")
     if notes:
@@ -323,3 +391,281 @@ def get_structure_details(structure_id: str) -> Dict[str, Any]:
 def get_literature_sources() -> List[Dict[str, Any]]:
     """Return bibliographic and heritage guidelines source catalog."""
     return default_repository.list_sources()
+
+
+# -----------------------------------------------------------------------------
+# Image Ingestion & Storage Endpoints (Cloudinary & Local Durability)
+# -----------------------------------------------------------------------------
+
+
+@api_router.post(
+    "/images/upload",
+    response_model=ImageUploadResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Upload Inspection Image",
+    description=(
+        "Uploads an inspection photograph through a backend-controlled workflow. "
+        "Enforces streaming bounded reads, validates format and content decodability via Pillow, "
+        "uploads to Cloudinary without exposing credentials, and durably records metadata."
+    ),
+    tags=["Images"],
+)
+async def upload_inspection_image(
+    request: Request,
+    file: Optional[UploadFile] = File(default=None),
+    images: Optional[UploadFile] = File(default=None),
+    image: Optional[UploadFile] = File(default=None),
+    inspection_id: Optional[str] = Form(default=None),
+    structure_type: Optional[str] = Form(default=None),
+    structure_name: Optional[str] = Form(default=None),
+    notes: Optional[str] = Form(default=None),
+) -> ImageUploadResponse:
+    """Accept and validate image upload, store to Cloudinary, and persist metadata."""
+    # Resolve uploaded file from available multipart fields
+    target_file = file or images or image
+
+    if target_file is None:
+        # Check form dynamically in case of non-standard field naming
+        try:
+            form = await request.form()
+            for key, val in form.items():
+                if hasattr(val, "read") and hasattr(val, "filename"):
+                    target_file = val
+                    break
+        except Exception:
+            pass
+
+    if target_file is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No image file provided in multipart request. Use 'file' or 'images' form field.",
+        )
+
+    # 1. Bounded streaming read and strict image validation
+    try:
+        image_bytes, format_str, width, height = await read_and_validate_image_upload(
+            target_file,
+            max_size_bytes=settings.max_upload_size_bytes,
+            allowed_formats=settings.allowed_image_formats,
+        )
+    except ImageEmptyError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except ImageSizeLimitError as e:
+        raise HTTPException(
+            status_code=status.HTTP_413_CONTENT_TOO_LARGE, detail=str(e)
+        )
+    except ImageFormatError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except ImageDecodeError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except ImageValidationError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    # 2. Check Cloudinary configuration
+    if not cloudinary_service.is_configured():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=(
+                "Image storage service is not configured. "
+                "Required backend environment variables: "
+                "CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET."
+            ),
+        )
+
+    # 3. Generate stable identifiers
+    gen_image_id = f"img_{uuid.uuid4()}"
+    assigned_inspection_id = inspection_id or f"insp_{uuid.uuid4()}"
+    public_id = f"{settings.cloudinary_folder}/{gen_image_id}"
+
+    # 4. Upload to Cloudinary
+    tags = ["jaldrishti", "heritage_water_structure"]
+    if structure_type:
+        tags.append(structure_type.lower())
+
+    context = {
+        "image_id": gen_image_id,
+        "inspection_id": assigned_inspection_id,
+    }
+    if structure_name:
+        context["structure_name"] = structure_name
+
+    try:
+        upload_res = cloudinary_service.upload_image(
+            image_bytes=image_bytes,
+            public_id=public_id,
+            folder=settings.cloudinary_folder,
+            tags=tags,
+            context=context,
+        )
+    except CloudinaryConfigError as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e)
+        )
+    except CloudinaryUploadError as e:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Cloudinary image upload failed. Please verify storage availability and try again.",
+        )
+    except Exception as e:
+        logger.error("Unexpected upload failure: %s", type(e).__name__)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal error processing image upload.",
+        )
+
+    # 5. Assemble persistent metadata
+    now_iso = datetime.now(timezone.utc).isoformat()
+    metadata = ImageMetadata(
+        image_id=gen_image_id,
+        inspection_id=assigned_inspection_id,
+        public_id=upload_res.get("public_id", public_id),
+        asset_id=upload_res.get("asset_id"),
+        resource_type="image",
+        format=format_str,
+        width=width,
+        height=height,
+        bytes=len(image_bytes),
+        created_at=now_iso,
+        status="uploaded",
+        structure_type=structure_type,
+        original_filename=getattr(target_file, "filename", None),
+        preview_url=upload_res.get("preview_url")
+        or cloudinary_service.build_preview_url(
+            upload_res.get("public_id", public_id), format_str
+        ),
+        secure_url=upload_res.get("secure_url")
+        or cloudinary_service.build_original_url(
+            upload_res.get("public_id", public_id), format_str
+        ),
+    )
+
+    # 6. Durably persist metadata in SQLite
+    try:
+        image_repository.save(metadata)
+    except MetadataPersistenceError as e:
+        # Partial failure handling: image was uploaded to Cloudinary, but DB write failed.
+        logger.error(
+            "Database persistence failed for image %s. Attempting Cloudinary rollback: %s",
+            gen_image_id,
+            e,
+        )
+        try:
+            cloudinary_service.delete_image(metadata.public_id)
+        except Exception as cleanup_err:
+            logger.warning(
+                "Rollback deletion in Cloudinary failed for %s: %s",
+                metadata.public_id,
+                cleanup_err,
+            )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to persist image metadata. Upload rolled back.",
+        )
+
+    return metadata.to_upload_response()
+
+
+@api_router.get(
+    "/images/{image_id}",
+    response_model=ImageUploadResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get Image Metadata",
+    description="Retrieve stable metadata and delivery URLs for an uploaded inspection image.",
+    tags=["Images"],
+)
+def get_image(image_id: str) -> ImageUploadResponse:
+    """Retrieve image metadata by its application-level image identifier."""
+    record = image_repository.get_by_id(image_id)
+    if not record:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Image with id '{image_id}' not found.",
+        )
+    return record.to_upload_response()
+
+
+@api_router.delete(
+    "/images/{image_id}",
+    response_model=ImageDeleteResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Delete Image Asset",
+    description=(
+        "Remove image from Cloudinary storage and delete associated durable metadata record. "
+        "Handles partial failures explicitly."
+    ),
+    tags=["Images"],
+)
+def delete_image(image_id: str) -> ImageDeleteResponse:
+    """Delete image asset from both Cloudinary and local metadata repository."""
+    record = image_repository.get_by_id(image_id)
+    if not record:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Image with id '{image_id}' not found.",
+        )
+
+    cloudinary_deleted = False
+    metadata_deleted = False
+
+    # Attempt Cloudinary deletion
+    try:
+        cloudinary_deleted = cloudinary_service.delete_image(record.public_id)
+    except CloudinaryDeleteError as e:
+        logger.error("Cloudinary deletion failed for %s: %s", record.public_id, e)
+        cloudinary_deleted = False
+    except CloudinaryConfigError:
+        logger.warning(
+            "Cloudinary credentials missing during deletion of %s.", record.public_id
+        )
+        cloudinary_deleted = False
+
+    # Attempt database record deletion
+    try:
+        metadata_deleted = image_repository.delete(image_id)
+    except MetadataPersistenceError as e:
+        logger.error("Database deletion failed for %s: %s", image_id, e)
+        metadata_deleted = False
+
+    # Evaluate outcome and handle partial failures explicitly
+    if not cloudinary_deleted and not metadata_deleted:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to delete image from storage provider and metadata repository.",
+        )
+    if not cloudinary_deleted and metadata_deleted:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Partial deletion failure: database record removed, but Cloudinary asset could not be deleted.",
+        )
+    if cloudinary_deleted and not metadata_deleted:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Partial deletion failure: Cloudinary asset removed, but database record could not be deleted.",
+        )
+
+    return ImageDeleteResponse(
+        image_id=image_id,
+        status="deleted",
+        detail="Image asset deleted from Cloudinary and metadata repository.",
+        cloudinary_deleted=True,
+        metadata_deleted=True,
+    )
+
+
+@api_router.get(
+    "/inspections/{inspection_id}/images",
+    response_model=InspectionImagesListResponse,
+    status_code=status.HTTP_200_OK,
+    summary="List Inspection Images",
+    description="Retrieve all verified images registered to an inspection session.",
+    tags=["Images"],
+)
+def list_inspection_images(inspection_id: str) -> InspectionImagesListResponse:
+    """Retrieve all images associated with an inspection session."""
+    records = image_repository.list_by_inspection_id(inspection_id)
+    return InspectionImagesListResponse(
+        inspection_id=inspection_id,
+        total=len(records),
+        images=[r.to_upload_response() for r in records],
+    )
+

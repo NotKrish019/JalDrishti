@@ -19,6 +19,12 @@ from backend.app.schemas.engineering import (
     SubScores,
 )
 from backend.app.schemas.health import HealthResponse
+from backend.app.schemas.image import (
+    ImageDeleteResponse,
+    ImageMetadata,
+    ImageUploadResponse,
+    InspectionImagesListResponse,
+)
 from backend.app.schemas.requests import (
     AnalysisPipelineRequest,
     EngineeringAssessmentRequest,
@@ -94,4 +100,10 @@ __all__ = [
     "StructureInfo",
     "AnalysisMetadata",
     "AnalysisResult",
+    # Images & Inspection Ingestion
+    "ImageUploadResponse",
+    "ImageMetadata",
+    "ImageDeleteResponse",
+    "InspectionImagesListResponse",
 ]
+

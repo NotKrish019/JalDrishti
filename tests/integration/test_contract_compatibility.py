@@ -19,6 +19,7 @@ from backend.app.schemas.analysis import (
     StructureInfo,
     StructureTypeEnum,
 )
+from backend.app.schemas.image import ImageUploadResponse
 from backend.app.schemas.engineering import (
     DeductionUrgency,
     EngineeringResult,
@@ -419,3 +420,22 @@ def test_invalid_contract_rejected_by_both() -> None:
     schema = load_json_schema("vision_result.schema.json")
     with pytest.raises(JsonSchemaValidationError):
         Draft202012Validator(schema).validate(invalid_data)
+
+
+def test_image_upload_result_validates_against_json_schema() -> None:
+    """Verify ImageUploadResponse serialization strictly validates against image_upload_result.schema.json."""
+    image_resp = ImageUploadResponse(
+        image_id="img_12345678-1234-5678-1234-567812345678",
+        inspection_id="insp_87654321-4321-8765-4321-876543210987",
+        status="uploaded",
+        preview_url="https://res.cloudinary.com/test-cloud/image/upload/c_limit,w_800,q_auto,f_auto/v1/jaldrishti/inspections/img_123.jpg",
+        original_url="https://res.cloudinary.com/test-cloud/image/upload/v1/jaldrishti/inspections/img_123.jpg",
+        format="jpeg",
+        width=1920,
+        height=1080,
+        bytes=245120,
+        created_at="2026-10-19T07:15:00Z",
+    )
+
+    validate_model_against_contract(image_resp, "image_upload_result.schema.json")
+

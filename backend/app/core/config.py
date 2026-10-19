@@ -5,7 +5,7 @@ Provides strongly typed environment configuration with safe defaults.
 """
 
 import os
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
@@ -31,6 +31,52 @@ class Settings(BaseModel):
             if origin.strip()
         ]
     )
+
+    # Cloudinary configuration (backend only - secret NEVER exposed)
+    cloudinary_cloud_name: Optional[str] = Field(
+        default_factory=lambda: os.getenv("CLOUDINARY_CLOUD_NAME")
+    )
+    cloudinary_api_key: Optional[str] = Field(
+        default_factory=lambda: os.getenv("CLOUDINARY_API_KEY")
+    )
+    cloudinary_api_secret: Optional[str] = Field(
+        default_factory=lambda: os.getenv("CLOUDINARY_API_SECRET")
+    )
+    cloudinary_folder: str = Field(
+        default_factory=lambda: os.getenv("CLOUDINARY_FOLDER", "jaldrishti/inspections")
+    )
+    cloudinary_secure_delivery: bool = Field(
+        default_factory=lambda: os.getenv("CLOUDINARY_SECURE_DELIVERY", "true").lower()
+        in ("true", "1", "yes")
+    )
+
+    # Image upload policy configuration
+    max_upload_size_bytes: int = Field(
+        default_factory=lambda: int(
+            os.getenv("MAX_UPLOAD_SIZE_BYTES", str(10 * 1024 * 1024))
+        )
+    )
+    allowed_image_formats: List[str] = Field(
+        default_factory=lambda: [
+            fmt.strip().lower()
+            for fmt in os.getenv("ALLOWED_IMAGE_FORMATS", "jpeg,jpg,png,webp").split(",")
+            if fmt.strip()
+        ]
+    )
+
+    # Metadata persistence configuration (SQLite)
+    sqlite_db_path: str = Field(
+        default_factory=lambda: os.getenv("SQLITE_DB_PATH", "data/jaldrishti.db")
+    )
+
+    @property
+    def is_cloudinary_configured(self) -> bool:
+        """Check if all necessary Cloudinary credentials are provided."""
+        return bool(
+            self.cloudinary_cloud_name
+            and self.cloudinary_api_key
+            and self.cloudinary_api_secret
+        )
 
 
 settings = Settings()

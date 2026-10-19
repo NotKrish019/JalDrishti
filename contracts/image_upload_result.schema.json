@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://baoliguard.org/schemas/image_upload_result.schema.json",
+  "title": "BaoliGuardImageUploadResultContract",
+  "description": "Shared contract for image ingestion, Cloudinary storage, and frontend preview delivery between Anika (Frontend), Krish (Vision), and Swastik (Backend).",
+  "type": "object",
+  "required": [
+    "image_id",
+    "status",
+    "preview_url",
+    "format",
+    "width",
+    "height",
+    "bytes",
+    "created_at"
+  ],
+  "properties": {
+    "image_id": {
+      "type": "string",
+      "description": "Stable internal unique image identifier."
+    },
+    "inspection_id": {
+      "type": ["string", "null"],
+      "description": "Associated inspection session identifier."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["uploaded", "processing", "ready", "failed"],
+      "description": "Current processing and storage lifecycle status."
+    },
+    "preview_url": {
+      "type": "string",
+      "description": "Optimized responsive preview URL for frontend visualization."
+    },
+    "original_url": {
+      "type": ["string", "null"],
+      "description": "Secure delivery URL for the full-resolution original inspection image."
+    },
+    "format": {
+      "type": "string",
+      "enum": ["jpeg", "png", "webp"],
+      "description": "Verified image format."
+    },
+    "width": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Image width in pixels."
+    },
+    "height": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Image height in pixels."
+    },
+    "bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Image payload size in bytes."
+    },
+    "created_at": {
+      "type": "string",
+      "description": "ISO 8601 creation timestamp."
+    }
+  },
+  "additionalProperties": false
+}

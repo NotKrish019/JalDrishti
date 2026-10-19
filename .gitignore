@@ -47,6 +47,11 @@ vision/model/*
 vision/outputs/*
 Darbhanga_Fort/
 
+# Local Persistence / Database
+*.db
+*.sqlite
+*.sqlite3
+
 # IDE and Editor
 .vscode/*
 .idea/*

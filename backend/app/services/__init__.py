@@ -7,6 +7,13 @@ Frontend -> FastAPI -> VisionService (Krish) -> EngineeringService (Kirti) -> An
 """
 
 from backend.app.services.analysis_service import AnalysisService, analysis_service
+from backend.app.services.cloudinary_service import (
+    CloudinaryConfigError,
+    CloudinaryDeleteError,
+    CloudinaryService,
+    CloudinaryUploadError,
+    cloudinary_service,
+)
 from backend.app.services.engineering_service import (
     EngineeringService,
     engineering_service,
@@ -20,4 +27,10 @@ __all__ = [
     "engineering_service",
     "AnalysisService",
     "analysis_service",
+    "CloudinaryService",
+    "cloudinary_service",
+    "CloudinaryConfigError",
+    "CloudinaryUploadError",
+    "CloudinaryDeleteError",
 ]
+

@@ -33,6 +33,9 @@ To eliminate integration friction and allow parallel engineering without merge c
    Multi-dimensional evaluation matrix (mechanical, moisture, thermal, chemical, reversibility, heritage, visual) comparing candidate interventions against historical substrates.
 5. **[`restoration_result.schema.json`](file:///contracts/restoration_result.schema.json)**  
    Phased restoration roadmap incorporating indigenous knowledge systems (IKS) and highlighting incompatible modern practices (e.g. Portland cement rendering).
+6. **[`image_upload_result.schema.json`](file:///contracts/image_upload_result.schema.json)**  
+   Shared contract for image ingestion, Cloudinary storage, responsive preview generation, and original image retrieval connecting Anika (Frontend) and Krish (Vision) via backend orchestration.
+
 
 ---
 

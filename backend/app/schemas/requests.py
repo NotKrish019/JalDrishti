@@ -168,6 +168,9 @@ class AnalysisPipelineRequest(BaseModel):
     region: Optional[str] = Field(
         default="Northern India", description="Geographical territory"
     )
+    image_id: Optional[str] = Field(
+        default=None, description="Optional registered image identifier from /images/upload"
+    )
     source_images: List[str] = Field(
         default_factory=lambda: ["survey_image_01.jpg"],
         min_length=1,

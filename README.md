@@ -57,7 +57,7 @@ Inter-subsystem communication is strictly governed by standardized JSON schemas 
 | Layer | Technologies |
 | :--- | :--- |
 | **Frontend & PWA** | React 18, Vite, TypeScript, Tailwind CSS, Three.js |
-| **Backend & Integration** | Python 3.10+, FastAPI, Pydantic, Uvicorn |
+| **Backend & Integration** | Python 3.10+, FastAPI, Pydantic, Uvicorn, Cloudinary, SQLite |
 | **Computer Vision & AI** | PyTorch, Ultralytics YOLOv8 segmentation, OpenCV, NumPy, scikit-image |
 | **Conservation Engineering** | Python, deterministic physics & condition scoring formulas |
 | **Knowledge Engine** | Indian Knowledge Systems (IKS) ontology, JSON schemas |
