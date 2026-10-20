@@ -31,7 +31,7 @@
     <rect x="12" y="12" width="60" height="20" rx="4" fill="#122A27"/>
     <text x="42" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#D7B98E" text-anchor="middle">STAGE 1</text>
     <text x="12" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="17" font-weight="800" fill="#F7F4EC">SEE (दृष्टि)</text>
-    <text x="12" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">Computer Vision (Lead: Krish)</text>
+    <text x="12" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">Computer Vision Subsystem</text>
     <line x1="12" y1="80" x2="208" y2="80" stroke="#D7B98E" stroke-width="0.5" stroke-opacity="0.3"/>
     <text x="12" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• YOLOv8n crack detection pilot</text>
     <text x="12" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• HSV vegetation visual indicator</text>
@@ -47,7 +47,7 @@
     <rect x="12" y="12" width="60" height="20" rx="4" fill="#122A27"/>
     <text x="42" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#D7B98E" text-anchor="middle">STAGE 2</text>
     <text x="12" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#F7F4EC">UNDERSTAND (ज्ञान)</text>
-    <text x="12" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">IKS Knowledge (Lead: Kirti)</text>
+    <text x="12" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">Heritage &amp; IKS Knowledge</text>
     <line x1="12" y1="80" x2="208" y2="80" stroke="#D7B98E" stroke-width="0.5" stroke-opacity="0.3"/>
     <text x="12" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• Typologies: Baoli, Bawari, Kund, Vav</text>
     <text x="12" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• Historical material DNA (Surkhi/Lime)</text>
@@ -63,7 +63,7 @@
     <rect x="12" y="12" width="60" height="20" rx="4" fill="#122A27"/>
     <text x="42" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#D7B98E" text-anchor="middle">STAGE 3</text>
     <text x="12" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#F7F4EC">ASSESS (परीक्षण)</text>
-    <text x="12" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">Engineering Engine (Kirti)</text>
+    <text x="12" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">Deterministic Physics Engine</text>
     <line x1="12" y1="80" x2="208" y2="80" stroke="#D7B98E" stroke-width="0.5" stroke-opacity="0.3"/>
     <text x="12" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• 7-D material compatibility score</text>
     <text x="12" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• Condition &amp; water functionality index</text>
@@ -79,7 +79,7 @@
     <rect x="12" y="12" width="60" height="20" rx="4" fill="#122A27"/>
     <text x="42" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#D7B98E" text-anchor="middle">STAGE 4</text>
     <text x="12" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#F7F4EC">REVIVE (पुनर्निर्माण)</text>
-    <text x="12" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">Restoration Roadmap (Swastik &amp; Kirti)</text>
+    <text x="12" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">Conservation &amp; Revival Engine</text>
     <line x1="12" y1="80" x2="208" y2="80" stroke="#D7B98E" stroke-width="0.5" stroke-opacity="0.3"/>
     <text x="12" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• 4-phase conservation roadmap</text>
     <text x="12" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• Prohibits cement / synthetic seals</text>
