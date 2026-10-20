@@ -7,18 +7,19 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-123C3A?style=for-the-badge&logo=python&logoColor=D7B98E)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-24594D?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Pydantic](https://img.shields.io/badge/Pydantic-v2-1B2927?style=for-the-badge&logo=pydantic&logoColor=D7B98E)](https://docs.pydantic.dev/)
-[![YOLOv8](https://img.shields.io/badge/YOLOv8-Pilot-123C3A?style=for-the-badge&logo=pytorch&logoColor=D7B98E)](vision/models/crack_pilot_yolov8n.pt)
-[![OpenCV](https://img.shields.io/badge/OpenCV-4.8%2B-24594D?style=for-the-badge&logo=opencv&logoColor=white)](https://opencv.org/)
 [![React 18](https://img.shields.io/badge/React-18.3-1B2927?style=for-the-badge&logo=react&logoColor=61DAFB)](frontend/)
 [![Three.js](https://img.shields.io/badge/Three.js-0.185-123C3A?style=for-the-badge&logo=threedotjs&logoColor=white)](frontend/src/scene/)
-[![SQLite](https://img.shields.io/badge/SQLite-Durable-24594D?style=for-the-badge&logo=sqlite&logoColor=D7B98E)](data/jaldrishti.db)
-[![Tests](https://img.shields.io/badge/Tests-183%20Passed-24594D?style=for-the-badge&logo=pytest&logoColor=white)](tests/)
+[![Live Deployment](https://img.shields.io/badge/Live%20Demo-Vercel%20Production-4E9982?style=for-the-badge&logo=vercel&logoColor=white)](https://jaldrishti-sigma.vercel.app)
+[![Tests](https://img.shields.io/badge/Tests-186%20Passed-24594D?style=for-the-badge&logo=pytest&logoColor=white)](tests/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-D7B98E?style=for-the-badge&labelColor=242B2A&color=D7B98E)](LICENSE)
 
 <br/>
 
 **A sovereign, explainable digital engineering platform connecting non-invasive computer vision, deterministic conservation physics, and Indian Knowledge Systems (IKS) to assess, diagnose, and safeguard historic stepwells, baolis, kunds, and bawaris.**
+
+<br/>
+
+[![Open Live Platform](https://img.shields.io/badge/🚀_LAUNCH_LIVE_PLATFORM-jaldrishti--sigma.vercel.app-4E9982?style=for-the-badge&labelColor=122A28)](https://jaldrishti-sigma.vercel.app)
 
 <br/>
 
