@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/jaldrishti_logo.png" alt="Jaldrishti — AI-Assisted Conservation of Traditional Indian Water Heritage" width="560" />
+<img width="1672" height="941" alt="0b0e82d7-ede2-439d-b10d-612884a41fe9" src="https://github.com/user-attachments/assets/8154e28c-e4d4-4792-ba60-84e1ba80b90c" />
 
 # Jaldrishti
 ### AI-Assisted Conservation of Traditional Indian Water Heritage
