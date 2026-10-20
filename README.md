@@ -1,4 +1,4 @@
-# BaoliGuard
+# JalDrishti
 
 **Jal-Dharohar Digital Intelligence &amp; Conservation Platform**  
 *An AI-assisted digital engineering and heritage conservation system for traditional Indian water infrastructure.*
