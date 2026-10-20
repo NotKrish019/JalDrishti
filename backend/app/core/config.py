@@ -77,7 +77,11 @@ class Settings(BaseModel):
 
     # Metadata persistence configuration (SQLite)
     sqlite_db_path: str = Field(
-        default_factory=lambda: os.getenv("SQLITE_DB_PATH", "data/jaldrishti.db")
+        default_factory=lambda: (
+            "/tmp/jaldrishti.db"
+            if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME")
+            else os.getenv("SQLITE_DB_PATH", "data/jaldrishti.db")
+        )
     )
 
     @property
