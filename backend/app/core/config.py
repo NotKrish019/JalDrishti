@@ -25,17 +25,19 @@ class Settings(BaseModel):
 
     # Server configuration
     host: str = Field(default_factory=lambda: os.getenv("BACKEND_HOST", "127.0.0.1"))
-    port: int = Field(default_factory=lambda: int(os.getenv("BACKEND_PORT", "8000")))
+    port: int = Field(
+        default_factory=lambda: int(os.getenv("PORT", os.getenv("BACKEND_PORT", "8000")))
+    )
     environment: str = Field(default_factory=lambda: os.getenv("ENVIRONMENT", "development"))
     log_level: str = Field(default_factory=lambda: os.getenv("LOG_LEVEL", "info"))
 
-    # CORS configuration - development origins for Vite PWA frontend
+    # CORS configuration - development and production Vercel origins
     cors_origins: List[str] = Field(
         default_factory=lambda: [
             origin.strip()
             for origin in os.getenv(
                 "CORS_ORIGINS",
-                "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000",
+                "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,https://jaldrishti-sigma.vercel.app,https://jaldrishti-frontend.vercel.app",
             ).split(",")
             if origin.strip()
         ]

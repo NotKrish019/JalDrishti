@@ -377,9 +377,11 @@ jaldrishti/
 │       ├── evaluate_pilot.py           # Evaluates YOLOv8n crack pilot on unseen images
 │       ├── train_crack_pilot.py        # Fine-tunes YOLOv8n on heritage crack annotations
 │       └── vegetation_indicator.py     # Deterministic HSV vegetation indicator
-├── tests/                              # Comprehensive automated test suite (183 tests)
+├── tests/                              # Comprehensive automated test suite (186 tests)
 ├── pyproject.toml                      # Python package build configuration and dependencies
 ├── requirements.txt                    # Python dependency manifest
+├── Dockerfile                          # Multi-stage production container for Render / Docker
+├── render.yaml                         # Infrastructure-as-Code Blueprint for Render deployment
 ├── vercel.json                         # Vercel deployment routes and rewrites
 └── LICENSE                             # MIT Open-Source License
 ```
@@ -444,6 +446,26 @@ cd frontend
 npm run dev
 ```
 - **Frontend Application:** [http://localhost:5173](http://localhost:5173)
+
+### 6. Production Cloud Deployment
+
+#### Deploy Backend to Render (1-Click Blueprint):
+The repository includes a ready-to-use [`render.yaml`](render.yaml) specification:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/NotKrish019/JalDrishti)
+
+1. Open your [Render Dashboard](https://dashboard.render.com).
+2. Click **New +** &rarr; **Blueprint** and link `https://github.com/NotKrish019/JalDrishti.git`.
+3. Render automatically provisions the web service using `render.yaml`:
+   - **Runtime:** Python 3.11
+   - **Build Command:** `pip install --upgrade pip && pip install -r requirements.txt`
+   - **Start Command:** `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT`
+   - **Health Check Path:** `/health`
+4. *(Optional Docker Deployment)*: Render can also build using the root [`Dockerfile`](Dockerfile) by selecting **Docker** runtime.
+
+#### Deploy Frontend & Serverless to Vercel:
+The frontend and serverless routes are pre-configured via [`vercel.json`](vercel.json):
+- **Live Production URL:** [https://jaldrishti-sigma.vercel.app](https://jaldrishti-sigma.vercel.app)
 
 <details>
 <summary><strong>📦 Contributor Note: Dataset & Model Weight Policies</strong></summary>
