@@ -33,6 +33,14 @@
       "destination": "/api/index.py"
     },
     {
+      "source": "/images/:path*",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/inspections/:path*",
+      "destination": "/api/index.py"
+    },
+    {
       "source": "/api/:path*",
       "destination": "/api/index.py"
     },
