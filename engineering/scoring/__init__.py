@@ -1,4 +1,4 @@
-"""Scoring subsystem for BaoliGuard engineering condition indices."""
+"""Scoring subsystem for Jaldrishti engineering condition indices."""
 
 from engineering.scoring.visual_condition import (
     VisualConditionScorer,

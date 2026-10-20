@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://baoliguard.org/schemas/structure.schema.json",
+  "$id": "https://jaldrishti.org/schemas/structure.schema.json",
   "title": "StructureKnowledgeContract",
   "description": "Schema enforcing structural and hydrological IKS engineering documentation for traditional Indian water systems.",
   "type": "object",

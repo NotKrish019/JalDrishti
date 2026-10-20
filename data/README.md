@@ -1,4 +1,4 @@
-# BaoliGuard Data Management & Storage Policy
+# Jaldrishti Data Management & Storage Policy
 
 ---
 

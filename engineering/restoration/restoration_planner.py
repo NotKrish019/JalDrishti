@@ -1,4 +1,4 @@
-"""Conservation Restoration Planning and Priority Engine for BaoliGuard.
+"""Conservation Restoration Planning and Priority Engine for Jaldrishti.
 
 Generates phased, prioritized conservation roadmaps adhering to
 /contracts/restoration_result.schema.json and /contracts/engineering_result.schema.json.

@@ -1,5 +1,5 @@
 """
-BaoliGuard - Crack Detection Training Sprint (YOLOv8n)
+Jaldrishti - Crack Detection Training Sprint (YOLOv8n)
 Emergency Hackathon MVP Pilot
 """
 
@@ -11,7 +11,7 @@ from ultralytics import YOLO
 
 def main():
     print("=" * 60)
-    print("BAOLIGUARD — CRACK DETECTION PILOT TRAINING (YOLOv8n)")
+    print("JALDRISHTI — CRACK DETECTION PILOT TRAINING (YOLOv8n)")
     print("=" * 60)
 
     project_root = Path(__file__).resolve().parent.parent.parent

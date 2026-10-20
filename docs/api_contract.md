@@ -1,4 +1,4 @@
-# BaoliGuard API Contract & Orchestration Protocol
+# Jaldrishti API Contract & Orchestration Protocol
 
 **Status:** Phase 0 Specification  
 **Primary Implementers (Phase 1):** Swastik Parmar (Backend) & Anika Jain (Frontend)
@@ -56,7 +56,7 @@ Returns server status and project version.
   ```json
   {
     "status": "ok",
-    "project": "baoliguard",
+    "project": "jaldrishti",
     "version": "0.1.0"
   }
   ```

@@ -1,5 +1,5 @@
 """
-BaoliGuard - Demo Asset & Output Contract Generator
+Jaldrishti - Demo Asset & Output Contract Generator
 Populates vision/outputs/demo/ with:
 - 3 crack-positive predictions (orig + overlay)
 - 2 background predictions (orig + overlay)

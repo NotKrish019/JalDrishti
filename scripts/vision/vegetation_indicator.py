@@ -1,5 +1,5 @@
 """
-BaoliGuard - Visual Vegetation Indicator (Deterministic OpenCV)
+Jaldrishti - Visual Vegetation Indicator (Deterministic OpenCV)
 Emergency Hackathon MVP Feature
 
 IMPORTANT NOTICE:

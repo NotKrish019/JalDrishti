@@ -1,4 +1,4 @@
-"""API routing package for BaoliGuard backend.
+"""API routing package for Jaldrishti backend.
 
 Maintained by Swastik Parmar (Backend / Integration Engineer).
 """

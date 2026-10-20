@@ -58,7 +58,7 @@ def test_pwa_manifest_validity() -> None:
     with open(manifest_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    assert data.get("short_name") in ["JalDrishti", "BaoliGuard"]
+    assert data.get("short_name") in ["JalDrishti", "Jaldrishti"]
     assert "start_url" in data
     assert data.get("display") == "standalone"
 

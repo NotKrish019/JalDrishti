@@ -1,6 +1,6 @@
-# BaoliGuard System Architecture
+# Jaldrishti System Architecture
 
-**Project:** BaoliGuard — Jal-Dharohar Digital Intelligence & Conservation Platform  
+**Project:** Jaldrishti — Jal-Dharohar Digital Intelligence & Conservation Platform  
 **System Paradigm:** Sovereign AI, Indigenous Knowledge Systems (IKS) & Deterministic Conservation Engineering
 
 ---

@@ -1,4 +1,4 @@
-"""Material Compatibility Engine for BaoliGuard heritage conservation.
+"""Material Compatibility Engine for Jaldrishti heritage conservation.
 
 Evaluates candidate intervention materials against historic substrates using deterministic,
 multi-dimensional compatibility rules adhering strictly to

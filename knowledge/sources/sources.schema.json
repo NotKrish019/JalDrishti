@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://baoliguard.org/schemas/sources.schema.json",
+  "$id": "https://jaldrishti.org/schemas/sources.schema.json",
   "title": "IKSSourceTraceability",
   "description": "Schema enforcing academic and research traceability for all IKS and conservation assertions.",
   "type": "array",

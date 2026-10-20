@@ -1,5 +1,5 @@
 """
-BaoliGuard - Vision Pilot Inference & Demo Pipeline
+Jaldrishti - Vision Pilot Inference & Demo Pipeline
 Performs unseen image testing, computes unified output contract,
 and exports demo samples to vision/outputs/demo/.
 """
@@ -19,7 +19,7 @@ from vegetation_indicator import analyze_vegetation_indicator
 
 def run_evaluation_and_demo():
     print("=" * 60)
-    print("BAOLIGUARD — VISION PILOT EVALUATION & DEMO GENERATION")
+    print("JALDRISHTI — VISION PILOT EVALUATION & DEMO GENERATION")
     print("=" * 60)
 
     project_root = Path(__file__).resolve().parent.parent.parent

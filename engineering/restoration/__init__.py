@@ -1,4 +1,4 @@
-"""Restoration planning and roadmapping subsystem for BaoliGuard."""
+"""Restoration planning and roadmapping subsystem for Jaldrishti."""
 
 from engineering.restoration.restoration_planner import (
     RestorationPlanningEngine,

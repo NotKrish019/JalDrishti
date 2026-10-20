@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://baoliguard.org/schemas/vision_result.schema.json",
+  "$id": "https://jaldrishti.org/schemas/vision_result.schema.json",
   "title": "VisionResultContract",
-  "description": "Standardized output contract for the BaoliGuard computer vision inference pipeline (Krish). Supports relative/image-space measurements without premature physical scaling.",
+  "description": "Standardized output contract for the Jaldrishti computer vision inference pipeline (Krish). Supports relative/image-space measurements without premature physical scaling.",
   "type": "object",
   "required": [
     "structure_type",

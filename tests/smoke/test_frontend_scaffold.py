@@ -32,7 +32,7 @@ def test_frontend_package_json_validity() -> None:
     with open(pkg_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    assert data.get("name") == "baoliguard-frontend"
+    assert data.get("name") == "jaldrishti-frontend"
     assert "scripts" in data
     assert "dev" in data["scripts"]
     assert "build" in data["scripts"]

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://baoliguard.org/schemas/material_compatibility.schema.json",
+  "$id": "https://jaldrishti.org/schemas/material_compatibility.schema.json",
   "title": "MaterialCompatibilityContract",
   "description": "Schema for evaluating heritage material compatibility against candidate conservation interventions (Kirti Antil). Distinguishes inferred photo-based material hypotheses from lab-verified testing.",
   "type": "object",

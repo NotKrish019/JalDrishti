@@ -29,7 +29,7 @@ class TestIKSKnowledgeSchemas:
         with open(schema_file, "r", encoding="utf-8") as f:
             schema_data = json.load(f)
         Draft202012Validator.check_schema(schema_data)
-        assert schema_data.get("$id") == "https://baoliguard.org/schemas/structure.schema.json"
+        assert schema_data.get("$id") == "https://jaldrishti.org/schemas/structure.schema.json"
 
     def test_sources_schema_is_valid_json_schema(self) -> None:
         schema_file = SOURCES_DIR / "sources.schema.json"

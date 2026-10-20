@@ -1,4 +1,4 @@
-# BaoliGuard Hackathon Demonstration Plan
+# Jaldrishti Hackathon Demonstration Plan
 
 **Status:** **PLANNED DEMONSTRATION WORKFLOW (For Future Hackathon Phases)**
 
@@ -6,7 +6,7 @@
 
 ## 1. 10-Step End-to-End Live Demo Sequence
 
-During the final hackathon presentation, BaoliGuard will demonstrate the full cycle of heritage preservation across 10 structured steps:
+During the final hackathon presentation, Jaldrishti will demonstrate the full cycle of heritage preservation across 10 structured steps:
 
 ```
 Step 1: Upload Field Survey Imagery

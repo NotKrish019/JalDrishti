@@ -1,4 +1,4 @@
-# BaoliGuard Git & Development Workflow
+# Jaldrishti Git & Development Workflow
 
 **Objective:** Zero merge conflicts, modular development, and verifiable quality across all 4 teammates.
 

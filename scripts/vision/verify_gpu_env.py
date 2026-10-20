@@ -1,6 +1,6 @@
 """GPU Environment and Pretrained Inference Smoke Test.
 
-BaoliGuard Computer Vision Subsystem - Phase 2 Stage 1
+Jaldrishti Computer Vision Subsystem - Phase 2 Stage 1
 Owner: Krish (Computer Vision / AI Lead)
 
 Verifies PyTorch CUDA acceleration, GPU memory, Ultralytics YOLOv8 segmentation,
@@ -83,7 +83,7 @@ def verify_environment() -> dict:
 if __name__ == "__main__":
     report = verify_environment()
     print("=" * 60)
-    print("BAOLIGUARD VISION — STAGE 1 GPU ENVIRONMENT REPORT")
+    print("JALDRISHTI VISION — STAGE 1 GPU ENVIRONMENT REPORT")
     print("=" * 60)
     for k, v in report.items():
         print(f"{k}: {v}")

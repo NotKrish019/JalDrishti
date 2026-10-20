@@ -21,7 +21,7 @@ class StructureType(str, Enum):
 
 
 class VisionDefectClass(str, Enum):
-    """Initial and extended visual defect classes for BaoliGuard."""
+    """Initial and extended visual defect classes for Jaldrishti."""
 
     CRACK = "crack"
     SPALLING = "spalling"

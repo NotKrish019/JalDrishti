@@ -1,4 +1,4 @@
-# BaoliGuard Shared Contracts
+# Jaldrishti Shared Contracts
 
 **Status:** Phase 0 Locked & Shared  
 **Audience:** All Teammates (Krish, Kirti, Anika, Swastik)

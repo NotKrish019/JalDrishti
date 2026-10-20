@@ -1,4 +1,4 @@
-"""Water Functionality Subsystem for BaoliGuard."""
+"""Water Functionality Subsystem for Jaldrishti."""
 
 from engineering.water_functionality.water_scorer import (
     WaterFunctionalityScorer,

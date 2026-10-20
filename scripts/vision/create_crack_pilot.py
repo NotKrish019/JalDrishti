@@ -1,6 +1,6 @@
 """Generates minimal YOLO crack detection pilot dataset with hard negatives.
 
-BaoliGuard Vision - Emergency Phase 2 Sprint
+Jaldrishti Vision - Emergency Phase 2 Sprint
 Owner: Krish (Computer Vision / AI Lead)
 
 LEGACY. The boxes written here come from an OpenCV black-hat heuristic (with a fixed centre

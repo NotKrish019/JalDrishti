@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://baoliguard.org/schemas/restoration_result.schema.json",
+  "$id": "https://jaldrishti.org/schemas/restoration_result.schema.json",
   "title": "RestorationResultContract",
   "description": "Standardized output schema for conservation intervention planning and restoration roadmaps (Kirti Antil & Swastik Parmar). Integrates IKS traditional materials with modern conservation ethics.",
   "type": "object",

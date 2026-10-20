@@ -1,5 +1,5 @@
 /**
- * BaoliGuard Frontend Type Definitions
+ * Jaldrishti Frontend Type Definitions
  *
  * Strictly aligned with backend shared JSON contracts in /contracts:
  * - contracts/analysis.schema.json

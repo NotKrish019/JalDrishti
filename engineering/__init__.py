@@ -1,4 +1,4 @@
-"""BaoliGuard Conservation Engineering Subsystem.
+"""Jaldrishti Conservation Engineering Subsystem.
 
 Owner: Kirti Antil (IKS / Material Compatibility / Conservation Engineering Lead)
 

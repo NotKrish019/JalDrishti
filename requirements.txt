@@ -1,5 +1,5 @@
 # ============================================================
-# BaoliGuard - Core Dependencies
+# Jaldrishti - Core Dependencies
 # Phase 0 Bootstrap Specification
 # ============================================================
 

@@ -1,4 +1,4 @@
-"""Deterministic Visual Condition Scoring for BaoliGuard heritage conservation.
+"""Deterministic Visual Condition Scoring for Jaldrishti heritage conservation.
 
 Consumes visual defect observations from the vision subsystem (cracks, vegetation,
 spalling, stone dislodgement) and calculates transparent condition indices conforming to

@@ -1,4 +1,4 @@
-"""Material Compatibility Subsystem for BaoliGuard Heritage Conservation.
+"""Material Compatibility Subsystem for Jaldrishti Heritage Conservation.
 
 Owner: Kirti Antil (IKS / Material Compatibility / Conservation Engineering Lead)
 """

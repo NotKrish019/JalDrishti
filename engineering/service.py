@@ -53,7 +53,7 @@ from engineering.assessment import (
 )
 
 
-logger = logging.getLogger("baoliguard.engineering")
+logger = logging.getLogger("jaldrishti.engineering")
 
 
 # Typology to default historic substrate inference mapping

@@ -59,7 +59,7 @@ class TestMaterialDNAProfiles:
 
     def test_material_schema_is_valid_draft202012(self, material_schema: dict) -> None:
         Draft202012Validator.check_schema(material_schema)
-        assert material_schema.get("$id") == "https://baoliguard.org/schemas/material.schema.json"
+        assert material_schema.get("$id") == "https://jaldrishti.org/schemas/material.schema.json"
 
     @pytest.mark.parametrize("mat_id", EXPECTED_MATERIALS)
     def test_material_file_exists_and_conforms_to_schema(self, mat_id: str, material_schema: dict) -> None:

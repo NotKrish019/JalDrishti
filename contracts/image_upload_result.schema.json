@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://baoliguard.org/schemas/image_upload_result.schema.json",
-  "title": "BaoliGuardImageUploadResultContract",
+  "$id": "https://jaldrishti.org/schemas/image_upload_result.schema.json",
+  "title": "JaldrishtiImageUploadResultContract",
   "description": "Shared contract for image ingestion, Cloudinary storage, and frontend preview delivery between Anika (Frontend), Krish (Vision), and Swastik (Backend).",
   "type": "object",
   "required": [

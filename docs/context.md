@@ -1,6 +1,6 @@
-# BaoliGuard Project Context & Philosophical Framework
+# Jaldrishti Project Context & Philosophical Framework
 
-**Project:** BaoliGuard (Jal-Dharohar Digital Intelligence & Conservation Platform)  
+**Project:** Jaldrishti (Jal-Dharohar Digital Intelligence & Conservation Platform)  
 **Hackathon Focus:** Viksit Bharat / Indian Knowledge Systems (IKS) Digital Engineering Hackathon  
 **Current Phase:** **PHASE 0 (Repository Bootstrap & Governance)**
 

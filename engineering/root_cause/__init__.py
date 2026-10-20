@@ -1,4 +1,4 @@
-"""Root Cause Deduction Subsystem for BaoliGuard."""
+"""Root Cause Deduction Subsystem for Jaldrishti."""
 
 from engineering.root_cause.deduction_rules import (
     RootCauseDeductionEngine,

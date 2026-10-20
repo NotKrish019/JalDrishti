@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://baoliguard.org/schemas/engineering_result.schema.json",
+  "$id": "https://jaldrishti.org/schemas/engineering_result.schema.json",
   "title": "EngineeringResultContract",
   "description": "Output schema for deterministic engineering rules, condition scores, and functionality assessment (Kirti Antil). Distinguishes prototype decision-support metrics from certified structural engineering.",
   "type": "object",

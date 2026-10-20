@@ -1,4 +1,4 @@
-# BaoliGuard Integration Subsystem
+# Jaldrishti Integration Subsystem
 
 **Owner:** Swastik Parmar (Backend / Integration / System Orchestration)  
 **Primary Ownership:**

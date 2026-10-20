@@ -5,7 +5,7 @@
 ---
 
 ## 1. Conservation Philosophy
-BaoliGuard operates under a strict conservation-first ethos aligned with ASI, INTACH, and UNESCO guidelines:
+Jaldrishti operates under a strict conservation-first ethos aligned with ASI, INTACH, and UNESCO guidelines:
 1. **Preserve Original Fabric:** Maximum retention of authentic stone masonry and historic lime bedding.
 2. **Understand Root Cause:** Diagnose underlying causes (vegetation expansion, blocked drainage, groundwater depression) before treating surface symptoms.
 3. **Minimum Intervention:** Intervene only to the extent necessary to ensure structural stability and water functionality.

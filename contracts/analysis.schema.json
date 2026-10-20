@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://baoliguard.org/schemas/analysis.schema.json",
-  "title": "BaoliGuardUnifiedAnalysisContract",
+  "$id": "https://jaldrishti.org/schemas/analysis.schema.json",
+  "title": "JaldrishtiUnifiedAnalysisContract",
   "description": "Unified pipeline contract connecting Vision (Krish), Engineering & IKS (Kirti Antil), Backend Orchestration (Swastik Parmar), and Frontend Visualization (Anika Jain).",
   "type": "object",
   "required": [

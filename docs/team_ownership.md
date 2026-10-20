@@ -1,6 +1,6 @@
-# BaoliGuard Team Ownership & Directory Boundaries
+# Jaldrishti Team Ownership & Directory Boundaries
 
-**Project:** BaoliGuard — Jal-Dharohar Digital Intelligence & Conservation Platform  
+**Project:** Jaldrishti — Jal-Dharohar Digital Intelligence & Conservation Platform  
 **Phase:** Phase 0 (Bootstrap & Governance)
 
 ---

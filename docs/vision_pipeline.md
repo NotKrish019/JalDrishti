@@ -1,4 +1,4 @@
-# BaoliGuard Computer Vision Pipeline
+# Jaldrishti Computer Vision Pipeline
 
 **Owner:** Krish (Computer Vision / AI)  
 **Status:** **PLANNED FUNCTIONALITY (Phase 1 Execution)**

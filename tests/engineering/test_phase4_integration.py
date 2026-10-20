@@ -218,7 +218,7 @@ class TestBackendIntegrationPayloadAssembly:
                 "type": "baoli",
                 "name": "Agrasen ki Baoli",
                 "region": "Delhi NCR",
-                "source_images": ["https://baoliguard.org/images/agrasen_01.jpg"],
+                "source_images": ["https://jaldrishti.org/images/agrasen_01.jpg"],
             },
             "vision": vision_mock,
             "visual_condition": eng_output["engineering_result"]["visual_condition_score"],

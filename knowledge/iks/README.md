@@ -7,7 +7,7 @@
 ## 1. Scope & Objective
 This directory articulates traditional Indian hydrological concepts and water stewardship ethics governing historic water structures (Baoli, Bawari, Kund, Vav).
 
-The primary goal is to translate historical engineering wisdom into actionable, deterministic rules that the BaoliGuard digital platform can consume during condition assessment, root-cause diagnosis, and restoration planning.
+The primary goal is to translate historical engineering wisdom into actionable, deterministic rules that the Jaldrishti digital platform can consume during condition assessment, root-cause diagnosis, and restoration planning.
 
 ---
 

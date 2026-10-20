@@ -1,4 +1,4 @@
-# BaoliGuard Digital Twin Subsystem
+# Jaldrishti Digital Twin Subsystem
 
 **Owner:** Anika Jain (Frontend / PWA / Digital Twin)  
 **Primary Ownership:**
