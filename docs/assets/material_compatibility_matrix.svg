@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" width="100%" height="auto">
+  <defs>
+    <linearGradient id="matrixBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#122A28"/>
+      <stop offset="100%" stop-color="#1B2423"/>
+    </linearGradient>
+    <linearGradient id="limeBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#24594D"/>
+      <stop offset="100%" stop-color="#4E9982"/>
+    </linearGradient>
+    <linearGradient id="cementBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7A2E2E"/>
+      <stop offset="100%" stop-color="#B84343"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="480" rx="12" fill="url(#matrixBg)"/>
+  <rect x="12" y="12" width="976" height="456" rx="8" fill="none" stroke="#D7B98E" stroke-width="1" stroke-opacity="0.3"/>
+
+  <!-- Header -->
+  <text x="40" y="50" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#F7F4EC" letter-spacing="0.5">
+    The 7 Dimensions of Material Compatibility (RILEM TC 203-RHM / ASI 2020)
+  </text>
+  <text x="40" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12.5" fill="#D7B98E" letter-spacing="0.2">
+    Deterministic Evaluation: Traditional Hydraulic Lime-Surkhi Mortar vs. Destructive Ordinary Portland Cement (OPC)
+  </text>
+
+  <!-- Legend -->
+  <g transform="translate(680, 42)">
+    <rect x="0" y="0" width="14" height="14" rx="3" fill="#4E9982"/>
+    <text x="20" y="11" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#F7F4EC">Surkhi Lime (Traditional)</text>
+    <rect x="160" y="0" width="14" height="14" rx="3" fill="#B84343"/>
+    <text x="180" y="11" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#F7F4EC">OPC Cement (Alien)</text>
+  </g>
+
+  <!-- Table Header -->
+  <line x1="40" y1="95" x2="960" y2="95" stroke="#D7B98E" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="40" y="115" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">DIMENSION &amp; WEIGHT</text>
+  <text x="240" y="115" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">SCIENTIFIC CRITERIA &amp; BENCHMARK</text>
+  <text x="640" y="115" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">COMPATIBILITY COMPARISON</text>
+  <text x="900" y="115" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">RATING</text>
+  <line x1="40" y1="125" x2="960" y2="125" stroke="#D7B98E" stroke-width="0.75" stroke-opacity="0.2"/>
+
+  <!-- Row 1: Moisture (0.25) -->
+  <g transform="translate(40, 135)">
+    <text x="0" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#F7F4EC">1. Moisture Breathability</text>
+    <text x="0" y="37" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#D7B98E" opacity="0.8">Weight: 0.25 (IS 3115 / ASI)</text>
+    <text x="200" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#F7F4EC">Permeability &gt; 15 Perm; vapor-open</text>
+    <text x="200" y="37" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#D7B98E" opacity="0.75">Prevents rising damp &amp; sub-surface cryptoflorescence</text>
+
+    <!-- Bars -->
+    <rect x="600" y="10" width="220" height="12" rx="3" fill="url(#limeBar)"/>
+    <text x="830" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#4E9982" font-weight="600">0.96 / 1.0</text>
+    <rect x="600" y="28" width="35" height="12" rx="3" fill="url(#cementBar)"/>
+    <text x="645" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#B84343" font-weight="600">0.12 (Traps Water)</text>
+
+    <text x="860" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#4E9982">PASS</text>
+  </g>
+  <line x1="40" y1="185" x2="960" y2="185" stroke="#D7B98E" stroke-width="0.5" stroke-opacity="0.15"/>
+
+  <!-- Row 2: Mechanical (0.20) -->
+  <g transform="translate(40, 195)">
+    <text x="0" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#F7F4EC">2. Mechanical Sacrificiality</text>
+    <text x="0" y="37" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#D7B98E" opacity="0.8">Weight: 0.20 (RILEM TC 203)</text>
+    <text x="200" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#F7F4EC">Mortar strength (1.5–5 MPa) &lt; Host stone</text>
+    <text x="200" y="37" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#D7B98E" opacity="0.75">Mortar yields under ground settlement; protects stone arrises</text>
+
+    <!-- Bars -->
+    <rect x="600" y="10" width="205" height="12" rx="3" fill="url(#limeBar)"/>
+    <text x="815" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#4E9982" font-weight="600">0.92 / 1.0</text>
+    <rect x="600" y="28" width="45" height="12" rx="3" fill="url(#cementBar)"/>
+    <text x="655" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#B84343" font-weight="600">0.18 (Too Stiff)</text>
+
+    <text x="860" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#4E9982">PASS</text>
+  </g>
+  <line x1="40" y1="245" x2="960" y2="245" stroke="#D7B98E" stroke-width="0.5" stroke-opacity="0.15"/>
+
+  <!-- Row 3: Chemical (0.15) -->
+  <g transform="translate(40, 255)">
+    <text x="0" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#F7F4EC">3. Chemical Inertness</text>
+    <text x="0" y="37" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#D7B98E" opacity="0.8">Weight: 0.15 (RILEM TC 203)</text>
+    <text x="200" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#F7F4EC">Zero soluble sulfates / alkali leaching</text>
+    <text x="200" y="37" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#D7B98E" opacity="0.75">Eliminates expansive ettringite/thaumasite reaction</text>
+
+    <!-- Bars -->
+    <rect x="600" y="10" width="215" height="12" rx="3" fill="url(#limeBar)"/>
+    <text x="825" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#4E9982" font-weight="600">0.95 / 1.0</text>
+    <rect x="600" y="28" width="20" height="12" rx="3" fill="url(#cementBar)"/>
+    <text x="630" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#B84343" font-weight="600">0.05 (Salt Leaching)</text>
+
+    <text x="860" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#4E9982">PASS</text>
+  </g>
+  <line x1="40" y1="305" x2="960" y2="305" stroke="#D7B98E" stroke-width="0.5" stroke-opacity="0.15"/>
+
+  <!-- Row 4: Reversibility (0.15) -->
+  <g transform="translate(40, 315)">
+    <text x="0" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#F7F4EC">4. Reversibility</text>
+    <text x="0" y="37" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#D7B98E" opacity="0.8">Weight: 0.15 (INTACH / Venice)</text>
+    <text x="200" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#F7F4EC">Removable by hand chiseling without fracture</text>
+    <text x="200" y="37" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#D7B98E" opacity="0.75">Adheres to fundamental international conservation charters</text>
+
+    <!-- Bars -->
+    <rect x="600" y="10" width="195" height="12" rx="3" fill="url(#limeBar)"/>
+    <text x="805" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#4E9982" font-weight="600">0.88 / 1.0</text>
+    <rect x="600" y="28" width="15" height="12" rx="3" fill="url(#cementBar)"/>
+    <text x="625" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#B84343" font-weight="600">0.02 (Irreversible)</text>
+
+    <text x="860" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#4E9982">PASS</text>
+  </g>
+  <line x1="40" y1="365" x2="960" y2="365" stroke="#D7B98E" stroke-width="0.5" stroke-opacity="0.15"/>
+
+  <!-- Row 5-7 Compact Summary: Heritage, Thermal, Visual (0.30 combined) -->
+  <g transform="translate(40, 375)">
+    <text x="0" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#F7F4EC">5–7. Heritage, Thermal &amp; Visual</text>
+    <text x="0" y="37" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#D7B98E" opacity="0.8">Weights: 0.10, 0.10, 0.05</text>
+    <text x="200" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#F7F4EC">Δα &lt; 3.0×10⁻⁶/K; IKS herbal pozzolana match</text>
+    <text x="200" y="37" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#D7B98E" opacity="0.75">No interfacial shear delamination under &gt;25°C diurnal swings</text>
+
+    <!-- Bars -->
+    <rect x="600" y="10" width="210" height="12" rx="3" fill="url(#limeBar)"/>
+    <text x="820" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#4E9982" font-weight="600">0.94 / 1.0</text>
+    <rect x="600" y="28" width="50" height="12" rx="3" fill="url(#cementBar)"/>
+    <text x="660" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#B84343" font-weight="600">0.20 (Alien Shearing)</text>
+
+    <text x="860" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#4E9982">PASS</text>
+  </g>
+
+  <!-- Final Verdict Banner -->
+  <g transform="translate(40, 428)">
+    <rect x="0" y="0" width="450" height="32" rx="6" fill="#1C3831" stroke="#24594D" stroke-width="1"/>
+    <text x="15" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#4E9982">
+      HYDRAULIC LIME-SURKHI: COMPATIBLE (Score: 0.93 / 1.0)
+    </text>
+
+    <rect x="470" y="0" width="450" height="32" rx="6" fill="#3D1A1A" stroke="#7A2E2E" stroke-width="1"/>
+    <text x="485" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#E57373">
+      ORDINARY PORTLAND CEMENT: PROHIBITED (Score: 0.12 / 1.0)
+    </text>
+  </g>
+</svg>

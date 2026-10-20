@@ -101,6 +101,10 @@ class MaterialCompatibilityEngine:
             "surkhi": "surkhi_lime_mortar",
             "nhl": "natural_hydraulic_lime_nhl",
             "fat_lime": "fat_lime_putty",
+            "lime_putty": "fat_lime_putty",
+            "putty": "fat_lime_putty",
+            "slaked_lime": "fat_lime_putty",
+            "lime": "hydraulic_lime_mortar",
         }
         canonical_id = aliases.get(norm_id, norm_id)
 

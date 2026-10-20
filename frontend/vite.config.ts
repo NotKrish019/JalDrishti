@@ -12,5 +12,16 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    proxy: {
+      '/health': 'http://127.0.0.1:8000',
+      '/analyze': 'http://127.0.0.1:8000',
+      '/images': 'http://127.0.0.1:8000',
+      '/knowledge': 'http://127.0.0.1:8000',
+      '/material-compatibility': 'http://127.0.0.1:8000',
+      '/restore': 'http://127.0.0.1:8000',
+      '/engineering': 'http://127.0.0.1:8000',
+      '/vision': 'http://127.0.0.1:8000',
+      '/inspections': 'http://127.0.0.1:8000',
+    },
   },
 });

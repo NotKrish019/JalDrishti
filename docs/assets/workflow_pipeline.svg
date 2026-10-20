@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 260" width="100%" height="auto">
+  <defs>
+    <linearGradient id="pipeBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#122E2B"/>
+      <stop offset="100%" stop-color="#182322"/>
+    </linearGradient>
+    <linearGradient id="stageGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A3B37"/>
+      <stop offset="100%" stop-color="#24594D"/>
+    </linearGradient>
+    <linearGradient id="arrowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#24594D"/>
+      <stop offset="100%" stop-color="#D7B98E"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1100" height="260" rx="12" fill="url(#pipeBg)"/>
+  <rect x="10" y="10" width="1080" height="240" rx="8" fill="none" stroke="#D7B98E" stroke-width="1" stroke-opacity="0.3"/>
+
+  <!-- Pipeline Title -->
+  <text x="35" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700" fill="#F7F4EC" letter-spacing="1">
+    CORE PHILOSOPHICAL PIPELINE: SEE → UNDERSTAND → ASSESS → REVIVE
+  </text>
+  <text x="35" y="60" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" fill="#D7B98E" letter-spacing="0.5">
+    Strict decoupling of non-invasive visual observation, indigenous knowledge, deterministic physics, and phased restoration
+  </text>
+
+  <!-- Stage 1: SEE -->
+  <g transform="translate(35, 80)">
+    <rect x="0" y="0" width="220" height="150" rx="8" fill="url(#stageGrad)" stroke="#D7B98E" stroke-width="1" stroke-opacity="0.4"/>
+    <rect x="12" y="12" width="60" height="20" rx="4" fill="#122A27"/>
+    <text x="42" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#D7B98E" text-anchor="middle">STAGE 1</text>
+    <text x="12" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="17" font-weight="800" fill="#F7F4EC">SEE (दृष्टि)</text>
+    <text x="12" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">Computer Vision (Lead: Krish)</text>
+    <line x1="12" y1="80" x2="208" y2="80" stroke="#D7B98E" stroke-width="0.5" stroke-opacity="0.3"/>
+    <text x="12" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• YOLOv8n crack detection pilot</text>
+    <text x="12" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• HSV vegetation visual indicator</text>
+    <text x="12" y="130" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#D7B98E" opacity="0.9">Contract: vision_result.schema.json</text>
+  </g>
+
+  <!-- Arrow 1 -->
+  <path d="M 265 155 L 295 155 M 287 148 L 297 155 L 287 162" fill="none" stroke="url(#arrowGrad)" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Stage 2: UNDERSTAND -->
+  <g transform="translate(305, 80)">
+    <rect x="0" y="0" width="220" height="150" rx="8" fill="url(#stageGrad)" stroke="#D7B98E" stroke-width="1" stroke-opacity="0.4"/>
+    <rect x="12" y="12" width="60" height="20" rx="4" fill="#122A27"/>
+    <text x="42" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#D7B98E" text-anchor="middle">STAGE 2</text>
+    <text x="12" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#F7F4EC">UNDERSTAND (ज्ञान)</text>
+    <text x="12" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">IKS Knowledge (Lead: Kirti)</text>
+    <line x1="12" y1="80" x2="208" y2="80" stroke="#D7B98E" stroke-width="0.5" stroke-opacity="0.3"/>
+    <text x="12" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• Typologies: Baoli, Bawari, Kund, Vav</text>
+    <text x="12" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• Historical material DNA (Surkhi/Lime)</text>
+    <text x="12" y="130" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#D7B98E" opacity="0.9">Contract: sources_index.json</text>
+  </g>
+
+  <!-- Arrow 2 -->
+  <path d="M 535 155 L 565 155 M 557 148 L 567 155 L 557 162" fill="none" stroke="url(#arrowGrad)" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Stage 3: ASSESS -->
+  <g transform="translate(575, 80)">
+    <rect x="0" y="0" width="220" height="150" rx="8" fill="url(#stageGrad)" stroke="#D7B98E" stroke-width="1" stroke-opacity="0.4"/>
+    <rect x="12" y="12" width="60" height="20" rx="4" fill="#122A27"/>
+    <text x="42" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#D7B98E" text-anchor="middle">STAGE 3</text>
+    <text x="12" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#F7F4EC">ASSESS (परीक्षण)</text>
+    <text x="12" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">Engineering Engine (Kirti)</text>
+    <line x1="12" y1="80" x2="208" y2="80" stroke="#D7B98E" stroke-width="0.5" stroke-opacity="0.3"/>
+    <text x="12" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• 7-D material compatibility score</text>
+    <text x="12" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• Condition &amp; water functionality index</text>
+    <text x="12" y="130" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#D7B98E" opacity="0.9">Contract: engineering_result.schema.json</text>
+  </g>
+
+  <!-- Arrow 3 -->
+  <path d="M 805 155 L 835 155 M 827 148 L 837 155 L 827 162" fill="none" stroke="url(#arrowGrad)" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Stage 4: REVIVE -->
+  <g transform="translate(845, 80)">
+    <rect x="0" y="0" width="220" height="150" rx="8" fill="url(#stageGrad)" stroke="#D7B98E" stroke-width="1" stroke-opacity="0.4"/>
+    <rect x="12" y="12" width="60" height="20" rx="4" fill="#122A27"/>
+    <text x="42" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#D7B98E" text-anchor="middle">STAGE 4</text>
+    <text x="12" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#F7F4EC">REVIVE (पुनर्निर्माण)</text>
+    <text x="12" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#D7B98E">Restoration Roadmap (Swastik &amp; Kirti)</text>
+    <line x1="12" y1="80" x2="208" y2="80" stroke="#D7B98E" stroke-width="0.5" stroke-opacity="0.3"/>
+    <text x="12" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• 4-phase conservation roadmap</text>
+    <text x="12" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" fill="#F7F4EC" fill-opacity="0.85">• Prohibits cement / synthetic seals</text>
+    <text x="12" y="130" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#D7B98E" opacity="0.9">Contract: restoration_result.schema.json</text>
+  </g>
+</svg>

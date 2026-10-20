@@ -273,11 +273,17 @@ def evaluate_material_compatibility(
         )
     orig_mat = orig_mat or "hydraulic_lime_mortar"
 
-    res_dict = evaluate_compatibility(
-        original_material=orig_mat,
-        candidate_materials=req.candidate_materials,
-        original_material_confidence=req.original_material_confidence,
-    )
+    try:
+        res_dict = evaluate_compatibility(
+            original_material=orig_mat,
+            candidate_materials=req.candidate_materials,
+            original_material_confidence=req.original_material_confidence,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
     return MaterialCompatibilityResult.model_validate(res_dict)
 
 
@@ -296,19 +302,25 @@ def generate_restoration_roadmap(
     req = request or RestorationPlanRequest()
     st_val = req.structure_type.value if req.structure_type else "baoli"
 
-    res_dict = plan_restoration(
-        structure_type=st_val,
-        visual_condition_score=req.visual_condition_score or 75.0,
-        water_functionality_score=req.water_functionality_score or 60.0,
-        crack_burden=req.crack_burden or 0.0,
-        vegetation_burden=req.vegetation_burden or 0.0,
-        spalling_burden=req.spalling_burden or 0.0,
-        dislodgement_burden=req.dislodgement_burden or 0.0,
-        siltation_level=req.siltation_level or "unknown",
-        inlet_condition=req.inlet_condition or "unknown",
-        inferred_material=req.inferred_material or "hydraulic_lime_mortar",
-        root_causes=req.root_causes,
-    )
+    try:
+        res_dict = plan_restoration(
+            structure_type=st_val,
+            visual_condition_score=req.visual_condition_score or 75.0,
+            water_functionality_score=req.water_functionality_score or 60.0,
+            crack_burden=req.crack_burden or 0.0,
+            vegetation_burden=req.vegetation_burden or 0.0,
+            spalling_burden=req.spalling_burden or 0.0,
+            dislodgement_burden=req.dislodgement_burden or 0.0,
+            siltation_level=req.siltation_level or "unknown",
+            inlet_condition=req.inlet_condition or "unknown",
+            inferred_material=req.inferred_material or "hydraulic_lime_mortar",
+            root_causes=req.root_causes,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
     return RestorationResult.model_validate(res_dict)
 
 

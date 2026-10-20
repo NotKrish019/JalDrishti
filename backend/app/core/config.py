@@ -5,8 +5,14 @@ Provides strongly typed environment configuration with safe defaults.
 """
 
 import os
+from pathlib import Path
 from typing import List, Optional
+from dotenv import load_dotenv
 from pydantic import BaseModel, Field
+
+# Load environment variables from .env file if present
+_env_path = Path(__file__).resolve().parent.parent.parent.parent / ".env"
+load_dotenv(dotenv_path=_env_path, override=False)
 
 
 class Settings(BaseModel):
@@ -23,11 +29,14 @@ class Settings(BaseModel):
     environment: str = Field(default_factory=lambda: os.getenv("ENVIRONMENT", "development"))
     log_level: str = Field(default_factory=lambda: os.getenv("LOG_LEVEL", "info"))
 
-    # CORS configuration - strict development origin for Vite PWA frontend
+    # CORS configuration - development origins for Vite PWA frontend
     cors_origins: List[str] = Field(
         default_factory=lambda: [
             origin.strip()
-            for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+            for origin in os.getenv(
+                "CORS_ORIGINS",
+                "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000",
+            ).split(",")
             if origin.strip()
         ]
     )
