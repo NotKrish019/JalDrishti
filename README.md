@@ -9,7 +9,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-24594D?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React 18](https://img.shields.io/badge/React-18.3-1B2927?style=for-the-badge&logo=react&logoColor=61DAFB)](frontend/)
 [![Three.js](https://img.shields.io/badge/Three.js-0.185-123C3A?style=for-the-badge&logo=threedotjs&logoColor=white)](frontend/src/scene/)
-[![Live Deployment](https://img.shields.io/badge/Live%20Demo-Vercel%20Production-4E9982?style=for-the-badge&logo=vercel&logoColor=white)](https://jaldrishti-sigma.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-4E9982?style=for-the-badge&logo=vercel&logoColor=white)](https://jaldrishti-sigma.vercel.app)
 [![Tests](https://img.shields.io/badge/Tests-186%20Passed-24594D?style=for-the-badge&logo=pytest&logoColor=white)](tests/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-D7B98E?style=for-the-badge&labelColor=242B2A&color=D7B98E)](LICENSE)
 
@@ -19,7 +19,7 @@
 
 <br/>
 
-[![Open Live Platform](https://img.shields.io/badge/🚀_LAUNCH_LIVE_PLATFORM-jaldrishti--sigma.vercel.app-4E9982?style=for-the-badge&labelColor=122A28)](https://jaldrishti-sigma.vercel.app)
+[![Open Live Platform](https://img.shields.io/badge/🚀_VISIT_LIVE_PLATFORM-jaldrishti--sigma.vercel.app-4E9982?style=for-the-badge&labelColor=122A28)](https://jaldrishti-sigma.vercel.app)
 
 <br/>
 
@@ -318,8 +318,8 @@ graph TB
 
 ```
 jaldrishti/
-├── api/                                # Vercel serverless deployment entrypoint
-│   └── index.py                        # Exports FastAPI ASGI app for cloud serverless
+├── api/                                # Serverless gateway entrypoint
+│   └── index.py                        # Exports FastAPI ASGI app
 ├── backend/                            # FastAPI backend orchestration subsystem
 │   ├── app/
 │   │   ├── api/router.py               # API route definitions and endpoint handlers
@@ -380,9 +380,9 @@ jaldrishti/
 ├── tests/                              # Comprehensive automated test suite (186 tests)
 ├── pyproject.toml                      # Python package build configuration and dependencies
 ├── requirements.txt                    # Python dependency manifest
-├── Dockerfile                          # Multi-stage production container for Render / Docker
-├── render.yaml                         # Infrastructure-as-Code Blueprint for Render deployment
-├── vercel.json                         # Vercel deployment routes and rewrites
+├── Dockerfile                          # Multi-stage production container
+├── render.yaml                         # Service deployment blueprint
+├── vercel.json                         # Client and routing configuration
 └── LICENSE                             # MIT Open-Source License
 ```
 
@@ -446,27 +446,6 @@ cd frontend
 npm run dev
 ```
 - **Frontend Application:** [http://localhost:5173](http://localhost:5173)
-
-### 6. Production Cloud Deployment
-
-#### Deploy Backend to Render (1-Click Blueprint):
-The repository includes a ready-to-use [`render.yaml`](render.yaml) specification:
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/NotKrish019/JalDrishti)
-
-1. Open your [Render Dashboard](https://dashboard.render.com).
-2. Click **New +** &rarr; **Blueprint** and link `https://github.com/NotKrish019/JalDrishti.git`.
-3. Render automatically provisions the web service using `render.yaml`:
-   - **Runtime:** Python 3.11
-   - **Build Command:** `pip install --upgrade pip && pip install -r requirements.txt`
-   - **Start Command:** `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT`
-   - **Health Check Path:** `/health`
-4. *(Optional Docker Deployment)*: Render can also build using the root [`Dockerfile`](Dockerfile) by selecting **Docker** runtime.
-
-#### Deploy Frontend & Serverless to Vercel:
-The frontend and serverless routes are pre-configured via [`vercel.json`](vercel.json):
-- **Live Production URL:** [https://jaldrishti-sigma.vercel.app](https://jaldrishti-sigma.vercel.app)
-
 <details>
 <summary><strong>📦 Contributor Note: Dataset & Model Weight Policies</strong></summary>
 
@@ -761,20 +740,43 @@ pytest tests/frontend/ -v
 
 ---
 
-## 🤝 Contributing, Team & License
+## 🤝 Contributing & Community
 
-We welcome contributions from conservation architects, software engineers, archaeologists, and heritage researchers.
+Contributions are warmly welcomed from conservation architects, software engineers, archaeologists, and heritage researchers! Whether it is adding structural typologies, refining computer vision models, improving documentation, or reporting issues, we appreciate your help in safeguarding India's water heritage.
 
-### Authors & Core Maintainers (Team NeuralX):
-- **Krish** — Computer Vision / AI Lead
-- **Kirti Antil** — IKS, Materials & Conservation Engineering Lead
-- **Anika Jain** — Frontend, PWA & Digital Twin Lead
-- **Swastik Parmar** — Backend, Integration & System Orchestration Lead
+1. **Fork** the repository and create your feature branch: `git checkout -b feature/amazing-feature`
+2. **Commit** your changes: `git commit -m 'feat: add amazing feature'`
+3. **Push** to the branch: `git push origin feature/amazing-feature`
+4. **Open a Pull Request** with a detailed description of your changes.
 
-### License:
-This project is open-source under the **[MIT License](LICENSE)**.
+---
 
-### Academic Citation:
+## 👥 Core Maintainers & Contributors
+
+### Team NeuralX:
+
+| <img src="https://github.com/NotKrish019.png?size=100" width="80" height="80" style="border-radius: 50%;" alt="Krish"/><br/>**Krish** | <img src="https://github.com/KirtiAntil.png?size=100" width="80" height="80" style="border-radius: 50%;" alt="Kirti Antil"/><br/>**Kirti Antil** | <img src="https://github.com/AnikaJain.png?size=100" width="80" height="80" style="border-radius: 50%;" alt="Anika Jain"/><br/>**Anika Jain** | <img src="https://github.com/swastikparmar987.png?size=100" width="80" height="80" style="border-radius: 50%;" alt="Swastik Parmar"/><br/>**Swastik Parmar** |
+| :---: | :---: | :---: | :---: |
+| [![GitHub](https://img.shields.io/badge/GitHub-NotKrish019-181717?style=flat-square&logo=github)](https://github.com/NotKrish019)<br/><sub>Computer Vision & AI Lead</sub> | [![GitHub](https://img.shields.io/badge/GitHub-KirtiAntil-181717?style=flat-square&logo=github)](https://github.com/KirtiAntil)<br/><sub>IKS & Conservation Engineering</sub> | [![GitHub](https://img.shields.io/badge/GitHub-AnikaJain-181717?style=flat-square&logo=github)](https://github.com/AnikaJain)<br/><sub>Frontend & Digital Twin Lead</sub> | [![GitHub](https://img.shields.io/badge/GitHub-swastikparmar987-181717?style=flat-square&logo=github)](https://github.com/swastikparmar987)<br/><sub>Backend & System Orchestration</sub> |
+
+<br/>
+
+### Project Contributors:
+
+<a href="https://github.com/NotKrish019/JalDrishti/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=NotKrish019/JalDrishti" alt="JalDrishti Contributors" />
+</a>
+
+---
+
+## 📜 License
+
+This project is licensed under the **[MIT License](LICENSE)**.
+
+---
+
+## 📚 Citation
+
 ```bibtex
 @software{jaldrishti2026,
   author = {Krish and Antil, Kirti and Jain, Anika and Parmar, Swastik},
