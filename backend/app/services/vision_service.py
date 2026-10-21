@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 # Locate project root and model assets
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
+DETECTOR_CHECKPOINT_PATH = PROJECT_ROOT / "vision" / "models" / "crack_detector_pilot_v1" / "model.pt"
 MODEL_PATH = PROJECT_ROOT / "vision" / "models" / "crack_pilot_yolov8n.pt"
 DEMO_SUMMARY_PATH = PROJECT_ROOT / "vision" / "demo_assets" / "evaluation_summary.json"
 
@@ -37,6 +38,7 @@ class VisionService:
 
     def __init__(self, model_version: str = "jaldrishti-vision-v0.2.0") -> None:
         self.model_version = model_version
+        self._detector: Any = None
         self._yolo_model: Any = None
         self._demo_evaluations: Dict[str, Dict[str, Any]] = {}
         self._load_demo_evaluations()
@@ -59,8 +61,29 @@ class VisionService:
             except Exception as e:
                 logger.warning("Failed to load demo evaluations: %s", e)
 
+    def _get_detector(self) -> Any:
+        """Lazy loader for Faster R-CNN crack DetectionPredictor."""
+        if self._detector is None and DETECTOR_CHECKPOINT_PATH.is_file():
+            try:
+                from vision.inference.detector import DetectionPredictor
+
+                self._detector = DetectionPredictor.from_checkpoint(
+                    DETECTOR_CHECKPOINT_PATH, device="cpu"
+                )
+                logger.info(
+                    "Loaded Faster R-CNN crack detection model (%s) successfully.",
+                    self._detector.meta.get("model_version", "pilot_v1"),
+                )
+            except Exception as e:
+                logger.warning(
+                    "Could not initialize DetectionPredictor from %s: %s",
+                    DETECTOR_CHECKPOINT_PATH,
+                    e,
+                )
+        return self._detector
+
     def _get_yolo_model(self) -> Any:
-        """Lazy loader for Ultralytics YOLO model."""
+        """Lazy loader for Ultralytics YOLO model (legacy pilot)."""
         if self._yolo_model is None and MODEL_PATH.is_file():
             try:
                 from ultralytics import YOLO
@@ -196,7 +219,41 @@ class VisionService:
                     )
                 )
 
-        # 3. If YOLO model is loaded, perform live inference
+        # 3. Live model inference: prefer Faster R-CNN crack detector pilot v1, fallback to YOLOv8
+        detector = self._get_detector()
+        if not validated_detections and detector is not None and image_bytes:
+            try:
+                res = detector.predict(image_bytes)
+                if res.status == "ok" and res.detections:
+                    for det in res.detections:
+                        xmin, ymin, xmax, ymax = [float(v) for v in det.bbox]
+                        bw = max(1.0, xmax - xmin)
+                        bh = max(1.0, ymax - ymin)
+                        area = round(bw * bh, 1)
+                        cov = round(min(1.0, area / total_img_area), 4)
+                        length = round(max(bw, bh), 1)
+
+                        validated_detections.append(
+                            DetectionItem(
+                                class_name=det.class_name or "crack",
+                                confidence=round(float(det.confidence), 3),
+                                bounding_box=[xmin, ymin, xmax, ymax],
+                                pixel_area=area,
+                                coverage_ratio=cov,
+                                component_count=1,
+                                total_length_pixels=length,
+                                largest_component_length_pixels=length,
+                                relative_severity=(
+                                    RelativeSeverity.SEVERE
+                                    if cov > 0.15
+                                    else (RelativeSeverity.MODERATE if cov > 0.05 else RelativeSeverity.LOW)
+                                ),
+                            )
+                        )
+            except Exception as e:
+                logger.warning("Faster R-CNN DetectionPredictor live inference failed: %s", e)
+
+        # 4. Fallback to YOLOv8 pilot model if detector was not available or produced no detections
         yolo = self._get_yolo_model()
         if not validated_detections and yolo is not None and image_bytes:
             try:
@@ -235,7 +292,7 @@ class VisionService:
             except Exception as e:
                 logger.warning("YOLO live inference failed: %s", e)
 
-        # 4. If ROI box was provided by user selection, generate localized defect detection
+        # 5. If ROI box was provided by user selection, generate localized defect detection
         if not validated_detections and roi_box and len(roi_box) >= 4:
             rx, ry, rw, rh = [float(v) for v in roi_box[:4]]
             x_min = max(0.0, rx)
@@ -264,7 +321,7 @@ class VisionService:
                 )
             )
 
-        # 5. If raw image bytes were provided without detections or ROI, run deterministic crack estimation
+        # 6. If raw image bytes were provided without detections or ROI, run deterministic crack estimation
         if not validated_detections and image_bytes:
             bw = round(img_w * 0.35, 1)
             bh = round(img_h * 0.25, 1)
@@ -292,7 +349,10 @@ class VisionService:
         latency_ms = round((time.perf_counter() - start_time) * 1000.0, 2)
 
         model_tag = self.model_version
-        if self._yolo_model is not None:
+        if self._detector is not None:
+            det_ver = self._detector.meta.get("model_version", "pilot_v1")
+            model_tag = f"{self.model_version}+fasterrcnn-{det_ver}"
+        elif self._yolo_model is not None:
             model_tag = f"{self.model_version}+yolov8n-crack"
 
         return VisionResult(

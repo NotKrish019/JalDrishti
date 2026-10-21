@@ -2,7 +2,7 @@ services:
   - type: web
     name: jaldrishti-backend
     runtime: python
-    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt && pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu"
     startCommand: "uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT"
     plan: free
     healthCheckPath: /health

@@ -132,11 +132,12 @@ export const defectColor = (className: string): string => {
 
 /**
  * True only when the vision service reports a loaded detection model. The
- * backend appends "+yolov8n-crack" to model_version only when YOLO actually
- * loaded; otherwise any detections came from demo matches or fallback logic.
+ * backend appends "+fasterrcnn-..." or "+yolov8n-crack" to model_version only when
+ * an actual detection model was loaded and ran live inference; otherwise any
+ * detections came from demo matches or fallback logic.
  */
 export const visionModelRan = (result: AnalysisResultContract): boolean =>
-  /yolo/i.test(result.vision.processing_metadata?.model_version ?? '');
+  /(?:fasterrcnn|yolo|rcnn)/i.test(result.vision.processing_metadata?.model_version ?? '');
 
 export const visionOrigin = (session: InspectionSession): 'fixture' | 'model' | 'unverified' =>
   session.provenance === 'fixture' ? 'fixture' : visionModelRan(session.result) ? 'model' : 'unverified';
