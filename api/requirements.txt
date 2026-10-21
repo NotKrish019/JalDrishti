@@ -1,0 +1,30 @@
+# ============================================================
+# Jaldrishti - Core Dependencies
+# Phase 0 Bootstrap Specification
+# ============================================================
+
+# Backend & Orchestration
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+jsonschema>=4.18.0
+python-multipart>=0.0.9
+cloudinary>=1.36.0
+pillow>=10.0.0
+
+# Testing & Verification
+pytest>=7.4.0
+httpx>=0.24.0
+
+# ------------------------------------------------------------
+# Phase 1+ Dependencies (Uncomment during respective Phase 1 work)
+# ------------------------------------------------------------
+# Vision & AI (Krish - Phase 1)
+# torch>=2.0.0
+# torchvision>=0.15.0
+# ultralytics>=8.0.0
+# opencv-python>=4.8.0
+# scikit-image>=0.21.0
+# numpy for adaptive computer vision feature extraction
+numpy>=1.24.0

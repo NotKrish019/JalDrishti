@@ -6,43 +6,43 @@
   "rewrites": [
     {
       "source": "/health",
-      "destination": "https://jaldrishti.onrender.com/health"
+      "destination": "/api/index.py"
     },
     {
       "source": "/analyze",
-      "destination": "https://jaldrishti.onrender.com/analyze"
+      "destination": "/api/index.py"
     },
     {
       "source": "/engineering",
-      "destination": "https://jaldrishti.onrender.com/engineering"
+      "destination": "/api/index.py"
     },
     {
       "source": "/material-compatibility",
-      "destination": "https://jaldrishti.onrender.com/material-compatibility"
+      "destination": "/api/index.py"
     },
     {
       "source": "/restore",
-      "destination": "https://jaldrishti.onrender.com/restore"
+      "destination": "/api/index.py"
     },
     {
       "source": "/knowledge/:path*",
-      "destination": "https://jaldrishti.onrender.com/knowledge/:path*"
+      "destination": "/api/index.py"
     },
     {
       "source": "/vision/:path*",
-      "destination": "https://jaldrishti.onrender.com/vision/:path*"
+      "destination": "/api/index.py"
     },
     {
       "source": "/images/:path*",
-      "destination": "https://jaldrishti.onrender.com/images/:path*"
+      "destination": "/api/index.py"
     },
     {
       "source": "/inspections/:path*",
-      "destination": "https://jaldrishti.onrender.com/inspections/:path*"
+      "destination": "/api/index.py"
     },
     {
       "source": "/api/:path*",
-      "destination": "https://jaldrishti.onrender.com/api/:path*"
+      "destination": "/api/index.py"
     },
     {
       "source": "/((?!assets/|samples/|favicon\\.ico|manifest\\.json).*)",
