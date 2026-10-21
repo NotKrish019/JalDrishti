@@ -23,18 +23,18 @@
 
 <br/>
 
-[Overview](#-overview--the-conservation-challenge) •
-[The Solution](#-the-jaldrishti-solution) •
-[Philosophy Showcase](#-core-philosophy-showcase) •
-[Visual Demonstrations](#-visual-inspection--demonstration) •
-[System Architecture](#-system-architecture) •
-[Technology Stack](#-technology-stack) •
-[Repository Structure](#-repository-structure) •
-[Quickstart & Setup](#-installation--local-setup) •
-[API Reference](#-api-reference) •
-[Subsystem Deep Dives](#-subsystem-engineering--deep-dives) •
-[Testing & QA](#-testing--quality-assurance) •
-[Limitations & Disclaimer](#-limitations--responsible-use)
+<p align="center">
+  <a href="#-overview--the-conservation-challenge"><b>Overview</b></a> &nbsp;•&nbsp;
+  <a href="#-the-jaldrishti-solution"><b>Solution</b></a> &nbsp;•&nbsp;
+  <a href="#-core-philosophy-showcase"><b>Philosophy</b></a> &nbsp;•&nbsp;
+  <a href="#-visual-inspection--demonstration"><b>Visual Inspection</b></a> &nbsp;•&nbsp;
+  <a href="#-system-architecture"><b>Architecture</b></a> &nbsp;•&nbsp;
+  <a href="#-technology-stack"><b>Tech Stack</b></a> &nbsp;•&nbsp;
+  <a href="#-installation--local-setup"><b>Quickstart</b></a> &nbsp;•&nbsp;
+  <a href="#-api-reference"><b>API Docs</b></a> &nbsp;•&nbsp;
+  <a href="#-subsystem-engineering--deep-dives"><b>Engineering</b></a> &nbsp;•&nbsp;
+  <a href="#-core-maintainers--team-neuralx"><b>Team & Contributors</b></a>
+</p>
 
 </div>
 
@@ -446,6 +446,9 @@ cd frontend
 npm run dev
 ```
 - **Frontend Application:** [http://localhost:5173](http://localhost:5173)
+
+<br/>
+
 <details>
 <summary><strong>📦 Contributor Note: Dataset & Model Weight Policies</strong></summary>
 
@@ -740,42 +743,88 @@ pytest tests/frontend/ -v
 
 ---
 
-## 🤝 Contributing & Community
+## 👥 Core Maintainers & Team NeuralX
 
-Contributions are warmly welcomed from conservation architects, software engineers, archaeologists, and heritage researchers! Whether it is adding structural typologies, refining computer vision models, improving documentation, or reporting issues, we appreciate your help in safeguarding India's water heritage.
+JalDrishti is designed, engineered, and maintained by **Team NeuralX** across heritage conservation, deterministic physics, and sovereign engineering.
 
-1. **Fork** the repository and create your feature branch: `git checkout -b feature/amazing-feature`
-2. **Commit** your changes: `git commit -m 'feat: add amazing feature'`
-3. **Push** to the branch: `git push origin feature/amazing-feature`
-4. **Open a Pull Request** with a detailed description of your changes.
+<div align="center">
 
----
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <a href="https://github.com/NotKrish019">
+        <img src="https://github.com/NotKrish019.png" width="96" height="96" alt="Krish" style="border-radius: 50%;" /><br/><br/>
+        <b>Krish</b>
+      </a><br/>
+      <sub>AI & Computer Vision Lead</sub>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://github.com/Kirti-799">
+        <img src="https://github.com/Kirti-799.png" width="96" height="96" alt="Kirti Antil" style="border-radius: 50%;" /><br/><br/>
+        <b>Kirti Antil</b>
+      </a><br/>
+      <sub>IKS & Conservation Engineering</sub>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://github.com/anikabin-lang">
+        <img src="https://github.com/anikabin-lang.png" width="96" height="96" alt="Anika Jain" style="border-radius: 50%;" /><br/><br/>
+        <b>Anika Jain</b>
+      </a><br/>
+      <sub>Frontend & Digital Twin Lead</sub>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://github.com/swastikparmar987">
+        <img src="https://github.com/swastikparmar987.png" width="96" height="96" alt="Swastik Parmar" style="border-radius: 50%;" /><br/><br/>
+        <b>Swastik Parmar</b>
+      </a><br/>
+      <sub>Backend & System Orchestration</sub>
+    </td>
+  </tr>
+</table>
 
-## 👥 Core Maintainers & Contributors
-
-### Team NeuralX:
-
-| <img src="https://github.com/NotKrish019.png?size=100" width="80" height="80" style="border-radius: 50%;" alt="Krish"/><br/>**Krish** | <img src="https://github.com/KirtiAntil.png?size=100" width="80" height="80" style="border-radius: 50%;" alt="Kirti Antil"/><br/>**Kirti Antil** | <img src="https://github.com/AnikaJain.png?size=100" width="80" height="80" style="border-radius: 50%;" alt="Anika Jain"/><br/>**Anika Jain** | <img src="https://github.com/swastikparmar987.png?size=100" width="80" height="80" style="border-radius: 50%;" alt="Swastik Parmar"/><br/>**Swastik Parmar** |
-| :---: | :---: | :---: | :---: |
-| [![GitHub](https://img.shields.io/badge/GitHub-NotKrish019-181717?style=flat-square&logo=github)](https://github.com/NotKrish019)<br/><sub>Computer Vision & AI Lead</sub> | [![GitHub](https://img.shields.io/badge/GitHub-KirtiAntil-181717?style=flat-square&logo=github)](https://github.com/KirtiAntil)<br/><sub>IKS & Conservation Engineering</sub> | [![GitHub](https://img.shields.io/badge/GitHub-AnikaJain-181717?style=flat-square&logo=github)](https://github.com/AnikaJain)<br/><sub>Frontend & Digital Twin Lead</sub> | [![GitHub](https://img.shields.io/badge/GitHub-swastikparmar987-181717?style=flat-square&logo=github)](https://github.com/swastikparmar987)<br/><sub>Backend & System Orchestration</sub> |
+</div>
 
 <br/>
 
-### Project Contributors:
+### 🌟 Project Contributors
+
+<div align="center">
+
+<p>Heartfelt thanks to everyone contributing towards safeguarding India's historic water heritage!</p>
 
 <a href="https://github.com/NotKrish019/JalDrishti/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=NotKrish019/JalDrishti" alt="JalDrishti Contributors" />
 </a>
 
----
+</div>
 
-## 📜 License
-
-This project is licensed under the **[MIT License](LICENSE)**.
+<br/>
 
 ---
 
-## 📚 Citation
+## 🤝 Contributing & Community
+
+Contributions from conservation architects, archaeologists, software developers, and heritage researchers are warmly encouraged.
+
+```bash
+# 1. Fork & clone the repository
+git clone https://github.com/NotKrish019/JalDrishti.git
+
+# 2. Create your scoped feature branch
+git checkout -b feature/conservation-enhancement
+
+# 3. Commit your verified changes
+git commit -m 'feat: add heritage typology support'
+
+# 4. Push and open a Pull Request
+git push origin feature/conservation-enhancement
+```
+
+---
+
+## 📜 License & Citation
+
+JalDrishti is open-source software licensed under the **[MIT License](LICENSE)**.
 
 ```bibtex
 @software{jaldrishti2026,
@@ -790,6 +839,6 @@ This project is licensed under the **[MIT License](LICENSE)**.
 ---
 
 <div align="center">
-  <sub>Preserving India's timeless hydraulic wisdom through sovereign, transparent digital engineering.</sub><br>
+  <sub>Preserving India's timeless hydraulic wisdom through sovereign, transparent digital engineering.</sub><br/>
   <strong>JalDrishti — Connecting Stone, Water, and Science.</strong>
 </div>
